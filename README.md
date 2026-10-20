@@ -118,7 +118,7 @@ Each version is a git branch deployed to its own Vercel URL, listed in `config.v
 | Version | Branch | URL |
 |---|---|---|
 | v1 (primary) | `main` | https://nexflow-site-one.vercel.app |
-| v2 | `v2` | https://nexflow-site-two.vercel.app |
+| v2 | `v2` | https://nexflow-psp-v2.vercel.app |
 | v3 | `v3` | https://nexflow-site-three.vercel.app |
 
 - Push to a branch and Vercel redeploys that version.

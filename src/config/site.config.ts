@@ -36,7 +36,7 @@ export const config: SiteConfig = {
   showVersionSwitcher: true,
   versions: [
     { id: 'v1', label: 'V1', branch: 'main', url: 'https://nexflow-site-one.vercel.app' },
-    { id: 'v2', label: 'V2', branch: 'v2', url: 'https://nexflow-site-two.vercel.app' },
+    { id: 'v2', label: 'V2', branch: 'v2', url: 'https://nexflow-psp-v2.vercel.app' },
     { id: 'v3', label: 'V3', branch: 'v3', url: 'https://nexflow-site-three.vercel.app' },
   ],
 };
