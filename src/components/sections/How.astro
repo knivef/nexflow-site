@@ -1,0 +1,263 @@
+---
+import { site } from '@/content/site';
+import Section from '@/components/ui/Section.astro';
+import { renderPlaceholders } from '@/lib/placeholder';
+
+const { eyebrow, heading, intro, steps, timeline } = site.how;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<Section id="how" eyebrow={eyebrow} heading={heading} intro={intro}>
+  <ol class="how__steps" role="list">
+    {
+      steps.map((step, index) => (
+        <li class="how__step">
+          <div class="how__rail" aria-hidden="true">
+            <span class="how__node">{pad(index + 1)}</span>
+          </div>
+          <div class="how__content">
+            <h3 class="t-subheading">
+              <span class="visually-hidden">{`${index + 1}. `}</span>
+              {step.title}
+            </h3>
+            <p class="t-body">{step.body}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  {
+    timeline.milestones.length > 0 && (
+      <figure class="how__timeline">
+        <figcaption class="how__timeline-label t-caption">{timeline.label}</figcaption>
+        <ol class="how__milestones" role="list">
+          {timeline.milestones.map((milestone, index) => (
+            <li class="how__milestone">
+              {index > 0 && <span class="how__flow" aria-hidden="true" />}
+              <span class="how__pill">
+                <span class="how__pill-label">{milestone.label}</span>
+                <span class="how__pill-value" set:html={renderPlaceholders(milestone.value)} />
+              </span>
+            </li>
+          ))}
+        </ol>
+      </figure>
+    )
+  }
+</Section>
+
+<style>
+  /* Steps: horizontal timeline on desktop, stacked with a vertical rail on mobile. */
+  .how__steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0 var(--spacing-32);
+  }
+
+  .how__step {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-32);
+  }
+
+  .how__rail {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Hairline from each node to the next step. */
+  .how__rail::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    margin-left: var(--spacing-16);
+    margin-right: calc(var(--spacing-32) * -1);
+    background: var(--border-hairline);
+  }
+
+  .how__step:last-child .how__rail::after {
+    margin-right: 0;
+    background: linear-gradient(to right, var(--border-hairline), transparent);
+  }
+
+  .how__node {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 56px;
+    height: 40px;
+    padding: 0 16px;
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-pills);
+    background: var(--bg-page);
+    font-size: var(--text-body-sm);
+    color: var(--text-primary);
+  }
+
+  .how__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+    padding-right: var(--spacing-8);
+  }
+
+  /* Onboarding timeline graphic */
+  .how__timeline {
+    margin-top: var(--section-gap);
+    padding: var(--card-padding);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-cards);
+  }
+
+  .how__timeline-label {
+    margin-bottom: var(--spacing-24);
+  }
+
+  .how__milestones {
+    display: flex;
+    align-items: center;
+  }
+
+  .how__milestone {
+    display: flex;
+    flex: 1;
+    align-items: center;
+  }
+
+  .how__milestone:first-child {
+    flex: 0 0 auto;
+  }
+
+  .how__pill {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 24px;
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-2xl);
+    background: var(--bg-page);
+  }
+
+  .how__pill-label {
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .how__pill-value {
+    font-size: var(--text-body);
+    color: var(--text-primary);
+  }
+
+  /* Flow line between milestones, Sky Blue as the design specifies for pipeline lines. */
+  .how__flow {
+    position: relative;
+    flex: 1;
+    min-width: 32px;
+    height: 2px;
+    margin-inline: var(--spacing-16);
+    background-image: linear-gradient(to right, var(--color-sky-blue) 50%, transparent 50%);
+    background-size: 12px 2px;
+  }
+
+  .how__flow::after {
+    content: '';
+    position: absolute;
+    right: -2px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-top: 2px solid var(--color-sky-blue);
+    border-right: 2px solid var(--color-sky-blue);
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .how__flow {
+      animation: how-flow 1.2s linear infinite;
+    }
+  }
+
+  @keyframes how-flow {
+    to {
+      background-position: 12px 0;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .how__steps {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .how__step {
+      flex-direction: row;
+      gap: var(--spacing-24);
+    }
+
+    .how__rail {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .how__rail::after,
+    .how__step:last-child .how__rail::after {
+      width: 1px;
+      height: auto;
+      margin: var(--spacing-8) 0 0;
+      background: var(--border-hairline);
+    }
+
+    .how__step:last-child .how__rail::after {
+      background: linear-gradient(to bottom, var(--border-hairline), transparent);
+    }
+
+    .how__content {
+      padding: var(--spacing-8) 0 var(--spacing-40);
+    }
+
+    .how__milestones {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .how__milestone,
+    .how__milestone:first-child {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .how__flow {
+      flex: 0 0 32px;
+      width: 2px;
+      height: 32px;
+      min-width: 0;
+      margin: var(--spacing-8) auto;
+      background-image: linear-gradient(to bottom, var(--color-sky-blue) 50%, transparent 50%);
+      background-size: 2px 12px;
+    }
+
+    .how__flow::after {
+      top: auto;
+      right: auto;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%) rotate(135deg);
+    }
+  }
+
+  @media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+    .how__flow {
+      animation-name: how-flow-vertical;
+    }
+  }
+
+  @keyframes how-flow-vertical {
+    to {
+      background-position: 0 12px;
+    }
+  }
+</style>

@@ -1,0 +1,209 @@
+---
+import { site } from '@/content/site';
+import { renderPlaceholders, isReal } from '@/lib/placeholder';
+import { pageHref } from '@/lib/links';
+
+const { tagline, about, columns, contact, entityDetails, disclaimer, copyright } = site.footer;
+const brand = site.nav.brand;
+const year = new Date().getFullYear();
+
+// In-page anchors and real URLs become links. Placeholder URLs render as visible placeholder text instead.
+const linkable = (href: string) => href.startsWith('#') || isReal(href);
+const external = (href: string) => /^https?:\/\//.test(href);
+---
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a class="footer__logo" href={pageHref('#top', Astro.url.pathname)} aria-label={site.nav.brandLabel}>
+          <span class="footer__mark" aria-hidden="true"></span>
+          <span>{brand}</span>
+        </a>
+        <p class="t-body footer__tagline">{tagline}</p>
+      </div>
+
+      <section class="footer__about" aria-labelledby="footer-about-heading">
+        <h2 id="footer-about-heading" class="t-caption">{about.heading}</h2>
+        <p class="t-body-lg">{about.text}</p>
+      </section>
+    </div>
+
+    <nav class="footer__columns" aria-label={site.ui.footerNavLabel}>
+      {
+        columns.map((column) => (
+          <div>
+            <h2 class="t-caption footer__heading">{column.heading}</h2>
+            <ul role="list" class="footer__links">
+              {column.links.map((link) => (
+                <li>
+                  {linkable(link.href) ? (
+                    <a href={pageHref(link.href, Astro.url.pathname)}>{link.label}</a>
+                  ) : (
+                    <span class="footer__pending">
+                      {link.label} <Fragment set:html={renderPlaceholders(link.href)} />
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+
+      <div>
+        <h2 class="t-caption footer__heading">{contact.heading}</h2>
+        <ul role="list" class="footer__links">
+          <li>
+            {
+              isReal(contact.email) ? (
+                <a href={`mailto:${contact.email}`}>{contact.email}</a>
+              ) : (
+                <span class="footer__pending">
+                  {contact.emailLabel} <Fragment set:html={renderPlaceholders(contact.email)} />
+                </span>
+              )
+            }
+          </li>
+          {
+            contact.social.map((link) => (
+              <li>
+                {isReal(link.href) ? (
+                  <a href={link.href} rel={external(link.href) ? 'noopener' : undefined} target={external(link.href) ? '_blank' : undefined}>
+                    {link.label}
+                    <span aria-hidden="true"> ↗</span>
+                  </a>
+                ) : (
+                  <span class="footer__pending">
+                    {link.label} <Fragment set:html={renderPlaceholders(link.href)} />
+                  </span>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </nav>
+
+    <div class="footer__legal t-body-sm">
+      <p set:html={renderPlaceholders(disclaimer)} />
+      <p set:html={renderPlaceholders(entityDetails)} />
+      <p>{copyright.replace('{year}', String(year)).replace('{brand}', brand)}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--border-hairline);
+    padding-block: var(--spacing-80) var(--spacing-40);
+  }
+
+  .footer__inner {
+    display: grid;
+    gap: var(--spacing-64);
+  }
+
+  .footer__top {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: var(--spacing-40) var(--spacing-64);
+  }
+
+  .footer__brand {
+    display: grid;
+    gap: var(--spacing-16);
+    align-content: start;
+  }
+
+  .footer__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    justify-self: start;
+    font-family: var(--font-serif);
+    font-size: var(--text-heading-sm);
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+
+  .footer__mark {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--text-primary);
+  }
+
+  .footer__tagline {
+    color: var(--text-secondary);
+  }
+
+  .footer__about {
+    display: grid;
+    gap: var(--spacing-16);
+    max-width: 64ch;
+  }
+
+  .footer__about .t-body-lg {
+    color: var(--text-primary);
+  }
+
+  .footer__columns {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-40);
+    padding-top: var(--spacing-40);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .footer__heading {
+    margin-bottom: var(--spacing-16);
+  }
+
+  .footer__links {
+    display: grid;
+    gap: var(--spacing-8);
+  }
+
+  .footer__links a,
+  .footer__pending {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    min-height: 32px;
+    font-size: var(--text-body-sm);
+  }
+
+  .footer__links a {
+    text-decoration: none;
+  }
+
+  .footer__links a:hover {
+    text-decoration: underline;
+  }
+
+  .footer__pending {
+    color: var(--text-muted);
+  }
+
+  .footer__legal {
+    display: grid;
+    gap: var(--spacing-8);
+    padding-top: var(--spacing-24);
+    border-top: 1px solid var(--border-hairline);
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 1023px) {
+    .footer__top {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .footer__columns {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

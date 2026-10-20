@@ -1,0 +1,55 @@
+---
+/**
+ * Feature card. default: Parchment with 1px Ash border. elevated: Periwinkle surface, use once per section at most.
+ * Never uses a shadow.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  variant?: 'default' | 'elevated';
+  as?: 'div' | 'article' | 'li';
+  /** Heading level for the title slot, so cards fit the outline of the section they sit in. */
+  headingLevel?: 2 | 3 | 4;
+}
+
+const { variant = 'default', as: Tag = 'div', headingLevel = 3, class: className, ...rest } = Astro.props;
+const Heading = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
+---
+
+<Tag class:list={['card', `card--${variant}`, className]} {...rest}>
+  {Astro.slots.has('icon') && <div class="card__icon" aria-hidden="true"><slot name="icon" /></div>}
+  {Astro.slots.has('title') && <Heading class="card__title t-subheading"><slot name="title" /></Heading>}
+  <div class="card__body t-body"><slot /></div>
+  {Astro.slots.has('footer') && <div class="card__footer"><slot name="footer" /></div>}
+</Tag>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+    padding: var(--card-padding);
+    border-radius: var(--radius-cards);
+  }
+
+  .card--default {
+    background: var(--bg-page);
+    border: 1px solid var(--border-hairline);
+  }
+
+  .card--elevated {
+    background: var(--bg-elevated);
+    border: 1px solid transparent;
+  }
+
+  .card__icon {
+    width: 20px;
+    height: 20px;
+    color: var(--text-primary);
+  }
+
+  .card__footer {
+    margin-top: auto;
+    padding-top: var(--spacing-8);
+  }
+</style>

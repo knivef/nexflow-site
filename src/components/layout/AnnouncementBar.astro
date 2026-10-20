@@ -1,0 +1,141 @@
+---
+import { site } from '@/content/site';
+import { config } from '@/config/site.config';
+import { pageHref } from '@/lib/links';
+
+const { id, text, link } = site.announcement;
+const visible = config.showAnnouncementBar && text.trim().length > 0;
+const storageKey = `nexflow:announcement-dismissed:${id}`;
+// The inline script below runs as soon as the bar is parsed, so a dismissed bar never flashes on load.
+---
+
+{
+  visible && (
+    <aside class="announcement" aria-label={site.ui.announcementLabel} data-announcement data-key={storageKey}>
+      <div class="container announcement__inner">
+        <p class="announcement__text">
+          {text}
+          {link && (
+            <a class="announcement__link" href={pageHref(link.href, Astro.url.pathname)}>
+              {link.label}
+              <span aria-hidden="true">→</span>
+            </a>
+          )}
+        </p>
+        <button class="announcement__close" type="button" aria-label={site.ui.dismissAnnouncement} data-announcement-close>
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+    </aside>
+  )
+}
+
+{
+  visible && (
+    <script is:inline define:vars={{ storageKey }}>
+      try {
+        if (localStorage.getItem(storageKey) === '1') {
+          document.querySelector('[data-announcement]')?.setAttribute('hidden', '');
+        }
+      } catch (error) {
+        // Storage blocked (private mode, strict settings): just show the bar.
+      }
+    </script>
+  )
+}
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-announcement]');
+  const close = bar?.querySelector<HTMLButtonElement>('[data-announcement-close]');
+
+  close?.addEventListener('click', () => {
+    bar!.hidden = true;
+    try {
+      localStorage.setItem(bar!.dataset.key!, '1');
+    } catch {
+      // Storage blocked: the bar stays hidden for this page view only.
+    }
+    // Send focus somewhere sensible instead of losing it with the removed button.
+    document.querySelector<HTMLElement>('[data-nav] a')?.focus();
+  });
+</script>
+
+<style>
+  .announcement {
+    background: var(--bg-announcement);
+    color: var(--text-inverse);
+  }
+
+  .announcement[hidden] {
+    display: none;
+  }
+
+  .announcement__inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-16);
+    min-height: var(--announcement-height);
+    padding-block: var(--spacing-8);
+  }
+
+  .announcement__text {
+    flex: 1;
+    font-size: var(--text-body-sm);
+    text-align: center;
+  }
+
+  .announcement__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: var(--spacing-8);
+    padding: 6px 14px;
+    border: 1px solid var(--text-inverse);
+    border-radius: var(--radius-pills);
+    font-size: var(--text-caption);
+    line-height: 1;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .announcement__link:hover {
+    background: var(--text-inverse);
+    color: var(--bg-announcement);
+  }
+
+  .announcement__close {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-inverse);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .announcement__close:hover {
+    background: rgba(246, 243, 241, 0.15);
+  }
+
+  .announcement :focus-visible {
+    outline-color: var(--text-inverse);
+  }
+
+  @media (max-width: 599px) {
+    .announcement__text {
+      text-align: left;
+    }
+
+    .announcement__link {
+      margin: var(--spacing-8) 0 0;
+    }
+  }
+</style>

@@ -1,0 +1,136 @@
+---
+/**
+ * Section wrapper. Gives every page section its anchor id, container width, vertical rhythm
+ * and an accessible name via aria-labelledby when a heading is present.
+ * tone="elevated" uses the Periwinkle surface, tone="inverse" the Off-Black surface.
+ */
+interface Props {
+  id: string;
+  eyebrow?: string;
+  heading?: string;
+  /** Optional H3 directly under the H2, for a keyword-led secondary heading. */
+  subheading?: string;
+  intro?: string;
+  tone?: 'default' | 'elevated' | 'inverse';
+  /** Draw the hairline divider above the section. */
+  divider?: boolean;
+  /** Narrow the header block for long-form sections. */
+  align?: 'start' | 'center';
+  /** Fallback accessible name when the section has no visible heading. */
+  label?: string;
+}
+
+const {
+  id,
+  eyebrow,
+  heading,
+  subheading,
+  intro,
+  tone = 'default',
+  divider = true,
+  align = 'start',
+  label,
+} = Astro.props;
+
+const headingId = `${id}-heading`;
+const hasHeader = Boolean(eyebrow || heading || subheading || intro);
+const isEmpty = !hasHeader && !Astro.slots.has('default');
+---
+
+<section
+  id={id}
+  class:list={['section', `section--${tone}`, divider && 'section--divider', isEmpty && 'section--empty']}
+  aria-labelledby={heading ? headingId : undefined}
+  aria-label={!heading ? label : undefined}
+>
+  <div class="container">
+    {
+      hasHeader && (
+        <header class:list={['section__header', `section__header--${align}`]}>
+          {eyebrow && <p class="section__eyebrow t-caption">{eyebrow}</p>}
+          {heading && (
+            <h2 id={headingId} class="t-heading-lg">
+              {heading}
+            </h2>
+          )}
+          {subheading && <h3 class="section__subheading t-subheading">{subheading}</h3>}
+          {intro && <p class="section__intro t-body-lg">{intro}</p>}
+        </header>
+      )
+    }
+    <slot />
+    {
+      import.meta.env.DEV && isEmpty && (
+        <p class="section__dev-label t-caption" aria-hidden="true">
+          #{id}
+        </p>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .section {
+    padding-block: var(--section-padding-block);
+  }
+
+  .section--divider .container {
+    position: relative;
+  }
+
+  .section--divider + .section--divider > .container::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--section-padding-block) * -1);
+    left: var(--page-gutter);
+    right: var(--page-gutter);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .section--elevated {
+    background: var(--bg-elevated);
+  }
+
+  .section--inverse {
+    background: var(--bg-inverse);
+    color: var(--text-inverse);
+  }
+
+  .section--inverse :global(.t-heading-lg),
+  .section--inverse :global(.t-body-lg) {
+    color: var(--text-inverse);
+  }
+
+  .section__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+    max-width: 880px;
+    margin-bottom: var(--section-gap);
+  }
+
+  .section__header--center {
+    align-items: center;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .section__subheading {
+    color: var(--text-secondary);
+  }
+
+  .section__intro {
+    max-width: 64ch;
+  }
+
+  .section--empty {
+    padding-block: var(--spacing-64);
+  }
+
+  .section__dev-label {
+    padding: var(--spacing-24);
+    border: 1px dashed var(--border-hairline);
+    border-radius: var(--radius-2xl);
+    text-align: center;
+  }
+</style>
