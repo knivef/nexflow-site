@@ -111,7 +111,7 @@ Implemented in `src/styles/tokens.css`. Decisions made on top of the design file
 - **Form:** `#apply` posts to `/api/apply`, which validates with `src/lib/apply.ts` (shared with the browser) and delivers through the adapter named by `FORM_ADAPTER` (`webhook`, `notion`, `email` stub, `none`). Field names in `ApplyFieldName` are fixed; copy is free to change.
 - **Placeholders in links:** never put a placeholder in an `href`. Use `isReal()` from `src/lib/placeholder.ts` and render placeholder text instead.
 - **Repo hygiene:** `README.md` with local dev and Vercel deploy steps, `.gitignore`, `PLACEHOLDERS.md`, `public/llms.txt`, `public/robots.txt`, sitemap.
-- **Git and versions:** private repo `knivef/nexflow-site`. `main` is v1 (tag `v1` = first approved version); branches `v2` and `v3` are alternative versions, each with its own Vercel URL (see README "Versions"). Shared changes go on `main`, then merge into `v2` and `v3`. Only v1 is indexable. Commit and push only when the user asks.
+- **Git and versions:** private repo `knivef/nexflow-site`, Vercel project `nexflow-psp` (team knivef-1268s-projects). `main` is v1 (tag `v1` = first approved version); branches `v2` and `v3` are alternative versions, each with its own Vercel URL (see README "Versions"). Shared changes go on `main`, then merge into `v2` and `v3`. Only v1 is indexable. Commit and push only when the user asks.
 
 ## Working style
 

@@ -5,10 +5,18 @@ import mdx from '@astrojs/mdx';
 import vercel from '@astrojs/vercel';
 import { loadEnv } from 'vite';
 
-const { SITE_URL } = loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), '');
+import { config } from './src/config/site.config';
+
+const { SITE_URL, SITE_VERSION } = loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), '');
+
+// Public URL: SITE_URL if set, otherwise the URL of the version Vercel is building (matched by git branch),
+// so v1, v2 and v3 each get correct canonical URLs, sitemap and schema without per-branch env vars.
+const branch = process.env.VERCEL_GIT_COMMIT_REF;
+const version = config.versions.find((v) => (SITE_VERSION ? v.id === SITE_VERSION : v.branch === branch));
+const siteUrl = SITE_URL || (process.env.VERCEL ? version?.url : undefined) || 'http://localhost:4321';
 
 export default defineConfig({
-  site: SITE_URL || 'http://localhost:4321',
+  site: siteUrl,
   // Pages are prerendered to static HTML. Only /api/apply runs on demand, as a Vercel function.
   output: 'static',
   adapter: vercel(),
