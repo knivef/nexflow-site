@@ -5,12 +5,11 @@ import { config } from '@/config/site.config';
 import Section from '@/components/ui/Section.astro';
 import Accordion from '@/components/ui/Accordion.astro';
 import Button from '@/components/ui/Button.astro';
-import Proof from '@/components/sections/Proof.astro';
 import { renderPlaceholders, isReal } from '@/lib/placeholder';
 
 const trust = site.trust;
-const { people, advisors, corporate, criteria, charter, security, presence, founding, resources, contact, labels } =
-  trust;
+// v2 drops the company and regulatory facts module, the founding programme module and testimonials.
+const { people, advisors, criteria, charter, security, presence, resources, contact, labels } = trust;
 
 const html = renderPlaceholders;
 const list = (items: string[]) => `<ul class="trust__checklist">${items.map((i) => `<li>${html(i)}</li>`).join('')}</ul>`;
@@ -125,64 +124,6 @@ const initials = (name: string) =>
       )
     }
 
-    {/* 3. Company and regulatory facts */}
-    <div class="trust__module">
-      <header class="trust__header">
-        <h3 class="t-heading-sm">{corporate.heading}</h3>
-        <p class="t-body">{corporate.description}</p>
-      </header>
-      <div class="trust__corporate">
-        <dl class="trust__facts">
-          {
-            corporate.facts.map((fact) => (
-              <div class="trust__fact">
-                <dt class="t-caption">{fact.label}</dt>
-                <dd>
-                  {isReal(fact.href) ? (
-                    <a href={fact.href} rel="noopener" target="_blank">
-                      {fact.value}
-                      <span aria-hidden="true"> ↗</span>
-                    </a>
-                  ) : (
-                    <span set:html={html(fact.value)} />
-                  )}
-                </dd>
-              </div>
-            ))
-          }
-        </dl>
-
-        {
-          corporate.licences.length > 0 ? (
-            <ul class="trust__licences" role="list">
-              {corporate.licences.map((licence) => (
-                <li class="trust__licence">
-                  <h4 class="t-subheading">{licence.name}</h4>
-                  <p class="t-body-sm">
-                    {corporate.licenceLabels.regulator}: {licence.regulator}
-                  </p>
-                  <p class="t-body-sm">
-                    {corporate.licenceLabels.number}: {licence.number}
-                  </p>
-                  {isReal(licence.href) && (
-                    <a href={licence.href} rel="noopener" target="_blank">
-                      {corporate.licenceLabels.register}
-                      <span aria-hidden="true"> ↗</span>
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div class="trust__statement">
-              <p class="t-body-lg">{corporate.notLicensedStatement}</p>
-              <p class="t-body-sm" set:html={html(corporate.statusNote)} />
-            </div>
-          )
-        }
-      </div>
-    </div>
-
     {/* 4. Partner criteria */}
     <div class="trust__module">
       <header class="trust__header">
@@ -255,19 +196,6 @@ const initials = (name: string) =>
           ))
         }
       </ul>
-    </div>
-
-    <Proof />
-
-    {/* 8. Founding partner programme */}
-    <div class="trust__module trust__module--founding">
-      <header class="trust__header">
-        <h3 class="t-heading-sm">{founding.heading}</h3>
-        <p class="t-body">{founding.description}</p>
-      </header>
-      <div class="trust__founding-link">
-        <Button variant="ghost" href={founding.link.href}>{founding.link.label}</Button>
-      </div>
     </div>
 
     {/* 9. Resources: behind config.showResources */}
@@ -395,20 +323,21 @@ const initials = (name: string) =>
     gap: var(--spacing-16);
     padding: var(--spacing-32);
     border: 1px solid var(--border-hairline);
+    background: var(--bg-card);
     border-radius: var(--radius-cards);
   }
 
   .trust__photo {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-xl);
     object-fit: cover;
   }
 
   .trust__photo--empty {
     display: grid;
     place-items: center;
-    background: var(--color-periwinkle-mist);
+    background: var(--bg-wash);
     font-size: var(--text-body-sm);
     color: var(--text-primary);
   }
@@ -439,7 +368,6 @@ const initials = (name: string) =>
   .trust__linkedin {
     margin-top: auto;
     font-size: var(--text-body-sm);
-    text-transform: uppercase;
   }
 
   .trust__advisors {
@@ -454,13 +382,7 @@ const initials = (name: string) =>
     align-content: start;
   }
 
-  /* Corporate facts */
-  .trust__corporate {
-    display: grid;
-    gap: var(--spacing-32);
-  }
 
-  .trust__facts,
   .trust__contact-links {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -472,31 +394,9 @@ const initials = (name: string) =>
     border-top: 1px solid var(--border-hairline);
   }
 
-  .trust__statement {
-    display: grid;
-    gap: var(--spacing-8);
-    padding: var(--card-padding);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-cards);
-  }
 
-  .trust__statement .t-body-lg {
-    color: var(--text-primary);
-  }
 
-  .trust__licences {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: var(--spacing-24);
-  }
 
-  .trust__licence {
-    display: grid;
-    gap: var(--spacing-8);
-    padding: var(--spacing-32);
-    border: 1px solid var(--border-hairline);
-    border-radius: var(--radius-cards);
-  }
 
   /* Criteria checklist inside the accordion */
   .trust__criteria :global(.accordion__summary) {
@@ -532,12 +432,21 @@ const initials = (name: string) =>
     left: 0;
   }
 
-  /* Charter: the one Periwinkle surface in this section */
+  /* Charter: the one inverted panel in this section. */
   .trust__charter {
     display: grid;
-    padding: var(--spacing-16) var(--card-padding);
+    padding: var(--spacing-8) var(--card-padding);
     border-radius: var(--radius-cards);
-    background: var(--bg-elevated);
+    background: var(--bg-inverse);
+    color: var(--text-inverse);
+  }
+
+  .trust__charter .t-subheading {
+    color: var(--text-inverse);
+  }
+
+  .trust__charter :global(.placeholder) {
+    font-size: var(--text-body);
   }
 
   .trust__charter li {
@@ -548,13 +457,13 @@ const initials = (name: string) =>
   }
 
   .trust__charter li + li {
-    border-top: 1px solid rgba(36, 36, 36, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
   }
 
   .trust__charter-num {
     flex-shrink: 0;
     font-size: var(--text-body-sm);
-    color: var(--text-secondary);
+    color: var(--accent-active);
   }
 
   /* Security badges */
@@ -570,13 +479,12 @@ const initials = (name: string) =>
     align-content: start;
     padding: var(--spacing-24);
     border: 1px solid var(--border-hairline);
+    background: var(--bg-card);
     border-radius: var(--radius-2xl);
   }
 
   .trust__badge-name {
     font-size: var(--text-body);
-    font-weight: var(--font-weight-medium);
-    text-transform: uppercase;
   }
 
   .trust__badge-status {
@@ -598,20 +506,15 @@ const initials = (name: string) =>
     gap: var(--spacing-8);
     padding: 12px 20px;
     border: 1px solid var(--border-hairline);
-    border-radius: var(--radius-pills);
+    border-radius: var(--radius-tags);
+    background: var(--bg-card);
     font-size: var(--text-body-sm);
-    text-transform: uppercase;
   }
 
   .trust__pill-type {
     color: var(--text-muted);
   }
 
-  /* Founding programme link */
-  .trust__founding-link {
-    display: flex;
-    align-items: center;
-  }
 
   /* Resources */
   .trust__resources {
@@ -626,6 +529,7 @@ const initials = (name: string) =>
     gap: var(--spacing-16);
     padding: var(--spacing-32);
     border: 1px solid var(--border-hairline);
+    background: var(--bg-card);
     border-radius: var(--radius-cards);
   }
 
@@ -635,6 +539,7 @@ const initials = (name: string) =>
     gap: var(--spacing-32);
     padding: var(--card-padding);
     border: 1px solid var(--border-hairline);
+    background: var(--bg-card);
     border-radius: var(--radius-cards);
   }
 
@@ -664,7 +569,6 @@ const initials = (name: string) =>
   }
 
   @media (max-width: 599px) {
-    .trust__facts,
     .trust__contact-links {
       grid-template-columns: 1fr;
     }

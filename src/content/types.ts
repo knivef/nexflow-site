@@ -59,8 +59,21 @@ export interface HeroContent {
   subheading: string;
   primaryCta: Link;
   secondaryCta: Link | null;
-  /** Short factual claims shown under the CTAs. */
+  /** Short factual claims shown under the CTAs. Kept for reference; v2 renders `stats` instead. */
   proofPoints: string[];
+  /** v2: the dark stat band under the hero. Values may contain placeholders. */
+  stats: { label: string; value: string }[];
+  /** v2: composite "work email + button" call to action. The email is carried into the #apply form. */
+  emailCapture: { label: string; placeholder: string; button: string };
+  /** v2: illustrative product-style panel beside the headline. Not real data: it is captioned as an illustration. */
+  visual: {
+    caption: string;
+    title: string;
+    subtitle: string;
+    rows: { label: string; status: string }[];
+    footerLabel: string;
+    footerValue: string;
+  };
 }
 
 export interface WhoColumn {
@@ -408,6 +421,8 @@ export interface FaqItem {
 export interface FaqContent extends SectionHeader {
   lastUpdatedLabel: string;
   items: FaqItem[];
+  /** If set, only these question ids are shown (and used for FAQPage schema), in this order. */
+  featured?: string[];
 }
 
 export interface FormOption {
@@ -448,6 +463,8 @@ export type ApplyFieldName =
 
 export interface ApplyContent extends SectionHeader {
   fields: Record<ApplyFieldName, FormFieldContent>;
+  /** Fields shown in the form, in order. Hidden fields are never required. */
+  visibleFields: ApplyFieldName[];
   consent: {
     /** {privacyLink} is replaced with a link to the privacy notice. */
     label: string;

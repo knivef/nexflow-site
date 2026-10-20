@@ -3,8 +3,10 @@ import { site } from '@/content/site';
 import Section from '@/components/ui/Section.astro';
 import Accordion from '@/components/ui/Accordion.astro';
 import { renderPlaceholders } from '@/lib/placeholder';
+import { faqItems } from '@/lib/faq';
 
-const { eyebrow, heading, intro, lastUpdatedLabel, items } = site.faq;
+const { eyebrow, heading, intro, lastUpdatedLabel } = site.faq;
+const items = faqItems;
 const html = renderPlaceholders;
 
 const formatDate = (iso: string) =>
@@ -67,7 +69,24 @@ const accordionItems = items.map((item) => ({
 
   .faq :global(.faq__updated) {
     font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
     text-transform: uppercase;
     color: var(--text-muted);
+  }
+
+  /* v2: questions sit on a white card, separated by hairlines. */
+  .faq :global(.accordion) {
+    padding: 0 var(--card-padding);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-cards);
+    background: var(--bg-card);
+  }
+
+  .faq :global(.accordion__item:first-child) {
+    border-top: 0;
+  }
+
+  .faq :global(.accordion__item:last-child) {
+    border-bottom: 0;
   }
 </style>

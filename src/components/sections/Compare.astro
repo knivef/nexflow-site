@@ -52,6 +52,7 @@ const { eyebrow, heading, intro, caption, columns, highlightColumn, edgeLabel, r
 <style>
   .compare__wrap {
     border: 1px solid var(--border-hairline);
+    background: var(--bg-card);
     border-radius: var(--radius-cards);
     overflow: hidden;
   }
@@ -77,10 +78,9 @@ const { eyebrow, heading, intro, caption, columns, highlightColumn, edgeLabel, r
   }
 
   .compare thead th {
-    font-family: var(--font-serif);
-    font-size: var(--text-subheading);
+    font-size: var(--text-body-lg);
     font-weight: var(--font-weight-regular);
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     line-height: var(--leading-subheading);
   }
 
@@ -100,9 +100,9 @@ const { eyebrow, heading, intro, caption, columns, highlightColumn, edgeLabel, r
     color: var(--text-primary);
   }
 
-  /* Nexflow column: the Periwinkle surface, no other emphasis. */
+  /* Nexflow column: the Bone wash, no other emphasis. */
   .compare .is-highlight {
-    background: var(--bg-elevated);
+    background: var(--bg-wash);
   }
 
   .compare tbody td.is-highlight {
@@ -121,10 +121,11 @@ const { eyebrow, heading, intro, caption, columns, highlightColumn, edgeLabel, r
 
   .compare__edge::before {
     content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--text-primary);
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--text-primary);
+    border-radius: 2px;
+    background: var(--accent-active);
   }
 
   .compare__footnote {
@@ -164,6 +165,7 @@ const { eyebrow, heading, intro, caption, columns, highlightColumn, edgeLabel, r
 
     .compare tbody tr {
       border: 1px solid var(--border-hairline);
+    background: var(--bg-card);
       border-radius: var(--radius-2xl);
       overflow: hidden;
     }

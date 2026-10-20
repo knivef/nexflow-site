@@ -97,8 +97,10 @@ export interface ApplyRules {
 /** Build the rules from the content file. Server-side, or at build time for the browser. */
 export function rulesFromContent(apply: ApplyContent): ApplyRules {
   const optionValues = (name: ApplyFieldName) => (apply.fields[name].options ?? []).map((o) => o.value);
+  // A field is only required if it is shown. Hidden fields are optional on both client and server.
+  const visible = new Set<ApplyFieldName>(apply.visibleFields);
   const required = Object.fromEntries(
-    Object.entries(apply.fields).map(([name, field]) => [name, field.required]),
+    Object.entries(apply.fields).map(([name, field]) => [name, field.required && visible.has(name as ApplyFieldName)]),
   ) as Record<ApplyFieldName, boolean>;
   return {
     options: {
@@ -222,8 +224,8 @@ export function validateApply(data: ApplyData, rules: ApplyRules): ApplyErrors {
     } else if (!options[name].includes(value)) errors[name] = messages.invalidOption;
   }
 
-  // Licence details are required unless the applicant has no licence.
-  if (!errors.licenceDetails && data.licenceStatus && data.licenceStatus !== 'none' && !data.licenceDetails) {
+  // Licence details are required unless the applicant has no licence (and only when the field is shown).
+  if (required.licenceDetails && !errors.licenceDetails && data.licenceStatus && data.licenceStatus !== 'none' && !data.licenceDetails) {
     errors.licenceDetails = messages.licenceDetails;
   }
 

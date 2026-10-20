@@ -9,21 +9,8 @@ import { HONEYPOT_FIELD, STARTED_AT_FIELD, rulesFromContent } from '@/lib/apply'
 import type { ApplyFieldName } from '@/content/types';
 
 const apply = site.apply;
-const order: ApplyFieldName[] = [
-  'fullName',
-  'workEmail',
-  'company',
-  'website',
-  'companyType',
-  'volume',
-  'licenceStatus',
-  'licenceDetails',
-  'verticals',
-  'geographies',
-  'needs',
-  'currentAcquirers',
-  'message',
-];
+// Only the fields listed in visibleFields are shown (v2 keeps the form short).
+const order: ApplyFieldName[] = apply.visibleFields;
 
 // Validation rules go to the browser as data, so the script doesn't bundle the whole content file.
 const rules = rulesFromContent(apply);
@@ -268,7 +255,7 @@ const bookingUrl = isReal(BOOKING_URL) ? BOOKING_URL : '';
   .apply {
     display: grid;
     gap: var(--spacing-24);
-    max-width: 1040px;
+    max-width: 800px;
   }
 
   .apply__form {
@@ -276,6 +263,7 @@ const bookingUrl = isReal(BOOKING_URL) ? BOOKING_URL : '';
     gap: var(--spacing-32);
     padding: var(--card-padding);
     border: 1px solid var(--border-hairline);
+    background: var(--bg-card);
     border-radius: var(--radius-cards);
   }
 
@@ -338,7 +326,7 @@ const bookingUrl = isReal(BOOKING_URL) ? BOOKING_URL : '';
     width: 20px;
     height: 20px;
     margin-top: 1px;
-    accent-color: var(--color-off-black);
+    accent-color: var(--color-ink);
   }
 
   .apply__consent-label input[aria-invalid='true'] {
@@ -376,7 +364,8 @@ const bookingUrl = isReal(BOOKING_URL) ? BOOKING_URL : '';
   }
 
   .apply__result--success {
-    background: var(--bg-elevated);
+    border: 1px solid var(--border-hairline);
+    background: var(--bg-card);
   }
 
   .apply__result--success:focus {
@@ -402,12 +391,11 @@ const bookingUrl = isReal(BOOKING_URL) ? BOOKING_URL : '';
     height: 680px;
     border: 0;
     border-radius: var(--radius-2xl);
-    background: var(--bg-page);
+    background: var(--bg-card);
   }
 
   .apply__booking a {
     font-size: var(--text-body-sm);
-    text-transform: uppercase;
   }
 
   @media (max-width: 767px) {

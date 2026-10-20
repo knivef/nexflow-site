@@ -91,7 +91,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
     padding: 0 16px;
     border: 1px solid var(--border-hairline);
     border-radius: var(--radius-pills);
-    background: var(--bg-page);
+    background: var(--bg-card);
     font-size: var(--text-body-sm);
     color: var(--text-primary);
   }
@@ -108,6 +108,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
     margin-top: var(--section-gap);
     padding: var(--card-padding);
     border: 1px solid var(--border-hairline);
+    background: var(--bg-card);
     border-radius: var(--radius-cards);
   }
 
@@ -137,7 +138,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
     padding: 14px 24px;
     border: 1px solid var(--border-hairline);
     border-radius: var(--radius-2xl);
-    background: var(--bg-page);
+    background: var(--bg-card);
   }
 
   .how__pill-label {
@@ -152,14 +153,14 @@ const pad = (n: number) => String(n).padStart(2, '0');
     color: var(--text-primary);
   }
 
-  /* Flow line between milestones, Sky Blue as the design specifies for pipeline lines. */
+  /* Flow line between milestones: a static dashed hairline. v2 avoids decorative motion. */
   .how__flow {
     position: relative;
     flex: 1;
     min-width: 32px;
     height: 2px;
     margin-inline: var(--spacing-16);
-    background-image: linear-gradient(to right, var(--color-sky-blue) 50%, transparent 50%);
+    background-image: linear-gradient(to right, var(--color-ash) 50%, transparent 50%);
     background-size: 12px 2px;
   }
 
@@ -170,21 +171,9 @@ const pad = (n: number) => String(n).padStart(2, '0');
     top: 50%;
     width: 8px;
     height: 8px;
-    border-top: 2px solid var(--color-sky-blue);
-    border-right: 2px solid var(--color-sky-blue);
+    border-top: 2px solid var(--color-ash);
+    border-right: 2px solid var(--color-ash);
     transform: translateY(-50%) rotate(45deg);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .how__flow {
-      animation: how-flow 1.2s linear infinite;
-    }
-  }
-
-  @keyframes how-flow {
-    to {
-      background-position: 12px 0;
-    }
   }
 
   @media (max-width: 1023px) {
@@ -236,7 +225,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
       height: 32px;
       min-width: 0;
       margin: var(--spacing-8) auto;
-      background-image: linear-gradient(to bottom, var(--color-sky-blue) 50%, transparent 50%);
+      background-image: linear-gradient(to bottom, var(--color-ash) 50%, transparent 50%);
       background-size: 2px 12px;
     }
 
@@ -249,15 +238,4 @@ const pad = (n: number) => String(n).padStart(2, '0');
     }
   }
 
-  @media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
-    .how__flow {
-      animation-name: how-flow-vertical;
-    }
-  }
-
-  @keyframes how-flow-vertical {
-    to {
-      background-position: 0 12px;
-    }
-  }
 </style>

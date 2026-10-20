@@ -44,8 +44,7 @@ const cell = (value: string, placeholder: boolean) =>
       <span class="network__link" aria-hidden="true"></span>
 
       <div class="network__hub">
-        <span class="network__glow" aria-hidden="true"></span>
-        <span class="network__node network__node--hub">
+          <span class="network__node network__node--hub">
           <span class="network__node-label">{diagram.hubLabel}</span>
           <span class="network__node-detail">{diagram.hubDetail}</span>
         </span>
@@ -216,12 +215,11 @@ const cell = (value: string, placeholder: boolean) =>
     padding: 12px 20px;
     border: 1px solid var(--border-hairline);
     border-radius: var(--radius-2xl);
-    background: var(--bg-page);
+    background: var(--bg-card);
   }
 
   .network__node-label {
     font-size: var(--text-body-sm);
-    text-transform: uppercase;
     color: var(--text-primary);
   }
 
@@ -239,7 +237,16 @@ const cell = (value: string, placeholder: boolean) =>
 
   .network__node--hub {
     position: relative;
-    border-color: var(--border-strong);
+    border-color: var(--text-primary);
+    background: var(--bg-inverse);
+  }
+
+  .network__node--hub .network__node-label {
+    color: var(--text-inverse);
+  }
+
+  .network__node--hub .network__node-detail {
+    color: var(--text-inverse-muted);
   }
 
   .network__hub {
@@ -248,19 +255,9 @@ const cell = (value: string, placeholder: boolean) =>
     place-items: center;
   }
 
-  .network__glow {
-    position: absolute;
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, var(--color-mint), transparent);
-    filter: blur(24px);
-    opacity: 0.8;
-  }
-
   .network__link {
     height: 2px;
-    background-image: linear-gradient(to right, var(--color-sky-blue) 50%, transparent 50%);
+    background-image: linear-gradient(to right, var(--color-ash) 50%, transparent 50%);
     background-size: 12px 2px;
   }
 
@@ -280,7 +277,7 @@ const cell = (value: string, placeholder: boolean) =>
 
   .network__fan path {
     fill: none;
-    stroke: var(--color-sky-blue);
+    stroke: var(--color-ash);
     stroke-width: 2;
     stroke-dasharray: 6 6;
     vector-effect: non-scaling-stroke;
@@ -310,28 +307,6 @@ const cell = (value: string, placeholder: boolean) =>
     white-space: nowrap;
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .network__link {
-      animation: network-flow 1.2s linear infinite;
-    }
-
-    .network__fan path {
-      animation: network-dash 1.2s linear infinite;
-    }
-  }
-
-  @keyframes network-flow {
-    to {
-      background-position: 12px 0;
-    }
-  }
-
-  @keyframes network-dash {
-    to {
-      stroke-dashoffset: -12;
-    }
-  }
-
   @media (max-width: 1023px) {
     .network__diagram {
       grid-template-columns: 1fr;
@@ -341,7 +316,7 @@ const cell = (value: string, placeholder: boolean) =>
     .network__link {
       width: 2px;
       height: 40px;
-      background-image: linear-gradient(to bottom, var(--color-sky-blue) 50%, transparent 50%);
+      background-image: linear-gradient(to bottom, var(--color-ash) 50%, transparent 50%);
       background-size: 2px 12px;
     }
 
@@ -351,11 +326,6 @@ const cell = (value: string, placeholder: boolean) =>
 
     .network__hub {
       margin-bottom: var(--spacing-24);
-    }
-
-    .network__glow {
-      width: 160px;
-      height: 160px;
     }
 
     .network__regions {
@@ -368,18 +338,6 @@ const cell = (value: string, placeholder: boolean) =>
   @media (max-width: 599px) {
     .network__regions {
       grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
-    .network__link {
-      animation-name: network-flow-vertical;
-    }
-  }
-
-  @keyframes network-flow-vertical {
-    to {
-      background-position: 0 12px;
     }
   }
 
@@ -404,9 +362,7 @@ const cell = (value: string, placeholder: boolean) =>
   }
 
   .network__filter-label {
-    font-size: var(--text-caption);
-    font-weight: var(--font-weight-medium);
-    text-transform: uppercase;
+    font-size: var(--text-body-sm);
   }
 
   .network__select {
@@ -418,8 +374,8 @@ const cell = (value: string, placeholder: boolean) =>
     min-height: 44px;
     padding: 10px 44px 10px 20px;
     border: 1px solid var(--border-control);
-    border-radius: var(--radius-pills);
-    background: var(--bg-page);
+    border-radius: var(--radius-inputs);
+    background: var(--bg-card);
     font-size: var(--text-body-sm);
     appearance: none;
     cursor: pointer;
@@ -443,7 +399,6 @@ const cell = (value: string, placeholder: boolean) =>
     border: 0;
     background: transparent;
     font-size: var(--text-body-sm);
-    text-transform: uppercase;
     text-decoration: underline;
     text-underline-offset: 0.25em;
     cursor: pointer;
@@ -463,6 +418,7 @@ const cell = (value: string, placeholder: boolean) =>
   /* Table */
   .network__table-wrap {
     border: 1px solid var(--border-hairline);
+    background: var(--bg-card);
     border-radius: var(--radius-2xl);
     overflow: hidden;
   }

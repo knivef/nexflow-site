@@ -155,15 +155,10 @@ const groupInputType = kind === 'radio' ? 'radio' : 'checkbox';
   .field__label {
     padding: 0;
     font-size: var(--text-body-sm);
-    font-weight: var(--font-weight-medium);
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
     color: var(--text-primary);
   }
 
   .field__required {
-    font-weight: var(--font-weight-regular);
-    text-transform: none;
     color: var(--text-muted);
   }
 
@@ -174,19 +169,14 @@ const groupInputType = kind === 'radio' ? 'radio' : 'checkbox';
 
   .field__control {
     width: 100%;
-    min-height: 48px;
-    padding: 12px 20px;
+    min-height: 44px;
+    padding: 10px 16px;
     border: 1px solid var(--border-control);
     border-radius: var(--radius-inputs);
-    background: var(--bg-page);
+    background: var(--bg-card);
     color: var(--text-primary);
     font-size: var(--text-body);
     transition: border-color var(--duration-fast) var(--ease-out);
-  }
-
-  input.field__control,
-  select.field__control {
-    border-radius: var(--radius-pills);
   }
 
   textarea.field__control {
@@ -247,16 +237,18 @@ const groupInputType = kind === 'radio' ? 'radio' : 'checkbox';
   .field--group .field__choice {
     position: relative;
     align-items: center;
-    min-height: 44px;
-    padding: 10px 20px;
+    min-height: 40px;
+    padding: 8px 14px;
     border: 1px solid var(--border-control);
-    border-radius: var(--radius-pills);
+    border-radius: var(--radius-tags);
+    background: var(--bg-card);
+    font-size: var(--text-body-sm);
   }
 
   .field--group .field__choice:has(input:checked) {
-    background: var(--bg-inverse);
-    border-color: var(--bg-inverse);
-    color: var(--text-inverse);
+    background: var(--accent-active);
+    border-color: var(--text-primary);
+    color: var(--text-primary);
   }
 
   /* A tick as well as the colour change, so the selected state doesn't rely on colour alone. */
@@ -278,7 +270,7 @@ const groupInputType = kind === 'radio' ? 'radio' : 'checkbox';
     width: 20px;
     height: 20px;
     margin-top: 1px;
-    accent-color: var(--color-off-black);
+    accent-color: var(--color-ink);
   }
 
   .field--group .field__choice input {

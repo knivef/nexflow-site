@@ -1,147 +1,158 @@
 /*
-  Nexflow design tokens.
-  Source: design/variables.css and design/DESIGN.md (raw palette, type scale, spacing, radii, shadow).
-  Semantic aliases below map those raw values to roles. Components use the semantic aliases.
+  Nexflow design tokens: v2 ("editorial finance desk").
+  Source: design/variables.css and design/DESIGN.md. The v1 design files are kept in design/v1/.
+  Semantic aliases below map the raw palette to roles. Components use the semantic aliases, so the
+  same components render v1 or v2 depending on which token file the branch carries.
 */
 
 :root {
   /* Raw palette (from design/variables.css) */
-  --color-parchment: #f6f3f1;
-  --color-lake-blue: #2b59d1;
-  --color-periwinkle-mist: #cfdaf5;
-  --color-sky-blue: #a0b5eb;
-  --color-mint: #a7fccd;
-  --color-coral: #ff9473;
-  --color-gold: #ecda98;
-  --color-crimson: #f37a0a;
-  --color-off-black: #242424;
-  --color-ink: #000000;
-  --color-graphite: #4e4d4d;
-  --color-smoke: #797776;
-  --color-ash: #cecac8;
+  --color-highlighter-yellow: #e4f222;
+  --color-ink: #0c0a08;
+  --color-obsidian: #1a1919;
+  --color-paper: #ffffff;
+  --color-bone: #f4f2f0;
+  --color-ash: #6d6c6b;
+  --color-hairline: #e5e7eb;
+  --color-smoke: #d3d3d3;
 
   /*
     Accessibility adjustments (WCAG 2.2 AA).
-    Smoke on Parchment is 4.03:1, below the 4.5:1 needed for small text, so muted text uses a slightly darker Smoke.
-    Ash on Parchment is 1.47:1, below the 3:1 needed for form control boundaries, so inputs use a darker control border.
-    Ash stays the hairline colour for decorative dividers and card edges, as the design specifies.
+    Ash on Obsidian is 3.35:1, too low for small labels, so labels on dark bands use a lighter grey.
+    The design's input border (10% black) is about 1.1:1; form controls need 3:1, so they use a darker grey.
+    Focus rings use Ink: Highlighter Yellow on Bone is 1.1:1 and would not be visible.
   */
-  --color-smoke-text: #706e6d; /* 4.59:1 on Parchment */
-  --color-control-border: #8a8684; /* 3.26:1 on Parchment */
-  --color-error: #b3261e; /* 5.9:1 on Parchment, used only for form errors */
+  --color-ash-on-dark: #a1a09f; /* 6.72:1 on Obsidian */
+  --color-control-border: #8d8b89; /* 3.39:1 on Paper */
+  --color-error: #b3261e;
+  --color-action-hover: #d6e41a;
 
   /* Semantic roles */
-  --bg-page: var(--color-parchment);
-  --bg-elevated: var(--color-periwinkle-mist);
-  --bg-inverse: var(--color-off-black);
-  --bg-announcement: var(--color-ink);
-  --text-primary: var(--color-off-black);
-  --text-secondary: var(--color-graphite);
-  --text-muted: var(--color-smoke-text);
-  --text-inverse: var(--color-parchment);
-  --border-hairline: var(--color-ash);
+  --bg-page: var(--color-bone);
+  --bg-card: var(--color-paper);
+  --bg-elevated: var(--color-paper);
+  --bg-wash: var(--color-bone);
+  --bg-inverse: var(--color-obsidian);
+  --bg-announcement: var(--color-paper);
+  --text-primary: var(--color-ink);
+  --text-secondary: var(--color-ash);
+  --text-muted: var(--color-ash);
+  --text-inverse: var(--color-paper);
+  --text-inverse-muted: var(--color-ash-on-dark);
+  --border-hairline: var(--color-hairline);
   --border-control: var(--color-control-border);
-  --border-strong: var(--color-off-black);
-  --action-primary-bg: var(--color-lake-blue);
-  --action-primary-text: #ffffff;
-  --action-secondary-bg: var(--color-off-black);
-  --action-secondary-text: var(--color-parchment);
-  --focus-ring: var(--color-lake-blue);
+  --border-strong: var(--color-ink);
+  --action-primary-bg: var(--color-highlighter-yellow);
+  --action-primary-hover: var(--color-action-hover);
+  --action-primary-text: var(--color-ink);
+  --action-secondary-bg: var(--color-obsidian);
+  --action-secondary-text: var(--color-paper);
+  --accent-active: var(--color-highlighter-yellow);
+  --focus-ring: var(--color-ink);
 
   /*
-    Fonts. Untitled Serif and ABC Diatype Mono are licensed, so self-hosted open substitutes are used
-    (Newsreader for display, IBM Plex Mono for UI). Swap the first family name here if licences are bought.
+    One typeface, one weight. Lausanne is licensed, so Inter (the design's first-listed substitute) is
+    self-hosted. --font-serif and --font-mono are kept as aliases so shared components need no changes.
   */
-  --font-serif: 'Untitled Serif', 'Newsreader Variable', ui-serif, Georgia, Cambria, 'Times New Roman', serif;
-  --font-mono: 'ABC Diatype Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-sans: 'lausanne', 'Inter Variable', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: var(--font-sans);
+  --font-mono: var(--font-sans);
+  --font-features: 'ss01' on;
 
   /* Type scale (from design/variables.css) */
-  --text-caption: 12px;
-  --leading-caption: 1.2;
-  --tracking-caption: -0.4px;
+  --text-caption: 12px; /* design: 10px; raised to 12px for legibility of uppercase micro-labels */
+  --leading-caption: 1.5;
+  --tracking-caption: 0.05em;
   --text-body-sm: 14px;
-  --leading-body-sm: 1.35;
-  --tracking-body-sm: -0.28px;
+  --leading-body-sm: 1.43;
+  --tracking-body-sm: 0;
   --text-body: 16px;
-  --leading-body: 1.35;
-  --tracking-body: -0.4px;
-  --text-label: 18px;
-  --leading-label: 1.2;
-  --tracking-label: -0.4px;
+  --leading-body: 1.5;
+  --tracking-body: 0;
+  --text-label: 14px;
+  --leading-label: 1.43;
+  --tracking-label: 0;
   --text-body-lg: 20px;
-  --leading-body-lg: 1.35;
-  --tracking-body-lg: -0.4px;
+  --leading-body-lg: 1.3;
+  --tracking-body-lg: 0;
   --text-subheading: 24px;
-  --leading-subheading: 1.2;
-  --tracking-subheading: -0.48px;
-  --text-heading-sm: 32px;
-  --leading-heading-sm: 1.2;
-  --tracking-heading-sm: -0.64px;
+  --leading-subheading: 1.17;
+  --tracking-subheading: 0;
+  --text-heading-sm: 28px;
+  --leading-heading-sm: 1.14;
+  --tracking-heading-sm: 0;
   --text-heading: 40px;
-  --leading-heading: 1.2;
-  --tracking-heading: -0.8px;
+  --leading-heading: 1.05;
+  --tracking-heading: 0;
   --text-heading-lg: 48px;
-  --leading-heading-lg: 1.2;
-  --tracking-heading-lg: -0.96px;
-  --text-display: 80px;
-  --leading-display: 1.2;
-  --tracking-display: -1.6px;
+  --leading-heading-lg: 1.04;
+  --tracking-heading-lg: 0;
+  --text-display: 64px;
+  --leading-display: 1;
+  --tracking-display: 0;
 
   /* Fluid display sizes: hit the design sizes on desktop, scale down on small screens */
-  --fs-display: clamp(44px, 6.5vw + 12px, var(--text-display));
-  --fs-heading-lg: clamp(34px, 3vw + 20px, var(--text-heading-lg));
-  --fs-heading: clamp(30px, 2vw + 20px, var(--text-heading));
-  --fs-heading-sm: clamp(26px, 1vw + 20px, var(--text-heading-sm));
+  --fs-display: clamp(40px, 5vw + 12px, var(--text-display));
+  --fs-heading-lg: clamp(32px, 2.5vw + 18px, var(--text-heading-lg));
+  --fs-heading: clamp(28px, 1.5vw + 18px, var(--text-heading));
+  --fs-heading-sm: clamp(24px, 0.5vw + 20px, var(--text-heading-sm));
 
+  /* Single weight. Medium maps to regular so components that ask for emphasis stay at 400. */
   --font-weight-regular: 400;
-  --font-weight-medium: 500;
+  --font-weight-medium: 400;
 
-  /* Spacing (8px base) */
-  --spacing-unit: 8px;
+  /* Spacing (4px base) */
+  --spacing-unit: 4px;
+  --spacing-4: 4px;
   --spacing-8: 8px;
+  --spacing-12: 12px;
   --spacing-16: 16px;
+  --spacing-20: 20px;
   --spacing-24: 24px;
   --spacing-32: 32px;
   --spacing-40: 40px;
+  --spacing-48: 48px;
   --spacing-64: 64px;
   --spacing-72: 72px;
   --spacing-80: 80px;
-  --spacing-200: 200px;
-  --spacing-216: 216px;
+  --spacing-128: 128px;
+  --spacing-156: 156px;
 
   /* Layout */
-  --page-max-width: 1432px;
-  --page-gutter: clamp(16px, 4vw, 40px);
-  --section-gap: 64px;
-  --section-padding-block: clamp(64px, 8vw, 120px);
-  --card-padding: clamp(24px, 3vw, 40px);
-  --element-gap: 16px;
-  --nav-height: 80px;
+  --page-max-width: 1200px;
+  --page-gutter: clamp(16px, 4vw, 32px);
+  --section-gap: 48px;
+  --section-padding-block: clamp(64px, 9vw, 128px);
+  --card-padding: 24px;
+  --element-gap: 8px;
+  --nav-height: 62px;
   --announcement-height: 40px;
 
-  /* Radii */
+  /* Radii: 6 / 10 / 12 / 16 only. No pill shapes. */
+  --radius-md: 6px;
+  --radius-xl: 12px;
   --radius-2xl: 16px;
-  --radius-3xl: 40px;
-  --radius-full: 100px;
-  --radius-full-3: 9999px;
-  --radius-tags: 9999px;
-  --radius-cards: 40px;
-  --radius-pills: 9999px;
-  --radius-buttons: 100px;
-  --radius-inputs: 16px;
+  --radius-3xl: 16px;
+  --radius-tags: 6px;
+  --radius-cards: 16px;
+  --radius-pills: 6px;
+  --radius-buttons: 6px;
+  --radius-inputs: 10px;
+  --radius-wash: 12px;
 
-  /* Shadow: reserved for floating UI only (dropdowns, sticky nav on scroll). Cards never get shadows. */
-  --shadow-md: rgba(0, 0, 0, 0.1) 0px 0px 10px 0px;
+  /* Elevation is borders, not shadows. The only shadow is the nav's inset highlight. */
+  --shadow-md: none;
+  --shadow-subtle: rgba(255, 255, 255, 0.6) 0px 0px 2px 0px inset;
 
-  /* Motion */
+  /* Motion: utility-focused, 0.3s ease-out on colour changes */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --duration-fast: 150ms;
-  --duration-base: 250ms;
+  --duration-fast: 200ms;
+  --duration-base: 300ms;
 }
 
 @media (max-width: 767px) {
   :root {
-    --nav-height: 64px;
+    --nav-height: 58px;
   }
 }
 

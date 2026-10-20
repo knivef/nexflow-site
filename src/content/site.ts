@@ -55,9 +55,9 @@ export const site: SiteContent = {
   },
 
   announcement: {
-    id: 'founding-cohort-1',
-    text: 'Now onboarding our first cohort of founding PSP partners.',
-    link: { label: 'See terms', href: '#founding-partners' },
+    id: 'v2-onboarding-1',
+    text: 'Now onboarding PSP partners. Every application gets a reply within 24 hours.',
+    link: { label: 'Apply', href: '#apply' },
   },
 
   hero: {
@@ -76,6 +76,30 @@ export const site: SiteContent = {
       'Target MID go-live: [PLACEHOLDER: X] business days',
       'Response to every application within 24 hours',
     ],
+    stats: [
+      { label: 'Who we work with', value: 'PSPs only. Zero merchant-facing products.' },
+      { label: 'Acquiring network', value: '[PLACEHOLDER: X] acquirers across [PLACEHOLDER: Y] markets' },
+      { label: 'Target MID go-live', value: '[PLACEHOLDER: X] business days' },
+      { label: 'Application reply', value: 'Within 24 hours' },
+    ],
+    emailCapture: {
+      label: 'Work email',
+      placeholder: 'you@yourcompany.com',
+      button: 'Become a partner',
+    },
+    visual: {
+      caption: 'Illustration: how a merchant file moves through placement',
+      title: 'Merchant file',
+      subtitle: 'MCC 7995 · Licensed operator',
+      rows: [
+        { label: 'KYB and ownership', status: 'Checked' },
+        { label: 'Processing history', status: 'Checked' },
+        { label: 'Website compliance', status: 'Checked' },
+        { label: 'Licence verification', status: 'Checked' },
+      ],
+      footerLabel: 'Placement',
+      footerValue: 'Matched by MCC, geography and risk profile. Backup planned.',
+    },
   },
 
   who: {
@@ -815,6 +839,15 @@ export const site: SiteContent = {
     heading: 'Questions PSPs ask us',
     intro: '',
     lastUpdatedLabel: 'Last updated',
+    // v2 shows the six questions PSPs ask first.
+    featured: [
+      'is-nexflow-an-acquirer',
+      'what-is-acquiring-as-a-service',
+      'which-acquirers-accept-mcc-7995',
+      'how-long-does-it-take-to-get-a-live-mid',
+      'how-does-pricing-work',
+      'who-owns-the-merchant-relationship',
+    ],
     // Rule for every answer: `lead` answers the question directly in 1 to 2 sentences. Detail comes after.
     items: [
       {
@@ -1008,6 +1041,8 @@ export const site: SiteContent = {
     eyebrow: '',
     heading: "Tell us about your book. We'll tell you where it fits.",
     intro: 'Reply within 24 hours. Confidential. NDA available on request.',
+    // v2 keeps the form short: the rest is covered on the first call.
+    visibleFields: ['fullName', 'workEmail', 'company', 'website', 'companyType', 'volume', 'licenceStatus', 'verticals'],
     fields: {
       fullName: { name: 'fullName', label: 'Full name', kind: 'input', type: 'text', required: true, autocomplete: 'name', width: 'half' },
       workEmail: {
@@ -1044,7 +1079,6 @@ export const site: SiteContent = {
           { value: 'orchestrator', label: 'Orchestrator' },
           { value: 'emi-pi', label: 'EMI / PI' },
           { value: 'referral', label: 'Referral partner' },
-          { value: 'founding', label: 'Founding partner' },
           { value: 'other', label: 'Other' },
         ],
       },
@@ -1202,7 +1236,6 @@ export const site: SiteContent = {
           { label: 'Verticals', href: '#verticals' },
           { label: 'Partners', href: '#partners' },
           { label: 'Trust', href: '#trust' },
-          { label: 'Founding partners', href: '#founding-partners' },
           { label: 'FAQ', href: '#faq' },
           { label: 'Apply', href: '#apply' },
         ],

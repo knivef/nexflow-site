@@ -16,17 +16,22 @@ The page has three jobs:
 
 Design references and design instructions are supplied separately (Step 2). Follow them for layout, visual style, typography, colour, spacing, motion and components. These rules cover structure, content, copy, functionality and technical requirements. If anything here conflicts with the design instructions, the design instructions win for anything visual.
 
-Design source files live in `design/` (copied from the user's originals):
+**This is the v2 branch.** v2 uses a different design from v1 (main).
 
-- `design/DESIGN.md` (style reference: parchment canvas, serif headings at weight 400, mono for all UI text, pill buttons, 40px card radius, hairline Ash borders, no shadows)
+Design source files live in `design/` (v2, "editorial finance desk"). v1's design files are kept in `design/v1/` for reference only.
+
+- `design/DESIGN.md`: warm off-white Bone canvas, white cards with 1px hairline borders, no shadows, one typeface at weight 400 only, 6px buttons and tags, 10px inputs, 16px cards, left-aligned layouts, no gradients or illustrations, Highlighter Yellow (#e4f222) only on primary actions and active states, Obsidian (#1a1919) for inverted bands, nav panels and footer.
 - `design/tokens.json`, `design/variables.css`, `design/theme.css`
 
 Implemented in `src/styles/tokens.css`. Decisions made on top of the design files:
 
-- Lake Blue is the single primary CTA per screen (DESIGN.md wins over the tokens.json note).
-- Fonts: Newsreader (display) and IBM Plex Mono (UI), self-hosted, as substitutes for the licensed Untitled Serif and ABC Diatype Mono.
-- AA fixes: muted text uses `--color-smoke-text` (#706e6d) instead of Smoke; form controls use `--color-control-border` (#8a8684) instead of Ash. Ash stays for decorative hairlines.
-- The announcement bar sits above the sticky nav. `#top` is the page wrapper, so "back to top" links work even with a sticky nav.
+- Font: Inter (self-hosted) as the substitute for licensed Lausanne, with `font-feature-settings: 'ss01' on`. `--font-serif` and `--font-mono` are aliases of `--font-sans` so shared components need no changes.
+- Micro-labels use 12px instead of the design's 10px, for legibility.
+- AA fixes: labels on Obsidian use #a1a09f (Ash is 3.35:1 there); form controls use #8d8b89 borders (the design's 10% border is about 1.1:1); focus rings are Ink, not Yellow.
+- The hero panel is an illustration of how a merchant file moves through placement, captioned as such. It shows no data and implies no product dashboard.
+- Decorative motion from v1 (flowing dashed lines) is removed; v2 only animates colour changes.
+
+**v2 content scope (differs from v1):** no `#founding-partners` section or founding references; no testimonials component; no company and regulatory facts module in `#trust`; FAQ shows the six ids in `site.faq.featured`; the form shows only `site.apply.visibleFields`. The removed content stays in `site.ts` unused so merges from `main` stay simple.
 
 ## Non-negotiable rules
 
@@ -84,7 +89,7 @@ Implemented in `src/styles/tokens.css`. Decisions made on top of the design file
 9. `#verticals`
 10. `#partners`
 11. `#trust`
-12. `#founding-partners`
+12. `#founding-partners` (v1 only; not in v2)
 13. `#compare`
 14. `#merchants`
 15. `#faq`

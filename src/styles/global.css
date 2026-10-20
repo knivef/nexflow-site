@@ -1,6 +1,4 @@
-@import '@fontsource-variable/newsreader/opsz.css';
-@import '@fontsource/ibm-plex-mono/latin-400.css';
-@import '@fontsource/ibm-plex-mono/latin-500.css';
+@import '@fontsource-variable/inter/index.css';
 @import './tokens.css';
 
 /* Reset */
@@ -35,6 +33,7 @@ body {
   font-size: var(--text-body);
   line-height: var(--leading-body);
   letter-spacing: var(--tracking-body);
+  font-feature-settings: var(--font-features);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -53,6 +52,7 @@ textarea,
 select {
   font: inherit;
   letter-spacing: inherit;
+  font-feature-settings: inherit;
   color: inherit;
 }
 
@@ -81,7 +81,7 @@ ol[role='list'] {
   outline-offset: 3px;
 }
 
-/* Typography roles. Headings are always serif at weight 400, never bold. */
+/* Typography roles. One typeface at weight 400: hierarchy comes from size, never weight. */
 .t-display,
 .t-heading-lg,
 .t-heading,
@@ -96,25 +96,25 @@ ol[role='list'] {
 .t-display {
   font-size: var(--fs-display);
   line-height: var(--leading-display);
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 .t-heading-lg {
   font-size: var(--fs-heading-lg);
   line-height: var(--leading-heading-lg);
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 .t-heading {
   font-size: var(--fs-heading);
   line-height: var(--leading-heading);
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 .t-heading-sm {
   font-size: var(--fs-heading-sm);
   line-height: var(--leading-heading-sm);
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 .t-subheading {
@@ -202,7 +202,7 @@ ol[role='list'] {
 .placeholder {
   display: inline;
   padding: 0 0.25em;
-  background: var(--color-gold);
+  background: #f6e7a6;
   color: var(--text-primary);
   font-family: var(--font-mono);
   border-radius: 4px;

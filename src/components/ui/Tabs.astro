@@ -132,29 +132,29 @@ const panels = await Promise.all(
   }
 
   .tabs__tab {
-    min-height: 44px;
-    padding: 12px 20px;
+    min-height: 40px;
+    padding: 0 14px;
     border: 1px solid var(--border-hairline);
-    border-radius: var(--radius-pills);
-    background: transparent;
+    border-radius: var(--radius-tags);
+    background: var(--bg-card);
     color: var(--text-primary);
     font-size: var(--text-body-sm);
     line-height: 1;
-    text-transform: uppercase;
     cursor: pointer;
     transition:
-      background-color var(--duration-fast) var(--ease-out),
-      border-color var(--duration-fast) var(--ease-out);
+      background-color var(--duration-base) var(--ease-out),
+      border-color var(--duration-base) var(--ease-out);
   }
 
   .tabs__tab:hover {
     border-color: var(--border-strong);
   }
 
+  /* Active state: the one place besides CTAs where Highlighter Yellow appears. */
   .tabs__tab[aria-selected='true'] {
-    background: var(--bg-inverse);
-    border-color: var(--bg-inverse);
-    color: var(--text-inverse);
+    background: var(--accent-active);
+    border-color: var(--accent-active);
+    color: var(--text-primary);
   }
 
   .tabs__panel:focus-visible {

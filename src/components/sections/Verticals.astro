@@ -116,6 +116,7 @@ const { eyebrow, heading, intro, tabsLabel, defaultTab, labels, items, other } =
   .vertical__card {
     padding: var(--card-padding);
     border: 1px solid var(--border-hairline);
+    background: var(--bg-card);
     border-radius: var(--radius-cards);
   }
 
@@ -137,13 +138,14 @@ const { eyebrow, heading, intro, tabsLabel, defaultTab, labels, items, other } =
     font-weight: var(--font-weight-medium);
   }
 
-  /* Referral sub-block: the Periwinkle surface marks it as a different audience. */
+  /* Referral sub-block: a Bone wash card marks it as a different audience. */
   .vertical__aside {
     display: grid;
     gap: var(--spacing-8);
     padding: var(--card-padding);
-    border-radius: var(--radius-cards);
-    background: var(--bg-elevated);
+    border-radius: var(--radius-wash);
+    background: var(--bg-card);
+    border: 1px dashed var(--border-control);
   }
 
   .vertical__aside .t-body {

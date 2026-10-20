@@ -94,14 +94,20 @@ const external = (href: string) => /^https?:\/\//.test(href);
 </footer>
 
 <style>
+  /* v2: inverted Obsidian footer. */
   .footer {
-    border-top: 1px solid var(--border-hairline);
-    padding-block: var(--spacing-80) var(--spacing-40);
+    padding-block: var(--spacing-64) var(--spacing-40);
+    background: var(--bg-inverse);
+    color: var(--text-inverse);
+  }
+
+  .footer :focus-visible {
+    outline-color: var(--text-inverse);
   }
 
   .footer__inner {
     display: grid;
-    gap: var(--spacing-64);
+    gap: var(--spacing-48);
   }
 
   .footer__top {
@@ -112,40 +118,42 @@ const external = (href: string) => /^https?:\/\//.test(href);
 
   .footer__brand {
     display: grid;
-    gap: var(--spacing-16);
+    gap: var(--spacing-12);
     align-content: start;
   }
 
   .footer__logo {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     justify-self: start;
-    font-family: var(--font-serif);
-    font-size: var(--text-heading-sm);
-    letter-spacing: -0.02em;
+    font-size: var(--text-subheading);
     text-decoration: none;
   }
 
   .footer__mark {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--text-primary);
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    background: var(--accent-active);
   }
 
   .footer__tagline {
-    color: var(--text-secondary);
+    color: var(--text-inverse-muted);
   }
 
   .footer__about {
     display: grid;
-    gap: var(--spacing-16);
+    gap: var(--spacing-12);
     max-width: 64ch;
   }
 
+  .footer__about h2 {
+    color: var(--text-inverse-muted);
+  }
+
   .footer__about .t-body-lg {
-    color: var(--text-primary);
+    color: var(--text-inverse);
   }
 
   .footer__columns {
@@ -153,16 +161,17 @@ const external = (href: string) => /^https?:\/\//.test(href);
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--spacing-40);
     padding-top: var(--spacing-40);
-    border-top: 1px solid var(--border-hairline);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
   }
 
   .footer__heading {
-    margin-bottom: var(--spacing-16);
+    margin-bottom: var(--spacing-12);
+    color: var(--text-inverse-muted);
   }
 
   .footer__links {
     display: grid;
-    gap: var(--spacing-8);
+    gap: var(--spacing-4);
   }
 
   .footer__links a,
@@ -176,23 +185,25 @@ const external = (href: string) => /^https?:\/\//.test(href);
   }
 
   .footer__links a {
+    color: var(--text-inverse);
     text-decoration: none;
   }
 
   .footer__links a:hover {
     text-decoration: underline;
+    text-underline-offset: 0.2em;
   }
 
   .footer__pending {
-    color: var(--text-muted);
+    color: var(--text-inverse-muted);
   }
 
   .footer__legal {
     display: grid;
     gap: var(--spacing-8);
     padding-top: var(--spacing-24);
-    border-top: 1px solid var(--border-hairline);
-    color: var(--text-muted);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text-inverse-muted);
   }
 
   @media (max-width: 1023px) {

@@ -6,7 +6,12 @@ import { site } from '@/content/site';
 import type { FaqItem } from '@/content/types';
 import { hasPlaceholder } from '@/lib/placeholder';
 
-export const faqItems: FaqItem[] = site.faq.items;
+/** The questions shown on the page. If `featured` is set, only those, in that order. Schema must match what's visible. */
+export const faqItems: FaqItem[] = site.faq.featured
+  ? site.faq.featured
+      .map((id) => site.faq.items.find((item) => item.id === id))
+      .filter((item): item is FaqItem => Boolean(item))
+  : site.faq.items;
 
 export interface FaqSchemaEntry {
   id: string;

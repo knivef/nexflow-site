@@ -1,73 +1,51 @@
-# Monad — Style Reference
-> editorial tech journal on warm parchment
+# Ramp — Style Reference
+> Editorial finance desk, black-and-white pages with a single neon highlighter. A near-monochrome publication surface where one vivid chartreuse mark turns every interaction into a money signal.
 
 **Theme:** light
 
 Source measurements are normalized; roles and recommendations are interpreted. Font summary lists are independent, not paired by position. HTML examples are reconstructions, not source components.
 
-Monad renders its entire interface on a warm parchment canvas (#f6f3f1) that immediately separates it from the typical pure-white SaaS template. Headlines carry editorial weight in Untitled Serif at weight 400 — never bold — while every body, nav, and UI string runs in ABC Diatype Mono, giving the site the texture of a technical manual typeset for a literary magazine. A single vivid Lake Blue (#2b59d1) is the only chromatic accent for primary actions; everything else lives in a warm grayscale, so a periwinkle card surface (#cfdaf5) and soft pastel gradient washes (coral, sky, mint, gold) read as deliberate punctuation rather than noise. Components lean on hairline borders and 100px pill containers rather than shadows, and the rhythm stays calm and spacious with 40px card padding and generous vertical breathing room between sections.
+Ramp operates as a black-and-white editorial system punctuated by a single highlighter-yellow accent — the visual equivalent of a finance journal with a neon Sharpie. The interface stays nearly monochrome: warm off-white canvas, white cards, hairline gray borders, and deep near-black text. That one vivid chartreuse (#e4f222) appears only where money moves — CTAs, live counters, active states — making every action feel switched-on. Typography is a single-weight, neo-grotesque custom face (lausanne) at 400, used at large display sizes with tight leading (lineHeight ~1.0 at 64px) and positive tracking on small uppercase labels. Components are flat, hairline-bordered, and shadow-free: cards rest on borders, not shadows, with 12–16px radii; buttons are 6px-radius rectangles. Density is comfortable, rhythm is 8/12/16/24px, and motion is moderate and utility-focused rather than decorative.
 
 ## Tokens — Colors
 
 | Name | Value | Token | Role |
 |------|-------|-------|------|
-| Parchment | `#f6f3f1` | `--color-parchment` | Page canvas and the majority of surface fills — this warm off-white IS the brand's signature surface, immediately distinguishing the site from pure-white SaaS templates |
-| Lake Blue | `#2b59d1` | `--color-lake-blue` | Violet wash for highlight backgrounds, decorative bands, and soft emphasis behind content. Do not promote it to the primary CTA color |
-| Periwinkle Mist | `#cfdaf5` | `--color-periwinkle-mist` | Muted UI surface for disabled controls, low-emphasis panels, and placeholder blocks. |
-| Sky Blue | `#a0b5eb` | `--color-sky-blue` | Decorative gradient stop — appears in atmospheric washes and the pipeline diagram's flow lines, never as a UI fill |
-| Mint | `#a7fccd` | `--color-mint` | Supporting palette color for small decorative accents when the core palette needs contrast. |
-| Coral | `#ff9473` | `--color-coral` | Supporting palette color for small decorative accents when the core palette needs contrast. |
-| Gold | `#ecda98` | `--color-gold` | Decorative gradient stop — warm accent in gradient washes, never used in functional UI |
-| Crimson | `#f37a0a` | `--color-crimson` | Decorative gradient stop — deep warm tone in gradient washes alongside gold and coral |
-| Off-Black | `#242424` | `--color-off-black` | High-contrast neutral action fill for primary buttons on light surfaces. |
-| Ink | `#000000` | `--color-ink` | Announcement bar surface and certain heading fills — the black band at the top of the page and select heading contexts |
-| Graphite | `#4e4d4d` | `--color-graphite` | Secondary text — body copy and sub-headings that need less weight than primary headlines |
-| Smoke | `#797776` | `--color-smoke` | Muted helper text and tertiary links |
-| Ash | `#cecac8` | `--color-ash` | Hairline borders — 1px solid lines separating sections, outlining pipeline diagram nodes, and defining card edges |
+| Highlighter Yellow | `#e4f222` | `--color-highlighter-yellow` | Primary action fill, live counters, active-state highlights — the only chromatic accent in the system, making CTAs read as switched-on |
+| Ink | `#0c0a08` | `--color-ink` | Primary text, heading fill, dark surface backgrounds — near-black with the faintest warm cast |
+| Obsidian | `#1a1919` | `--color-obsidian` | Dark panels, navigation bar, inverted sections — slightly warmer and lighter than Ink for tonal variation |
+| Paper | `#ffffff` | `--color-paper` | Card surfaces, modal panels, light fills, reversed text on dark backgrounds |
+| Bone | `#f4f2f0` | `--color-bone` | Page canvas, subtle card washes, link background hover states — warm off-white base layer |
+| Ash | `#6d6c6b` | `--color-ash` | Secondary text, hushed captions, muted labels — the 60% opacity voice of --text-primary |
+| Hairline | `#e5e7eb` | `--color-hairline` | Card borders, divider lines, structural outlines — 1px hairlines replace shadows as the elevation primitive |
+| Smoke | `#d3d3d3` | `--color-smoke` | Subtle borders, muted backgrounds, skeleton states — the 200-step in the black scale |
 
 ## Tokens — Typography
 
-### ABC Diatype Mono — Body text, navigation, buttons, badges, tags, and ALL UI strings. The monospace choice across every functional element gives the interface its technical-manual character — body copy at 16-20px reads as data, not marketing. Nav labels and badges use 18px uppercase with tighter tracking; small print and meta text use 12px uppercase. Weight 500 is reserved for emphasized UI labels. · `--font-abc-diatype-mono`
-- **Substitute:** JetBrains Mono, IBM Plex Mono, or Space Mono
-- **Weights:** 400, 500
-- **Sizes:** 12px, 14px, 16px, 18px, 20px, 28px
-- **Line height:** 1.0–1.35 (varies by size)
-- **Letter spacing:** -0.033em at 12px, -0.025em at 16px, -0.022em at 18px, -0.02em at 14px and 20px, -0.014em at 28px
-- **Role:** Body text, navigation, buttons, badges, tags, and ALL UI strings. The monospace choice across every functional element gives the interface its technical-manual character — body copy at 16-20px reads as data, not marketing. Nav labels and badges use 18px uppercase with tighter tracking; small print and meta text use 12px uppercase. Weight 500 is reserved for emphasized UI labels.
-
-### Untitled Serif — Display and heading type only — used at 80px (hero), 48px (section), 40px and 32px (sub-section), 24px (feature card titles). Weight is locked at 400 across all sizes; the serif's natural contrast and the -0.02em letter-spacing do the heavy lifting instead of bold weight. This is the editorial confidence signature: headlines whisper through typographic refinement rather than shout through weight. · `--font-untitled-serif`
-- **Substitute:** Times New Roman, Georgia, or any editorial serif with similar stroke contrast
+### lausanne — Sole typeface across the entire system — headings, body, UI labels, nav, buttons, inputs. A single weight (400) forces hierarchy through size and tracking rather than weight contrast. · `--font-lausanne`
+- **Substitute:** Inter, IBM Plex Sans, or Söhne
 - **Weights:** 400
-- **Sizes:** 24px, 32px, 40px, 48px, 80px
-- **Line height:** 1.2
-- **Letter spacing:** -0.02em at all sizes (-1.6px at 80px, -0.96px at 48px, -0.8px at 40px, -0.64px at 32px, -0.48px at 24px)
-- **Role:** Display and heading type only — used at 80px (hero), 48px (section), 40px and 32px (sub-section), 24px (feature card titles). Weight is locked at 400 across all sizes; the serif's natural contrast and the -0.02em letter-spacing do the heavy lifting instead of bold weight. This is the editorial confidence signature: headlines whisper through typographic refinement rather than shout through weight.
-
-### Untitled Sans — Untitled Sans — detected in extracted data but not described by AI · `--font-untitled-sans`
-- **Weights:** 400
-- **Sizes:** 16px
-- **Line height:** 1.35
-- **Letter spacing:** -0.02
-- **Role:** Untitled Sans — detected in extracted data but not described by AI
+- **Sizes:** 10px, 13px, 14px, 16px, 18px, 20px, 24px, 28px, 40px, 48px, 64px
+- **Line height:** 0.74–2.20 (tight at display, generous at caption)
+- **Letter spacing:** 0.018em at 10px (uppercase micro-labels), 0.05em at small uppercase, 0 (normal) at body and display sizes
+- **OpenType features:** `"ss01" on`
+- **Role:** Sole typeface across the entire system — headings, body, UI labels, nav, buttons, inputs. A single weight (400) forces hierarchy through size and tracking rather than weight contrast.
 
 ### Type Scale
 
 | Role | Family | Weight | Size | Line Height | Letter Spacing | Token |
 |------|--------|--------|------|-------------|----------------|-------|
-| caption | — | — | 12px | 1.2 | -0.4px | `--text-caption` |
-| body-sm | — | — | 14px | 1.35 | -0.28px | `--text-body-sm` |
-| body | — | — | 16px | 1.35 | -0.4px | `--text-body` |
-| label | — | — | 18px | 1.2 | -0.4px | `--text-label` |
-| body-lg | — | — | 20px | 1.35 | -0.4px | `--text-body-lg` |
-| subheading | — | — | 24px | 1.2 | -0.48px | `--text-subheading` |
-| heading-sm | — | — | 32px | 1.2 | -0.64px | `--text-heading-sm` |
-| heading | — | — | 40px | 1.2 | -0.8px | `--text-heading` |
-| heading-lg | — | — | 48px | 1.2 | -0.96px | `--text-heading-lg` |
-| display | — | — | 80px | 1.2 | -1.6px | `--text-display` |
+| caption | — | — | 10px | 2.2 | 0.18px | `--text-caption` |
+| body | — | — | 16px | 1.5 | — | `--text-body` |
+| subheading | — | — | 20px | 1.3 | — | `--text-subheading` |
+| heading-sm | — | — | 24px | 1.17 | — | `--text-heading-sm` |
+| heading | — | — | 28px | 1.14 | — | `--text-heading` |
+| heading-lg | — | — | 40px | 1.05 | — | `--text-heading-lg` |
+| display | — | — | 64px | 1 | — | `--text-display` |
 
 ## Tokens — Spacing & Shapes
 
-**Base unit:** 8px
+**Base unit:** 4px
 
 **Density:** comfortable
 
@@ -75,175 +53,186 @@ Monad renders its entire interface on a warm parchment canvas (#f6f3f1) that imm
 
 | Name | Value | Token |
 |------|-------|-------|
+| 4 | 4px | `--spacing-4` |
 | 8 | 8px | `--spacing-8` |
+| 12 | 12px | `--spacing-12` |
 | 16 | 16px | `--spacing-16` |
+| 20 | 20px | `--spacing-20` |
 | 24 | 24px | `--spacing-24` |
 | 32 | 32px | `--spacing-32` |
 | 40 | 40px | `--spacing-40` |
+| 48 | 48px | `--spacing-48` |
 | 64 | 64px | `--spacing-64` |
-| 72 | 72px | `--spacing-72` |
-| 80 | 80px | `--spacing-80` |
-| 200 | 200px | `--spacing-200` |
-| 216 | 216px | `--spacing-216` |
+| 128 | 128px | `--spacing-128` |
+| 156 | 156px | `--spacing-156` |
 
 ### Border Radius
 
 | Element | Value |
 |---------|-------|
-| tags | 9999px |
-| cards | 40px |
-| pills | 9999px |
-| buttons | 100px |
+| tags | 6px |
+| cards | 16px |
+| inputs | 10px |
+| buttons | 6px |
 
 ### Shadows
 
 | Name | Value | Token |
 |------|-------|-------|
-| md | `rgba(0, 0, 0, 0.1) 0px 0px 10px 0px` | `--shadow-md` |
+| subtle | `rgba(255, 255, 255, 0.6) 0px 0px 2px 0px inset` | `--shadow-subtle` |
 
 ### Layout
 
-- **Page max-width:** 1432px
-- **Section gap:** 64px
-- **Card padding:** 40px
-- **Element gap:** 16px
+- **Page max-width:** 1200px
+- **Section gap:** 64-128px
+- **Card padding:** 20-24px
+- **Element gap:** 8px
 
 ## Components
 
-### Announcement Bar
-**Role:** Top-of-page notification strip
+### Primary Button (Highlighter)
+**Role:** Main CTA — 'Get started for free', 'Create report', 'See a demo'
 
-Full-width black (#000000) bar, ~40px tall, containing mono text in white (#f6f3f1) at 14px and a small white pill button (9999px radius, white border, 12px uppercase text) anchored right. Close icon (×) in white at far right.
+6px radius, #e4f222 fill, #0c0a08 text, no border, 0px vertical padding with 20px horizontal padding (text-aligned height ~44px). The only chromatic button in the system; its chartreuse fill is the highest-contrast pair against Ink text (17:1).
 
-### Primary Pill Button (Blue)
-**Role:** Primary conversion action
+### Outlined Button
+**Role:** Secondary CTA — 'Switch in days', 'Explore Ramp Intelligence'
 
-Lake Blue (#2b59d1) fill, white text in ABC Diatype Mono at 14px uppercase, 100px border-radius, 16px 32px padding, with a trailing arrow (▸) glyph in white. Height ~48px. This is the only saturated fill in the system.
+6px radius, transparent fill, 1px Ink border, Ink text, 0px vertical / 12px horizontal padding. Used when a second action sits beside the primary without competing for attention.
 
-### Primary Pill Button (Black)
-**Role:** Secondary conversion action
+### Ghost / Link Button
+**Role:** Tertiary action — nav items, 'Read the report', inline links
 
-Off-Black (#242424) fill, white text in ABC Diatype Mono at 14px uppercase, 100px border-radius, 16px 32px padding, no arrow. Height ~48px.
+Transparent fill, no border, Ink text, 6px radius. Hover state transitions to #f4f2f0 background.
 
-### Ghost Pill Button
-**Role:** Tertiary navigation action
+### Square Icon Button
+**Role:** Compact action — '+ New dashboard', utility toggles
 
-Transparent fill, 1px Off-Black (#242424) border, Off-Black text in ABC Diatype Mono at 14px uppercase, 100px border-radius, 16px 32px padding. Height ~48px.
+16px padding all sides, #f4f2f0 fill, 12px radius, Ink icon/text. Squarer feel than standard CTA; used for inline dashboard controls.
 
-### Text Link with Arrow
-**Role:** Navigation link with directional indicator
+### Content Card
+**Role:** Primary card surface for testimonials, feature blocks, logo grids
 
-Transparent fill, Off-Black (#242424) text in ABC Diatype Mono at 14px, trailing rightward arrow (→) in Off-Black. No background or border. Uppercase tracking.
+16px radius, #ffffff fill, 1px #e5e7eb border, no shadow, 20px padding. Border replaces shadow as the elevation primitive — 17 of these are the dominant card type.
 
-### Pipeline Node Tag
-**Role:** Labeled node in the data pipeline diagram
+### Wash Card
+**Role:** Subtle feature or stat card
 
-Parchment (#f6f3f1) fill, 1px Ash (#cecac8) border, 9999px border-radius (full pill), small mono icon (12px) + 14px mono uppercase text, 12px 20px padding. Connected by thin curved Ash lines to adjacent nodes.
+12px radius, #f4f2f0 fill, no border, 1px padding wrapper creates a hairline gap before content. Used for muted callouts that don't need white contrast.
 
-### Feature Card
-**Role:** Product capability card with icon, title, description
+### Email Input
+**Role:** Hero email capture, form fields
 
-Transparent or Parchment fill, 1px Ash (#cecac8) border, 40px border-radius, 40px padding. Small mono icon (20px) in top-left at 16px padding offset. Title in Untitled Serif at 24px weight 400, Off-Black. Body in ABC Diatype Mono at 16px weight 400, Graphite (#4e4d4d). No shadow.
+10px radius, transparent fill, 1px rgba(33,33,33,0.1) border, #0c0a08 text, 24px left padding / 16px right padding. Sits flush beside the Primary Button to form a composite CTA.
 
-### Elevated Feature Card (Periwinkle)
-**Role:** Hero feature card with gradient illustration
+### Testimonial Card
+**Role:** Customer quote with avatar and attribution
 
-Periwinkle Mist (#cfdaf5) fill, 40px border-radius, 40px padding. Contains a large gradient illustration on the right side using Coral → Sky Blue → Mint washes. Title in Untitled Serif 24px, body in mono 16px. This is the one card that uses a colored surface to draw the eye.
+16px radius, #ffffff fill, 1px #e5e7eb border, 20px padding, contains company logo badge (square), name + title in 16px lausanne 400, quote in #0c0a08 body. Arranged in horizontal scroll rows.
 
-### FAQ Accordion Item
-**Role:** Expandable question/answer row
+### Live Counter Ticker
+**Role:** Scrolling metric strip ('Agents at work today', 'Expenses reviewed')
 
-Full-width row, 40px vertical padding, 1px Ash (#cecac8) bottom border (no top border). Question text in Untitled Serif at 24px weight 400, Off-Black. Trailing chevron icon (↓) in Off-Black, 20px, right-aligned. No background fill change on hover.
+Full-width #1a1919 dark band, uppercase 10px lausanne labels in Ash (#6d6c6b), metric values in Paper (#ffffff) at 14px. Numbers pulse subtly via opacity transitions.
 
-### Logo Strip
-**Role:** Social proof partner logo row
-
-Single horizontal row of 6-7 partner logos in grayscale (desaturated from original brand colors), evenly spaced with ~32px gaps, left-aligned within max-width container. No logo lockup borders or cards.
-
-### Gradient Atmospheric Wash
-**Role:** Decorative background gradient blob
-
-Large blurred radial/linear gradient using Coral (#ff9473 80% opacity) → Sky Blue (#a0b5eb 80% opacity) or Sky Blue → Mint (#a7fccd), rendered with blur(50-75px) filter, positioned behind hero or feature content. Never sharp-edged, always softly diffused.
-
-### Navigation Bar
+### Sticky Navigation Bar
 **Role:** Primary site navigation
 
-Transparent or Parchment background, logo on far left (monad wordmark + circular dot mark), 4-5 nav text links centered or left-grouped in ABC Diatype Mono 18px uppercase Off-Black, action buttons (Login ghost + Get a Demo blue pill) right-aligned. ~80px height, no visible border.
+102px total height including 40px announcement bar above. #ffffff fill, 1px bottom border, 15 interactive elements (logo, Products, Partners, Solutions, Resources, Customers, Pricing, Sign in, See a demo). Frosted-glass inset shadow rgba(255,255,255,0.6) inset 0 0 2px adds subtle top highlight.
 
-### Hero Section
-**Role:** First-screen headline and subtext
+### Announcement Bar
+**Role:** Top-of-page promotional strip
 
-Full-width Parchment background, centered content stack: Untitled Serif headline at 80px weight 400 Off-Black, monospace subtext at 20px Graphite (#4e4d4d) at 1.35 line-height, two pill buttons centered below. No background image — pure typographic hero.
+40px height, #ffffff fill, 13px centered lausanne body text with inline link 'Learn more'. Dismissible with close icon. Sits above the main nav.
+
+### Hero Product Screenshot
+**Role:** Dashboard / product visual in hero and feature sections
+
+Rounded browser-chrome frame with traffic-light dots, floating UI panels with shadow-free white fills. Contains inline Highlighter Yellow CTA buttons to bridge product-as-marketing.
+
+### Logo Grid Cell
+**Role:** Customer logo display in social-proof block
+
+Transparent fill, 1px #e5e7eb grid borders forming cells, centered grayscale logo. 7-column layout; last cell replaced with a dark '7 mo' Pullquote card to break the grid rhythm.
 
 ## Do's and Don'ts
 
 ### Do
-- Use Untitled Serif at weight 400 for all headings — never go bold; the serif's stroke contrast and -0.02em tracking carry the weight visually
-- Use ABC Diatype Mono for all body copy, buttons, nav labels, badges, and functional UI text — the monospace IS the brand voice
-- Set all button and tag border-radius to 100px or 9999px — pill shapes are the container language of this system
-- Use Parchment (#f6f3f1) as the page canvas — never substitute pure white (#ffffff); the warm tint is signature
-- Reserve Lake Blue (#2b59d1) exclusively for the single primary action per screen; all other buttons use Off-Black or ghost variants
-- Use 1px solid Ash (#cecac8) for all borders and dividers — avoid thicker weights or darker border colors
-- Apply uppercase + tight tracking to all nav labels, buttons, and tag text via the monospace family
+- Use lausanne at weight 400 exclusively — never introduce a bold or semibold variant; hierarchy comes from size and tracking.
+- Use #e4f222 only for primary action fills, live counters, and active states — never as a background wash or decorative accent.
+- Express card elevation with 1px #e5e7eb borders on #ffffff fills — avoid box-shadow except for the nav's inset white highlight.
+- Set display headlines at 64px / 48px / 40px with line-height ≤ 1.05 to maintain the editorial typographic voice.
+- Apply 0.018em positive letter-spacing on 10px uppercase micro-labels and metric captions.
+- Use 6px radius for buttons and tags, 10px for inputs, 12px for wash cards, and 16px for content cards.
+- Include "ss01" in font-feature-settings on every lausanne declaration to preserve the typeface's editorial character.
 
 ### Don't
-- Never set headings in bold or 600+ weight — Untitled Serif headlines stay at 400 across all sizes
-- Never use pure white (#ffffff) as a page background — always use Parchment (#f6f3f1) to preserve the warm surface
-- Never use Lake Blue (#2b59d1) for anything other than the single primary action fill — it loses meaning if scattered
-- Never substitute a sans-serif for the monospace body font — the mono/serif pairing is the defining typographic gesture
-- Never apply drop shadows to cards — use 1px Ash borders and surface color contrast (Parchment → Periwinkle) for elevation instead
-- Never use corner radii below 16px on cards or below 100px on buttons — the system is pill-and-soft-rect, never sharp
-- Never introduce additional accent colors for UI elements — the pastel palette (Sky, Mint, Coral, Gold) is decorative-only and belongs in illustrations and gradient washes
+- Don't introduce additional chromatic accent colors — the system's power depends on a single highlighter-yellow signal against monochrome.
+- Don't use bold or semibold font weights — lausanne 400 at larger sizes carries all heading hierarchy.
+- Don't apply box-shadow to content cards, modals, or panels — use 1px #e5e7eb borders instead.
+- Don't use #0c0a08 as a background fill for large sections — reserve it for text; use #1a1919 for inverted panels.
+- Don't center body text or headlines — Ramp's layout is consistently left-aligned within centered max-width containers.
+- Don't add decorative gradients, illustrations, or stock photography — the visual language is typography, product screenshots, and grayscale logos only.
+- Don't use radii outside the system: 6 / 10 / 12 / 16px — never 4px or fully rounded pill shapes on UI elements.
 
 ## Surfaces
 
 | Level | Name | Value | Purpose |
 |-------|------|-------|---------|
-| 1 | Parchment | `#f6f3f1` | Page canvas — the base warm off-white that fills the entire viewport |
-| 2 | Periwinkle Mist | `#cfdaf5` | Elevated card surface — the one colored card that breaks the monochrome to draw the eye |
-| 3 | Off-Black | `#242424` | Dark surface for secondary buttons and inverted UI contexts |
-| 4 | Ink | `#000000` | Announcement bar — the darkest surface, used for the top notification strip |
+| 1 | Canvas | `#f4f2f0` | Page background — warm off-white sets a paper-like editorial feel |
+| 2 | Card | `#ffffff` | Standard card and content surface — pure white lifts above the Bone canvas |
+| 3 | Wash | `#f4f2f0` | Subtle secondary surface, link hover backgrounds, feature callouts |
+| 4 | Inverted | `#1a1919` | Dark panels, sticky nav, footer, hero inversion blocks |
+| 5 | Action | `#e4f222` | Accent surface for active states, live counters, high-emphasis fills |
 
 ## Elevation
 
-- **Subtle ambient elevation:** `rgba(0, 0, 0, 0.1) 0px 0px 10px 0px`
+Elevation is expressed entirely through hairline 1px borders (#e5e7eb) and surface tonal shifts (Bone → White → Inverted) rather than shadows. The one detected box-shadow is an inset white highlight on the sticky nav — a frosted-glass cue rather than a drop shadow. This deliberate flatness keeps the editorial feel intact and prevents visual noise on dense marketing surfaces.
 
 ## Imagery
 
-The visual language is dominated by a custom data pipeline diagram: pill-shaped bordered nodes connected by thin curved lines, with small icons inside each node representing data sources (Any Source, Cloud Logs, Vulnerabilities) and destinations (SIEM, Cloud Storage, Data Lake). The diagram uses a soft green radial glow at the center hub to suggest data normalization. Gradient atmospheric washes (Coral → Sky Blue, Sky Blue → Mint) with heavy blur filters create soft color halos behind hero and feature content. Partner logos appear desaturated in a single social-proof row. The 'In-flight Data Transforms' card features a large gradient illustration with overlapping translucent geometric shapes. No photography is used — the brand communicates through typography, diagram, and color wash alone.
+Photography and lifestyle imagery are absent. The visual language is dominated by product screenshots (floating browser-chrome UI frames showing Ramp dashboards), grayscale customer logos in grid cells, and one full-bleed dark product image (a pink neon 'Stay Posted' installation) as a brand-moment card. Iconography is filled, mono-colored, and minimal — small flat UI glyphs rather than illustrated characters. Everything reads as a screenshot or a typographic statement; no decorative illustration, no stock photography, no human faces outside of testimonial avatar squares. The density is text-dominant with product UI visuals carrying the visual weight.
+
+## Layout
+
+Full-bleed light canvas with max-width ~1200px centered content columns. Hero is a left-aligned typographic statement (64px headline + 24px sub + composite input+button) over a large product screenshot that bleeds to the right edge. Section rhythm alternates between light editorial bands (Bone canvas, 64–128px vertical padding) and one full-bleed dark band (#1a1919 Live Counter strip). Content arrangement is consistently left-aligned within centered max-width containers; feature blocks use 2-column text-left/visual-right pairs. Grid usage: a 7-column logo grid (customer names), a 4-column testimonial scroll grid, and stacked metric strips. Navigation is a sticky top bar (white, hairline-bordered, with a 40px announcement strip above it). The overall feel is editorial-publication: generous whitespace, tight typographic columns, and rhythmic full-bleed interruptions rather than modular card grids.
 
 ## Agent Prompt Guide
 
 Quick Color Reference:
-- text: #242424 (Off-Black)
-- background: #f6f3f1 (Parchment)
-- border: #cecac8 (Ash)
-- accent: #2b59d1 (Lake Blue)
-- primary action: no distinct CTA color
+- text: #0c0a08
+- background: #f4f2f0
+- card surface: #ffffff
+- border: #e5e7eb
+- muted text: #6d6c6b
+- primary action: #e4f222 (filled action)
 
-Example Component Prompts:
+3-5 Example Component Prompts:
+1. Hero headline: 64px lausanne weight 400, #0c0a08, line-height 1.0, on #f4f2f0 canvas. Subhead at 24px lausanne weight 400, #6d6c6b. Composite CTA: email input (#ffffff, 10px radius, 1px rgba(33,33,33,0.1) border, 24px left padding) flush beside a Primary Button (#e4f222 fill, #0c0a08 text, 6px radius, 20px horizontal padding).
+2. Content card: #ffffff fill, 1px #e5e7eb border, 16px radius, 20px padding. 16px lausanne 400 #0c0a08 body text. No shadow — border does the elevation work.
+3. Sticky nav: #ffffff fill, 1px #e5e7eb bottom border, 102px total height (40px announcement strip + 62px nav row). Logo left, centered nav links, Sign in + Highlighter Yellow 'See a demo' button right.
+4. Live Counter strip: full-bleed #1a1919 band, uppercase 10px lausanne #6d6c6b labels, #ffffff metric values at 14px. Horizontally scrolling ticker.
+5. Outlined Button: transparent fill, 1px #0c0a08 border, #0c0a08 text, 6px radius, 0px vertical / 12px horizontal padding.
 
-1. Create a hero section on Parchment (#f6f3f1) background. Centered headline in Untitled Serif at 80px weight 400, color #242424, letter-spacing -1.6px. Subtext below in ABC Diatype Mono at 20px weight 400, color #4e4d4d, line-height 1.35. Two centered pill buttons: primary Lake Blue (#2b59d1) with white text, and ghost (1px #242424 border, transparent fill, #242424 text), both 100px border-radius, 16px 32px padding, ABC Diatype Mono 14px uppercase.
+## Signature Design Choices
 
-2. Create a feature card on Parchment background. 1px solid #cecac8 border, 40px border-radius, 40px padding. Small 20px mono icon top-left at #242424. Title in Untitled Serif 24px weight 400, #242424. Body in ABC Diatype Mono 16px weight 400, #4e4d4d. No shadow.
+1. Single-weight typography: lausanne at 400 only — hierarchy comes from size and tracking, not bold. Headlines at 64px with line-height 1.0 feel like editorial pull-quotes, not SaaS headers.
+2. One chromatic accent rule: #e4f222 appears only on action surfaces. The page is otherwise a study in warm neutrals (Bone, Ink, Ash). This makes every chartreuse element register as 'money moving'.
+3. Hairline borders over shadows: cards use 1px #e5e7eb outlines instead of box-shadow. The single detected shadow is an inset white highlight on the nav — a frosted edge, not a drop shadow.
+4. Negative tracking on display, positive on caption: 64px headlines sit tight (lh 1.0), while 10px uppercase labels open up (ls 0.018em). The contrast between tight display and airy micro-labels defines the system's voice.
+5. Font feature 'ss01': lausanne ships with stylistic set 01 enabled — likely alternate g/t shapes that give the typeface its editorial character. Always include in CSS.
 
-3. Create a secondary pill button: Off-Black (#242424) fill, white text in ABC Diatype Mono 14px uppercase, 100px border-radius, 16px 32px padding, no arrow.
+## Motion Philosophy
 
-4. Create an FAQ accordion row: full-width, 40px vertical padding, 1px solid #cecac8 bottom border only. Question in Untitled Serif 24px weight 400, #242424. Trailing down-chevron icon (↓) in #242424 at 20px, right-aligned. No background fill.
-
-5. Create a pipeline diagram node tag: Parchment (#f6f3f1) fill, 1px solid #cecac8 border, 9999px border-radius, 12px 20px padding. Small 12px icon + 14px text in ABC Diatype Mono uppercase, #242424.
-
-## Typography Pairing Philosophy
-
-The serif-mono pairing is the single most distinctive design choice in this system. Untitled Serif handles all hierarchical display text (headlines, section titles, feature card titles, FAQ questions) — it carries editorial authority through its stroke contrast and refined letterforms, not through weight (always 400). ABC Diatype Mono handles everything functional: body paragraphs, navigation, button labels, badges, tags, and inline UI text. This creates a consistent voice: the serif announces, the mono instructs. A page that swapped in a sans-serif for body would lose its identity immediately.
+Motion is utility-focused and moderate: 0.3–0.4s durations with ease-out timing. Transitions target color, background-color, border-color, fill, and stroke — not transform or opacity theatrics. The system avoids animation as ornament; motion signals state change (hover fills, link underlines, counter increments). Backdrop blurs (25px, 12px, 8px) appear on overlays and the sticky nav for a frosted-glass cue.
 
 ## Similar Brands
 
-- **Linear** — Shares the restrained monochrome palette and minimal-elevation card approach, though Monad's warm Parchment canvas and serif headlines set it apart from Linear's cooler white surface
-- **Stripe** — Both use custom editorial serif typefaces for headlines with tight letter-spacing and -0.02em tracking, treating the homepage as a typographic composition rather than a product screenshot
-- **Vercel** — Shares the comfortable-density spacing, generous section gaps, and pill-shaped button language, though Monad adds the warm canvas and mono body twist
-- **Railway** — Both target developer audiences with a monospace-leaning UI vocabulary and minimal decoration, but Monad layers in the editorial serif for a more literary feel
-- **Arc Browser** — Both use warm off-white surfaces rather than pure white, and both treat the page as a designed editorial artifact rather than a typical SaaS template
+- **Linear** — Same monochrome-first UI philosophy with a single vivid accent color (Linear's violet) reserved exclusively for action surfaces, and near-identical hairline-border card approach over shadows.
+- **Stripe** — Editorial-grade typography, tight display leading, generous whitespace, and a restrained palette where one accent color carries the brand's visual energy.
+- **Notion** — Warm off-white canvas with ink-black text, single-weight sans-serif feel, and a flat component vocabulary that avoids heavy shadows or gradients.
+- **Substack** — Publication-leaning layout with oversized tight-leading headlines, warm neutrals, and a deliberate flatness that reads as editorial rather than product UI.
+- **Brex** — Direct fintech competitor sharing the same high-contrast monochrome base with one neon accent for CTAs and the same hairline-border card grammar.
 
 ## Quick Start
 
@@ -252,101 +241,79 @@ The serif-mono pairing is the single most distinctive design choice in this syst
 ```css
 :root {
   /* Colors */
-  --color-parchment: #f6f3f1;
-  --color-lake-blue: #2b59d1;
-  --color-periwinkle-mist: #cfdaf5;
-  --color-sky-blue: #a0b5eb;
-  --color-mint: #a7fccd;
-  --color-coral: #ff9473;
-  --color-gold: #ecda98;
-  --color-crimson: #f37a0a;
-  --color-off-black: #242424;
-  --color-ink: #000000;
-  --color-graphite: #4e4d4d;
-  --color-smoke: #797776;
-  --color-ash: #cecac8;
+  --color-highlighter-yellow: #e4f222;
+  --color-ink: #0c0a08;
+  --color-obsidian: #1a1919;
+  --color-paper: #ffffff;
+  --color-bone: #f4f2f0;
+  --color-ash: #6d6c6b;
+  --color-hairline: #e5e7eb;
+  --color-smoke: #d3d3d3;
 
   /* Typography — Font Families */
-  --font-abc-diatype-mono: 'ABC Diatype Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-untitled-serif: 'Untitled Serif', ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-untitled-sans: 'Untitled Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-lausanne: 'lausanne', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   /* Typography — Scale */
-  --text-caption: 12px;
-  --leading-caption: 1.2;
-  --tracking-caption: -0.4px;
-  --text-body-sm: 14px;
-  --leading-body-sm: 1.35;
-  --tracking-body-sm: -0.28px;
+  --text-caption: 10px;
+  --leading-caption: 2.2;
+  --tracking-caption: 0.18px;
   --text-body: 16px;
-  --leading-body: 1.35;
-  --tracking-body: -0.4px;
-  --text-label: 18px;
-  --leading-label: 1.2;
-  --tracking-label: -0.4px;
-  --text-body-lg: 20px;
-  --leading-body-lg: 1.35;
-  --tracking-body-lg: -0.4px;
-  --text-subheading: 24px;
-  --leading-subheading: 1.2;
-  --tracking-subheading: -0.48px;
-  --text-heading-sm: 32px;
-  --leading-heading-sm: 1.2;
-  --tracking-heading-sm: -0.64px;
-  --text-heading: 40px;
-  --leading-heading: 1.2;
-  --tracking-heading: -0.8px;
-  --text-heading-lg: 48px;
-  --leading-heading-lg: 1.2;
-  --tracking-heading-lg: -0.96px;
-  --text-display: 80px;
-  --leading-display: 1.2;
-  --tracking-display: -1.6px;
+  --leading-body: 1.5;
+  --text-subheading: 20px;
+  --leading-subheading: 1.3;
+  --text-heading-sm: 24px;
+  --leading-heading-sm: 1.17;
+  --text-heading: 28px;
+  --leading-heading: 1.14;
+  --text-heading-lg: 40px;
+  --leading-heading-lg: 1.05;
+  --text-display: 64px;
+  --leading-display: 1;
 
   /* Typography — Weights */
   --font-weight-regular: 400;
-  --font-weight-medium: 500;
 
   /* Spacing */
-  --spacing-unit: 8px;
+  --spacing-unit: 4px;
+  --spacing-4: 4px;
   --spacing-8: 8px;
+  --spacing-12: 12px;
   --spacing-16: 16px;
+  --spacing-20: 20px;
   --spacing-24: 24px;
   --spacing-32: 32px;
   --spacing-40: 40px;
+  --spacing-48: 48px;
   --spacing-64: 64px;
-  --spacing-72: 72px;
-  --spacing-80: 80px;
-  --spacing-200: 200px;
-  --spacing-216: 216px;
+  --spacing-128: 128px;
+  --spacing-156: 156px;
 
   /* Layout */
-  --page-max-width: 1432px;
-  --section-gap: 64px;
-  --card-padding: 40px;
-  --element-gap: 16px;
+  --page-max-width: 1200px;
+  --section-gap: 64-128px;
+  --card-padding: 20-24px;
+  --element-gap: 8px;
 
   /* Border Radius */
+  --radius-md: 6px;
+  --radius-xl: 12px;
   --radius-2xl: 16px;
-  --radius-3xl: 40px;
-  --radius-full: 100px;
-  --radius-full-2: 2000px;
-  --radius-full-3: 9999px;
 
   /* Named Radii */
-  --radius-tags: 9999px;
-  --radius-cards: 40px;
-  --radius-pills: 9999px;
-  --radius-buttons: 100px;
+  --radius-tags: 6px;
+  --radius-cards: 16px;
+  --radius-inputs: 10px;
+  --radius-buttons: 6px;
 
   /* Shadows */
-  --shadow-md: rgba(0, 0, 0, 0.1) 0px 0px 10px 0px;
+  --shadow-subtle: rgba(255, 255, 255, 0.6) 0px 0px 2px 0px inset;
 
   /* Surfaces */
-  --surface-parchment: #f6f3f1;
-  --surface-periwinkle-mist: #cfdaf5;
-  --surface-off-black: #242424;
-  --surface-ink: #000000;
+  --surface-canvas: #f4f2f0;
+  --surface-card: #ffffff;
+  --surface-wash: #f4f2f0;
+  --surface-inverted: #1a1919;
+  --surface-action: #e4f222;
 }
 ```
 
@@ -355,77 +322,55 @@ The serif-mono pairing is the single most distinctive design choice in this syst
 ```css
 @theme {
   /* Colors */
-  --color-parchment: #f6f3f1;
-  --color-lake-blue: #2b59d1;
-  --color-periwinkle-mist: #cfdaf5;
-  --color-sky-blue: #a0b5eb;
-  --color-mint: #a7fccd;
-  --color-coral: #ff9473;
-  --color-gold: #ecda98;
-  --color-crimson: #f37a0a;
-  --color-off-black: #242424;
-  --color-ink: #000000;
-  --color-graphite: #4e4d4d;
-  --color-smoke: #797776;
-  --color-ash: #cecac8;
+  --color-highlighter-yellow: #e4f222;
+  --color-ink: #0c0a08;
+  --color-obsidian: #1a1919;
+  --color-paper: #ffffff;
+  --color-bone: #f4f2f0;
+  --color-ash: #6d6c6b;
+  --color-hairline: #e5e7eb;
+  --color-smoke: #d3d3d3;
 
   /* Typography */
-  --font-abc-diatype-mono: 'ABC Diatype Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-untitled-serif: 'Untitled Serif', ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-untitled-sans: 'Untitled Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-lausanne: 'lausanne', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   /* Typography — Scale */
-  --text-caption: 12px;
-  --leading-caption: 1.2;
-  --tracking-caption: -0.4px;
-  --text-body-sm: 14px;
-  --leading-body-sm: 1.35;
-  --tracking-body-sm: -0.28px;
+  --text-caption: 10px;
+  --leading-caption: 2.2;
+  --tracking-caption: 0.18px;
   --text-body: 16px;
-  --leading-body: 1.35;
-  --tracking-body: -0.4px;
-  --text-label: 18px;
-  --leading-label: 1.2;
-  --tracking-label: -0.4px;
-  --text-body-lg: 20px;
-  --leading-body-lg: 1.35;
-  --tracking-body-lg: -0.4px;
-  --text-subheading: 24px;
-  --leading-subheading: 1.2;
-  --tracking-subheading: -0.48px;
-  --text-heading-sm: 32px;
-  --leading-heading-sm: 1.2;
-  --tracking-heading-sm: -0.64px;
-  --text-heading: 40px;
-  --leading-heading: 1.2;
-  --tracking-heading: -0.8px;
-  --text-heading-lg: 48px;
-  --leading-heading-lg: 1.2;
-  --tracking-heading-lg: -0.96px;
-  --text-display: 80px;
-  --leading-display: 1.2;
-  --tracking-display: -1.6px;
+  --leading-body: 1.5;
+  --text-subheading: 20px;
+  --leading-subheading: 1.3;
+  --text-heading-sm: 24px;
+  --leading-heading-sm: 1.17;
+  --text-heading: 28px;
+  --leading-heading: 1.14;
+  --text-heading-lg: 40px;
+  --leading-heading-lg: 1.05;
+  --text-display: 64px;
+  --leading-display: 1;
 
   /* Spacing */
+  --spacing-4: 4px;
   --spacing-8: 8px;
+  --spacing-12: 12px;
   --spacing-16: 16px;
+  --spacing-20: 20px;
   --spacing-24: 24px;
   --spacing-32: 32px;
   --spacing-40: 40px;
+  --spacing-48: 48px;
   --spacing-64: 64px;
-  --spacing-72: 72px;
-  --spacing-80: 80px;
-  --spacing-200: 200px;
-  --spacing-216: 216px;
+  --spacing-128: 128px;
+  --spacing-156: 156px;
 
   /* Border Radius */
+  --radius-md: 6px;
+  --radius-xl: 12px;
   --radius-2xl: 16px;
-  --radius-3xl: 40px;
-  --radius-full: 100px;
-  --radius-full-2: 2000px;
-  --radius-full-3: 9999px;
 
   /* Shadows */
-  --shadow-md: rgba(0, 0, 0, 0.1) 0px 0px 10px 0px;
+  --shadow-subtle: rgba(255, 255, 255, 0.6) 0px 0px 2px 0px inset;
 }
 ```

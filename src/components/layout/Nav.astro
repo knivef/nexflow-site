@@ -6,7 +6,7 @@ import { pageHref } from '@/lib/links';
 const { brand, brandLabel, links, merchantLink, primaryCta } = site.nav;
 const { menuOpen, menuClose, mainNavLabel } = site.ui;
 const href = (value: string) => pageHref(value, Astro.url.pathname);
-// The nav CTA uses the Off-Black "primary pill" so the hero's Lake Blue button stays the single blue action on screen.
+// v2: the nav CTA uses the Highlighter button, as in the design's sticky nav.
 ---
 
 <header class="nav" data-nav>
@@ -33,12 +33,12 @@ const href = (value: string) => pageHref(value, Astro.url.pathname);
         <span aria-hidden="true">→</span>
       </a>
       <div class="nav__menu-cta">
-        <Button variant="secondary" href={href(primaryCta.href)} arrow={false} block>{primaryCta.label}</Button>
+        <Button variant="primary" href={href(primaryCta.href)} arrow={false} block>{primaryCta.label}</Button>
       </div>
     </nav>
 
     <div class="nav__actions">
-      <Button variant="secondary" size="sm" href={href(primaryCta.href)} arrow={false} class="nav__bar-cta">
+      <Button variant="primary" size="sm" href={href(primaryCta.href)} arrow={false} class="nav__bar-cta">
         {primaryCta.label}
       </Button>
       <button
@@ -137,17 +137,16 @@ const href = (value: string) => pageHref(value, Astro.url.pathname);
 </script>
 
 <style>
+  /* v2: white bar with a hairline and a frosted inset highlight. */
   .nav {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: var(--bg-page);
-    border-bottom: 1px solid transparent;
-    transition: border-color var(--duration-base) var(--ease-out);
-  }
-
-  .nav.is-scrolled {
-    border-bottom-color: var(--border-hairline);
+    background: rgba(255, 255, 255, 0.92);
+    border-bottom: 1px solid var(--border-hairline);
+    box-shadow: var(--shadow-subtle);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   .nav__inner {
@@ -167,16 +166,14 @@ const href = (value: string) => pageHref(value, Astro.url.pathname);
   }
 
   .nav__mark {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
     background: var(--text-primary);
   }
 
   .nav__wordmark {
-    font-family: var(--font-serif);
-    font-size: var(--text-subheading);
-    letter-spacing: -0.02em;
+    font-size: var(--text-body-lg);
   }
 
   .nav__menu {
@@ -189,17 +186,24 @@ const href = (value: string) => pageHref(value, Astro.url.pathname);
 
   .nav__links {
     display: flex;
-    gap: var(--spacing-24);
+    gap: var(--spacing-4);
   }
 
   .nav__link {
     position: relative;
     display: inline-flex;
     align-items: center;
-    min-height: 44px;
-    font-size: var(--text-body);
-    text-transform: uppercase;
+    min-height: 36px;
+    padding: 0 10px;
+    border-radius: var(--radius-md);
+    font-size: var(--text-body-sm);
     text-decoration: none;
+    transition: background-color var(--duration-base) var(--ease-out);
+  }
+
+  .nav__link:hover,
+  .nav__link[aria-current='true'] {
+    background: var(--bg-wash);
   }
 
   .nav__link::after {
@@ -207,15 +211,16 @@ const href = (value: string) => pageHref(value, Astro.url.pathname);
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 8px;
-    height: 1px;
-    background: currentColor;
+    left: 10px;
+    right: 10px;
+    bottom: 4px;
+    height: 2px;
+    background: var(--accent-active);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform var(--duration-base) var(--ease-out);
   }
 
-  .nav__link:hover::after,
   .nav__link[aria-current='true']::after {
     transform: scaleX(1);
   }
@@ -248,11 +253,10 @@ const href = (value: string) => pageHref(value, Astro.url.pathname);
     min-height: 40px;
     padding: 10px 18px;
     border: 1px solid var(--border-strong);
-    border-radius: var(--radius-pills);
+    border-radius: var(--radius-buttons);
     background: transparent;
-    font-size: var(--text-caption);
+    font-size: var(--text-body-sm);
     line-height: 1;
-    text-transform: uppercase;
     cursor: pointer;
   }
 
@@ -278,7 +282,7 @@ const href = (value: string) => pageHref(value, Astro.url.pathname);
       max-height: calc(100vh - var(--nav-height));
       overflow-y: auto;
       padding: var(--spacing-8) var(--page-gutter) var(--spacing-32);
-      background: var(--bg-page);
+      background: var(--bg-card);
       border-bottom: 1px solid var(--border-hairline);
     }
 
@@ -293,9 +297,16 @@ const href = (value: string) => pageHref(value, Astro.url.pathname);
 
     .nav__link {
       width: 100%;
-      min-height: 56px;
-      font-size: var(--text-label);
+      min-height: 52px;
+      padding: 0;
+      border-radius: 0;
+      font-size: var(--text-body-lg);
       border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .nav__link:hover,
+    .nav__link[aria-current='true'] {
+      background: transparent;
     }
 
     .nav__link::after {

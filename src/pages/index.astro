@@ -9,7 +9,6 @@ import Features from '@/components/sections/Features.astro';
 import Verticals from '@/components/sections/Verticals.astro';
 import Partners from '@/components/sections/Partners.astro';
 import Trust from '@/components/sections/Trust.astro';
-import FoundingPartners from '@/components/sections/FoundingPartners.astro';
 import Compare from '@/components/sections/Compare.astro';
 import Merchants from '@/components/sections/Merchants.astro';
 import Faq from '@/components/sections/Faq.astro';
@@ -17,7 +16,7 @@ import Apply from '@/components/sections/Apply.astro';
 import { faqPageNode, serviceNode } from '@/lib/schema';
 
 const base = Astro.site ?? new URL('http://localhost:4321');
-// Section order and anchor ids follow CLAUDE.md exactly.
+// Section order and anchor ids follow CLAUDE.md. v2 has no #founding-partners section.
 ---
 
 <PageLayout schema={[serviceNode(base), faqPageNode(base)]}>
@@ -30,7 +29,6 @@ const base = Astro.site ?? new URL('http://localhost:4321');
   <Verticals />
   <Partners />
   <Trust />
-  <FoundingPartners />
   <Compare />
   <Merchants />
   <Faq />
