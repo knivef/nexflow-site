@@ -111,6 +111,23 @@ Every page uses `src/layouts/PageLayout.astro`, which brings the nav, announceme
 - **Guides** (`/guides/[slug]`): add a `.md` or `.mdx` file to `src/content/guides/` with `title`, `description`, `publishedAt` and optionally `updatedAt` and `draft`. It is built as a page, added to the sitemap and given Article schema. Drafts are not built.
 - **Vertical or audience pages** (`/igaming`, `/affiliates`): create `src/pages/igaming.astro`, wrap it in `PageLayout`, and reuse the section components or the vertical data in `site.verticals.items` (each item's `id` is already a URL-friendly slug).
 
+## Versions (v1, v2, v3)
+
+Each version is a git branch deployed to its own Vercel URL, listed in `config.versions` (`src/config/site.config.ts`):
+
+| Version | Branch | URL |
+|---|---|---|
+| v1 (primary) | `main` | https://nexflow-site.vercel.app |
+| v2 | `v2` | https://nexflow-site-v2.vercel.app |
+| v3 | `v3` | https://nexflow-site-v3.vercel.app |
+
+- Push to a branch and Vercel redeploys that version.
+- A floating switcher (bottom-left) links the versions and keeps the visitor on the same section. Turn it off with `showVersionSwitcher: false` before launch.
+- A build knows its version from the branch Vercel is building (`VERCEL_GIT_COMMIT_REF`), or `SITE_VERSION` if set. Locally it uses your current git branch.
+- Only v1 can be indexed. v2 and v3 send `noindex` and a robots.txt that blocks all crawlers, so review copies never compete with the main site.
+- Changes meant for every version go on `main` first, then merge `main` into `v2` and `v3`.
+- The `v1` git tag marks the first approved version.
+
 ## Deploy to Vercel
 
 1. Push this repo to GitHub.

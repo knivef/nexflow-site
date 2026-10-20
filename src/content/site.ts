@@ -19,6 +19,8 @@ export const site: SiteContent = {
     dismissAnnouncement: 'Dismiss announcement',
     requiredMarker: '(required)',
     selectPlaceholder: 'Select one',
+    versionSwitcherLabel: 'Site versions',
+    versionPrefix: 'Version',
     sectionLabels: {
       hero: 'Introduction',
       who: 'Who Nexflow works with',

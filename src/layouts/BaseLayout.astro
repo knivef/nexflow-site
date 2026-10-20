@@ -9,6 +9,7 @@ import { ANALYTICS_DOMAIN } from 'astro:env/server';
 import { site } from '@/content/site';
 import { isReal } from '@/lib/placeholder';
 import { graph, organizationNode } from '@/lib/schema';
+import { isPrimaryVersion } from '@/lib/version';
 
 interface Props {
   title?: string;
@@ -38,6 +39,8 @@ const canonical = new URL(Astro.url.pathname, base).href;
 const ogImage = new URL(image, base).href;
 const twitterHandle = site.seo.twitterHandle.replace(/^@/, '');
 const jsonLd = graph([organizationNode(base), ...schema]);
+// Review versions (v2, v3) are never indexed, so they don't compete with the primary version.
+const blockIndexing = noindex || !isPrimaryVersion();
 ---
 
 <!doctype html>
@@ -48,7 +51,7 @@ const jsonLd = graph([organizationNode(base), ...schema]);
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex" />}
+    {blockIndexing && <meta name="robots" content="noindex, nofollow" />}
 
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

@@ -7,6 +7,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import AnnouncementBar from '@/components/layout/AnnouncementBar.astro';
 import Nav from '@/components/layout/Nav.astro';
 import Footer from '@/components/layout/Footer.astro';
+import VersionSwitcher from '@/components/layout/VersionSwitcher.astro';
 import { site } from '@/content/site';
 
 type Props = Parameters<typeof BaseLayout>[0];
@@ -22,4 +23,5 @@ type Props = Parameters<typeof BaseLayout>[0];
     </main>
     <Footer />
   </div>
+  <VersionSwitcher />
 </BaseLayout>

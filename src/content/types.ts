@@ -30,6 +30,8 @@ export interface UiContent {
   dismissAnnouncement: string;
   requiredMarker: string;
   selectPlaceholder: string;
+  versionSwitcherLabel: string;
+  versionPrefix: string;
   /** Accessible names for sections, used when a section has no visible heading. Keyed by anchor id. */
   sectionLabels: Record<string, string>;
 }
