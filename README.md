@@ -113,19 +113,18 @@ Every page uses `src/layouts/PageLayout.astro`, which brings the nav, announceme
 
 ## Versions (v1, v2, v3)
 
-Each version is a git branch deployed to its own Vercel URL, listed in `config.versions` (`src/config/site.config.ts`):
+All three versions live on the `main` branch and are served from one Vercel deployment:
 
-| Version | Branch | URL |
-|---|---|---|
-| v1 (primary) | `main` | https://nexflow-site-one.vercel.app |
-| v2 | `v2` | https://nexflow-psp-v2.vercel.app |
-| v3 | `v3` | https://nexflow-site-three.vercel.app |
+| Version | URL | Code | Design |
+|---|---|---|---|
+| v1 (primary) | https://nexflow-site-one.vercel.app/ | `src/` (pages in `src/pages/`) | `design/` |
+| v2 | https://nexflow-site-one.vercel.app/v2/ | `src/v2/` (pages in `src/pages/v2/`) | `design/v2/` |
+| v3 | https://nexflow-site-one.vercel.app/v3/ | `src/v3/` (pages in `src/pages/v3/`) | `design/` (v3 starts as a copy of v1) |
 
-- Push to a branch and Vercel redeploys that version.
-- A floating switcher (bottom-left) links the versions and keeps the visitor on the same section. Turn it off with `showVersionSwitcher: false` before launch.
-- A build knows its version from the branch Vercel is building (`VERCEL_GIT_COMMIT_REF`), or `SITE_VERSION` if set. Locally it uses your current git branch.
-- Only v1 can be indexed. v2 and v3 send `noindex` and a robots.txt that blocks all crawlers, so review copies never compete with the main site.
-- Changes meant for every version go on `main` first, then merge `main` into `v2` and `v3`.
+- Each version is a self-contained tree with its own components, styles, content file, config and form endpoint (`/api/apply`, `/v2/api/apply`, `/v3/api/apply`). Imports use `@/` (v1), `@v2/` and `@v3/`, so the trees never share styles by accident.
+- The version list is in `src/shared/versions.ts`. The floating switcher (bottom-left) links the versions and keeps the visitor on the same section. Turn it off per version with `showVersionSwitcher: false` before launch.
+- Only v1 can be indexed. v2 and v3 send `noindex`, are disallowed in robots.txt and left out of the sitemap.
+- To change a version, edit its tree on `main` and push. The old `v2` and `v3` branches are superseded by `src/v2/` and `src/v3/` and are no longer used.
 - The `v1` git tag marks the first approved version.
 
 ## Deploy to Vercel

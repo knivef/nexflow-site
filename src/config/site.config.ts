@@ -16,13 +16,8 @@ export interface SiteConfig {
   merchantReferralForm: boolean;
   /** Show links to resources (docs, guides, status page) once they exist. */
   showResources: boolean;
-  /** Show the floating version switcher linking the deployed versions of the site. */
+  /** Show the floating version switcher linking the versions of the site (see src/shared/versions.ts). */
   showVersionSwitcher: boolean;
-  /**
-   * Deployed versions. Each lives on its own git branch and Vercel URL.
-   * The first entry is the primary version: the only one search engines may index.
-   */
-  versions: { id: string; label: string; branch: string; url: string }[];
 }
 
 export const config: SiteConfig = {
@@ -34,9 +29,4 @@ export const config: SiteConfig = {
   merchantReferralForm: false,
   showResources: false,
   showVersionSwitcher: true,
-  versions: [
-    { id: 'v1', label: 'V1', branch: 'main', url: 'https://nexflow-site-one.vercel.app' },
-    { id: 'v2', label: 'V2', branch: 'v2', url: 'https://nexflow-psp-v2.vercel.app' },
-    { id: 'v3', label: 'V3', branch: 'v3', url: 'https://nexflow-site-three.vercel.app' },
-  ],
 };

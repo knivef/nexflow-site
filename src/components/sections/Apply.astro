@@ -6,6 +6,7 @@ import Field from '@/components/ui/Field.astro';
 import Button from '@/components/ui/Button.astro';
 import { renderPlaceholders, isReal } from '@/lib/placeholder';
 import { HONEYPOT_FIELD, STARTED_AT_FIELD, rulesFromContent } from '@/lib/apply';
+import { basePath } from '@/lib/version';
 import type { ApplyFieldName } from '@/content/types';
 
 const apply = site.apply;
@@ -39,12 +40,14 @@ const failureEmail = isReal(apply.failure.email)
 const [failureBefore, failureAfter] = apply.failure.body.split('{email}');
 
 const bookingUrl = isReal(BOOKING_URL) ? BOOKING_URL : '';
+// Each version has its own endpoint, so it validates against its own form fields.
+const applyEndpoint = `${basePath()}api/apply`;
 // The honeypot field is moved off-screen and hidden from assistive tech: people never see it, bots fill it in.
 ---
 
 <Section id="apply" eyebrow={apply.eyebrow} heading={apply.heading} intro={apply.intro}>
   <div class="apply" data-apply>
-    <form class="apply__form" method="post" action="/api/apply" novalidate data-apply-form>
+    <form class="apply__form" method="post" action={applyEndpoint} novalidate data-apply-form>
       <p class="apply__summary" role="alert" tabindex="-1" data-apply-summary hidden></p>
 
       <div class="apply__hp" aria-hidden="true">

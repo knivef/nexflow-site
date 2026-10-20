@@ -1,0 +1,337 @@
+---
+/**
+ * v2 hero: left-aligned typographic statement with a composite "work email + button" CTA,
+ * an illustrative product-style panel on the right, and a full-bleed dark stat band below.
+ * The email typed here is carried into the #apply form; it never goes into the URL.
+ */
+import { site } from '@v2/content/site';
+import Button from '@v2/components/ui/Button.astro';
+import { renderPlaceholders } from '@v2/lib/placeholder';
+
+const { eyebrow, heading, subheading, primaryCta, secondaryCta, stats, emailCapture, visual } = site.hero;
+---
+
+<section id="hero" class="hero" aria-labelledby="hero-heading">
+  <div class="container hero__inner">
+    <div class="hero__copy">
+      <p class="hero__eyebrow t-caption">{eyebrow}</p>
+      <h1 id="hero-heading" class="hero__heading t-display">{heading}</h1>
+      <p class="hero__subheading" set:html={renderPlaceholders(subheading)} />
+
+      <form class="hero__capture" action={primaryCta.href} data-hero-capture>
+        <label class="visually-hidden" for="hero-email">{emailCapture.label}</label>
+        <input
+          id="hero-email"
+          class="hero__input"
+          type="email"
+          autocomplete="email"
+          placeholder={emailCapture.placeholder}
+          data-hero-email
+        />
+        <Button variant="primary" type="submit" arrow={false}>{emailCapture.button}</Button>
+      </form>
+
+      {
+        secondaryCta && (
+          <div class="hero__secondary">
+            <Button variant="link" href={secondaryCta.href}>
+              {secondaryCta.label}
+            </Button>
+          </div>
+        )
+      }
+    </div>
+
+    <figure class="hero__visual">
+      <div class="hero__window" aria-hidden="true">
+        <div class="hero__chrome">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="hero__panel">
+          <div class="hero__panel-head">
+            <p class="hero__panel-title">{visual.title}</p>
+            <p class="hero__panel-sub">{visual.subtitle}</p>
+          </div>
+          <ul class="hero__rows" role="list">
+            {
+              visual.rows.map((row) => (
+                <li>
+                  <span>{row.label}</span>
+                  <span class="hero__status">{row.status}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <div class="hero__panel-foot">
+            <p class="t-caption">{visual.footerLabel}</p>
+            <p>{visual.footerValue}</p>
+          </div>
+        </div>
+      </div>
+      <figcaption class="hero__caption">{visual.caption}</figcaption>
+    </figure>
+  </div>
+
+  {
+    stats.length > 0 && (
+      <div class="hero__band">
+        <ul class="container hero__stats" role="list">
+          {stats.map((stat) => (
+            <li class="hero__stat">
+              <p class="hero__stat-label">{stat.label}</p>
+              <p class="hero__stat-value" set:html={renderPlaceholders(stat.value)} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+</section>
+
+<script>
+  // Carry the hero email into the application form, then move the visitor there.
+  const capture = document.querySelector<HTMLFormElement>('[data-hero-capture]');
+  capture?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const email = capture.querySelector<HTMLInputElement>('[data-hero-email]')?.value.trim() ?? '';
+    const target = document.querySelector<HTMLInputElement>('#apply [name="workEmail"]');
+    if (target && email) {
+      target.value = email;
+      target.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    const apply = document.getElementById('apply');
+    apply?.scrollIntoView({ block: 'start' });
+    const next = document.querySelector<HTMLInputElement>(email ? '#apply [name="fullName"]' : '#apply [name="workEmail"]');
+    next?.focus({ preventScroll: true });
+    history.replaceState(null, '', '#apply');
+  });
+</script>
+
+<style>
+  .hero {
+    padding-top: clamp(48px, 7vw, 96px);
+  }
+
+  .hero__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: var(--spacing-64);
+    align-items: center;
+    padding-bottom: clamp(48px, 7vw, 96px);
+  }
+
+  .hero__eyebrow {
+    color: var(--text-secondary);
+  }
+
+  .hero__heading {
+    margin-top: var(--spacing-16);
+    max-width: 14ch;
+  }
+
+  .hero__subheading {
+    max-width: 52ch;
+    margin-top: var(--spacing-24);
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body-lg);
+    color: var(--text-secondary);
+  }
+
+  /* Composite CTA: input flush beside the Highlighter button. */
+  .hero__capture {
+    display: flex;
+    gap: var(--spacing-8);
+    max-width: 520px;
+    margin-top: var(--spacing-32);
+  }
+
+  .hero__input {
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0 16px 0 20px;
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-inputs);
+    background: var(--bg-card);
+    color: var(--text-primary);
+  }
+
+  .hero__input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .hero__input:focus-visible {
+    outline-offset: 1px;
+  }
+
+  .hero__secondary {
+    margin-top: var(--spacing-16);
+  }
+
+  /* Illustrative product-style panel in a browser-chrome frame. */
+  .hero__visual {
+    margin: 0;
+  }
+
+  .hero__window {
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-cards);
+    background: var(--bg-card);
+    overflow: hidden;
+  }
+
+  .hero__chrome {
+    display: flex;
+    gap: 6px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-hairline);
+  }
+
+  .hero__chrome span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-smoke);
+  }
+
+  .hero__panel {
+    display: grid;
+    gap: var(--spacing-20);
+    padding: var(--spacing-24);
+  }
+
+  .hero__panel-title {
+    font-size: var(--text-body-lg);
+  }
+
+  .hero__panel-sub {
+    margin-top: 4px;
+    font-size: var(--text-body-sm);
+    color: var(--text-secondary);
+  }
+
+  .hero__rows {
+    display: grid;
+    border: 1px solid var(--border-hairline);
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+  }
+
+  .hero__rows li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-16);
+    padding: 12px 16px;
+    font-size: var(--text-body-sm);
+  }
+
+  .hero__rows li + li {
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .hero__status {
+    padding: 4px 8px;
+    border-radius: var(--radius-tags);
+    background: var(--accent-active);
+    font-size: var(--text-caption);
+    line-height: 1;
+  }
+
+  .hero__panel-foot {
+    display: grid;
+    gap: 4px;
+    padding: 16px;
+    border-radius: var(--radius-xl);
+    background: var(--bg-wash);
+    font-size: var(--text-body-sm);
+  }
+
+  .hero__caption {
+    margin-top: var(--spacing-12);
+    font-size: var(--text-body-sm);
+    color: var(--text-muted);
+  }
+
+  /* Full-bleed dark stat band. */
+  .hero__band {
+    background: var(--bg-inverse);
+    color: var(--text-inverse);
+  }
+
+  .hero__stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .hero__stat {
+    display: grid;
+    gap: var(--spacing-8);
+    align-content: start;
+    padding: var(--spacing-24) var(--spacing-24) var(--spacing-24) 0;
+  }
+
+  .hero__stat + .hero__stat {
+    padding-left: var(--spacing-24);
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .hero__stat-label {
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+    color: var(--text-inverse-muted);
+  }
+
+  .hero__stat-value {
+    font-size: var(--text-body);
+    color: var(--text-inverse);
+  }
+
+  @media (max-width: 1023px) {
+    .hero__inner {
+      grid-template-columns: 1fr;
+    }
+
+    .hero__visual {
+      max-width: 560px;
+    }
+
+    .hero__stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hero__stat:nth-child(3) {
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    .hero__stat:nth-child(n + 3) {
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  @media (max-width: 599px) {
+    .hero__capture {
+      flex-direction: column;
+    }
+
+    .hero__capture :global(.btn) {
+      width: 100%;
+    }
+
+    .hero__stats {
+      grid-template-columns: 1fr;
+    }
+
+    .hero__stat,
+    .hero__stat + .hero__stat {
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    .hero__stat + .hero__stat {
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+  }
+</style>

@@ -5,15 +5,13 @@ import mdx from '@astrojs/mdx';
 import vercel from '@astrojs/vercel';
 import { loadEnv } from 'vite';
 
-import { config } from './src/config/site.config';
+import { PRODUCTION_URL } from './src/shared/versions';
 
-const { SITE_URL, SITE_VERSION } = loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), '');
+const { SITE_URL } = loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), '');
 
-// Public URL: SITE_URL if set, otherwise the URL of the version Vercel is building (matched by git branch),
-// so v1, v2 and v3 each get correct canonical URLs, sitemap and schema without per-branch env vars.
-const branch = process.env.VERCEL_GIT_COMMIT_REF;
-const version = config.versions.find((v) => (SITE_VERSION ? v.id === SITE_VERSION : v.branch === branch));
-const siteUrl = SITE_URL || (process.env.VERCEL ? version?.url : undefined) || 'http://localhost:4321';
+// Public URL: SITE_URL if set, otherwise the production URL when building on Vercel.
+// All three versions are served from this one deployment: v1 at /, v2 at /v2/, v3 at /v3/.
+const siteUrl = SITE_URL || (process.env.VERCEL ? PRODUCTION_URL : undefined) || 'http://localhost:4321';
 
 export default defineConfig({
   site: siteUrl,
@@ -21,7 +19,8 @@ export default defineConfig({
   output: 'static',
   adapter: vercel(),
   trailingSlash: 'ignore',
-  integrations: [mdx(), sitemap({ filter: (page) => !page.includes('/api/') })],
+  // Review versions (/v2/, /v3/) and the form endpoints stay out of the sitemap.
+  integrations: [mdx(), sitemap({ filter: (page) => !/\/(api|v2|v3)\//.test(new URL(page).pathname) })],
   // The sitemap integration writes /sitemap-index.xml; /sitemap.xml redirects there for crawlers that guess.
   redirects: { '/sitemap.xml': '/sitemap-index.xml' },
   env: {

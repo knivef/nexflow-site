@@ -1,0 +1,180 @@
+---
+import { site } from '@v3/content/site';
+import Section from '@v3/components/ui/Section.astro';
+import Tabs from '@v3/components/ui/Tabs.astro';
+import Button from '@v3/components/ui/Button.astro';
+import { renderPlaceholders } from '@v3/lib/placeholder';
+
+const { eyebrow, heading, intro, tabsLabel, defaultTab, labels, items, other } = site.verticals;
+---
+
+<Section id="verticals" eyebrow={eyebrow} heading={heading} intro={intro}>
+  <Tabs
+    id="verticals"
+    label={tabsLabel}
+    tabs={items.map(({ id, tabLabel }) => ({ id, label: tabLabel }))}
+    defaultTab={defaultTab}
+    deepLink
+  >
+    {
+      items.map((vertical) => (
+        <div slot={vertical.id} class="vertical">
+          <div class="vertical__main">
+            <p class="vertical__name t-caption">{vertical.name}</p>
+            <h3 class="t-heading">{vertical.subheading}</h3>
+            <dl class="vertical__copy">
+              <div>
+                <dt class="vertical__label t-caption">{labels.problem}</dt>
+                <dd class="t-body-lg" set:html={renderPlaceholders(vertical.problem)} />
+              </div>
+              <div>
+                <dt class="vertical__label t-caption">{labels.solution}</dt>
+                <dd class="t-body-lg vertical__solution" set:html={renderPlaceholders(vertical.solution)} />
+              </div>
+            </dl>
+          </div>
+
+          <div class="vertical__side">
+            <div class="vertical__card">
+              <h4 class="vertical__label t-caption">{labels.capabilities}</h4>
+              <ul class="vertical__caps" role="list">
+                {vertical.capabilities.map((capability) => (
+                  <li>
+                    <span class="vertical__marker" aria-hidden="true">
+                      +
+                    </span>
+                    <span set:html={renderPlaceholders(capability)} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {vertical.aside && (
+              <div class="vertical__aside">
+                <h4 class="t-subheading">{vertical.aside.heading}</h4>
+                <p class="vertical__audience t-body-sm">{vertical.aside.audience}</p>
+                <p class="t-body" set:html={renderPlaceholders(vertical.aside.body)} />
+              </div>
+            )}
+          </div>
+        </div>
+      ))
+    }
+  </Tabs>
+
+  <div class="vertical__other">
+    <div>
+      <h3 class="t-subheading">{other.title}</h3>
+      <p class="t-body">{other.body}</p>
+    </div>
+    <Button variant="link" href={other.link.href}>{other.link.label}</Button>
+  </div>
+</Section>
+
+<style>
+  .vertical {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--spacing-64);
+    align-items: start;
+  }
+
+  .vertical__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+  }
+
+  .vertical__main h3 {
+    max-width: 20ch;
+  }
+
+  .vertical__copy {
+    display: grid;
+    gap: var(--spacing-32);
+    margin-top: var(--spacing-24);
+  }
+
+  .vertical__copy dd {
+    margin: var(--spacing-8) 0 0;
+    max-width: 58ch;
+  }
+
+  .vertical__solution {
+    color: var(--text-primary);
+  }
+
+  .vertical__label {
+    font-weight: var(--font-weight-medium);
+  }
+
+  .vertical__side {
+    display: grid;
+    gap: var(--spacing-16);
+  }
+
+  .vertical__card {
+    padding: var(--card-padding);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-cards);
+  }
+
+  .vertical__caps {
+    display: grid;
+    margin-top: var(--spacing-16);
+  }
+
+  .vertical__caps li {
+    display: flex;
+    gap: var(--spacing-16);
+    padding-block: var(--spacing-16);
+    border-top: 1px solid var(--border-hairline);
+    color: var(--text-primary);
+  }
+
+  .vertical__marker {
+    flex-shrink: 0;
+    font-weight: var(--font-weight-medium);
+  }
+
+  /* Referral sub-block: the Periwinkle surface marks it as a different audience. */
+  .vertical__aside {
+    display: grid;
+    gap: var(--spacing-8);
+    padding: var(--card-padding);
+    border-radius: var(--radius-cards);
+    background: var(--bg-elevated);
+  }
+
+  .vertical__aside .t-body {
+    color: var(--text-primary);
+  }
+
+  .vertical__audience {
+    color: var(--text-secondary);
+  }
+
+  .vertical__other {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-16) var(--spacing-32);
+    margin-top: var(--section-gap);
+    padding: var(--card-padding);
+    border: 1px dashed var(--border-control);
+    border-radius: var(--radius-cards);
+  }
+
+  .vertical__other > div {
+    display: grid;
+    gap: var(--spacing-8);
+  }
+
+  @media (max-width: 1023px) {
+    .vertical {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-40);
+    }
+  }
+</style>

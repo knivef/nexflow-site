@@ -1,14 +1,15 @@
 ---
 /**
- * Floating switcher between the deployed versions of the site (one Vercel URL per git branch).
- * Switching keeps the visitor's place: the current path and #section are carried over.
+ * Floating switcher between the site versions (/, /v2/, /v3/), all on one deployment.
+ * Switching keeps the visitor's place: the current #section is carried over.
  */
 import { site } from '@/content/site';
 import { config } from '@/config/site.config';
 import { currentVersionId } from '@/lib/version';
+import { VERSIONS } from '@shared/versions';
 
 const current = currentVersionId();
-const visible = config.showVersionSwitcher && config.versions.length > 1;
+const visible = config.showVersionSwitcher && VERSIONS.length > 1;
 ---
 
 {
@@ -18,10 +19,10 @@ const visible = config.showVersionSwitcher && config.versions.length > 1;
         {site.ui.versionPrefix}
       </span>
       <ul role="list">
-        {config.versions.map((version) => (
+        {VERSIONS.map((version) => (
           <li>
             <a
-              href={version.url}
+              href={version.path}
               aria-current={version.id === current ? 'page' : undefined}
               data-version-link
             >
@@ -43,7 +44,6 @@ const visible = config.showVersionSwitcher && config.versions.length > 1;
         return;
       }
       const target = new URL(link.href);
-      target.pathname = location.pathname;
       target.hash = location.hash;
       link.href = target.href;
     });

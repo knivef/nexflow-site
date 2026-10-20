@@ -1,0 +1,193 @@
+---
+import { site } from '@v3/content/site';
+import Section from '@v3/components/ui/Section.astro';
+import { renderPlaceholders } from '@v3/lib/placeholder';
+
+const { eyebrow, heading, intro, caption, columns, highlightColumn, edgeLabel, rows, footnote } = site.compare;
+// Explicit ARIA roles keep table semantics when rows are restyled as stacked cards on small screens.
+---
+
+<Section id="compare" eyebrow={eyebrow} heading={heading} intro={intro}>
+  <div class="compare__wrap">
+    <table class="compare" role="table">
+      <caption class="visually-hidden">{caption}</caption>
+      <thead role="rowgroup">
+        <tr role="row">
+          <td class="compare__corner" role="cell"></td>
+          {
+            columns.map((column, index) => (
+              <th scope="col" role="columnheader" class:list={[index === highlightColumn && 'is-highlight']}>
+                {column}
+              </th>
+            ))
+          }
+        </tr>
+      </thead>
+      <tbody role="rowgroup">
+        {
+          rows.map((row) => (
+            <tr role="row">
+              <th scope="row" role="rowheader" class="compare__label">
+                {row.label}
+              </th>
+              {row.values.map((value, index) => (
+                <td
+                  role="cell"
+                  data-label={columns[index]}
+                  class:list={[index === highlightColumn && 'is-highlight', row.edge.includes(index) && 'has-edge']}
+                >
+                  <span set:html={renderPlaceholders(value)} />
+                  {row.edge.includes(index) && <span class="compare__edge">{edgeLabel}</span>}
+                </td>
+              ))}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="compare__footnote t-body">{footnote}</p>
+</Section>
+
+<style>
+  .compare__wrap {
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-cards);
+    overflow: hidden;
+  }
+
+  .compare {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: var(--text-body-sm);
+    text-align: left;
+  }
+
+  .compare th,
+  .compare td {
+    padding: var(--spacing-24);
+    vertical-align: top;
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .compare thead th,
+  .compare thead td {
+    border-top: 0;
+  }
+
+  .compare thead th {
+    font-family: var(--font-serif);
+    font-size: var(--text-subheading);
+    font-weight: var(--font-weight-regular);
+    letter-spacing: -0.02em;
+    line-height: var(--leading-subheading);
+  }
+
+  .compare__corner {
+    width: 22%;
+  }
+
+  .compare__label {
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .compare td {
+    color: var(--text-primary);
+  }
+
+  /* Nexflow column: the Periwinkle surface, no other emphasis. */
+  .compare .is-highlight {
+    background: var(--bg-elevated);
+  }
+
+  .compare tbody td.is-highlight {
+    border-top-color: rgba(36, 36, 36, 0.12);
+  }
+
+  .compare__edge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: var(--spacing-8);
+    font-size: var(--text-caption);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .compare__edge::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-primary);
+  }
+
+  .compare__footnote {
+    max-width: 72ch;
+    margin-top: var(--spacing-24);
+  }
+
+  /* Small screens: each row becomes a card listing the three options, with the Nexflow option highlighted. */
+  @media (max-width: 899px) {
+    .compare__wrap {
+      border: 0;
+      border-radius: 0;
+      overflow: visible;
+    }
+
+    .compare thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    .compare,
+    .compare tbody,
+    .compare tr,
+    .compare th,
+    .compare td {
+      display: block;
+      width: 100%;
+    }
+
+    .compare tbody {
+      display: grid;
+      gap: var(--spacing-16);
+    }
+
+    .compare tbody tr {
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-2xl);
+      overflow: hidden;
+    }
+
+    .compare tbody th {
+      border-top: 0;
+      padding: var(--spacing-16) var(--spacing-24);
+    }
+
+    .compare tbody td {
+      padding: var(--spacing-16) var(--spacing-24);
+    }
+
+    .compare tbody td::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: 4px;
+      font-size: var(--text-caption);
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .compare tbody td.is-highlight::before {
+      color: var(--text-secondary);
+    }
+  }
+</style>

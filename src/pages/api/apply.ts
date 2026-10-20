@@ -16,6 +16,7 @@ import {
   validateApply,
 } from '@/lib/apply';
 import { getAdapter, type ApplicationRecord } from '@/lib/adapters';
+import { basePath } from '@/lib/version';
 
 export const prerender = false;
 
@@ -47,7 +48,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   const respond = (status: number, body: Record<string, unknown>, outcome: 'success' | 'invalid' | 'error' | 'limited') =>
     isJson
       ? json(status, body)
-      : new Response(null, { status: 303, headers: { location: `/?apply=${outcome}#apply` } });
+      : new Response(null, { status: 303, headers: { location: `${basePath()}?apply=${outcome}#apply` } });
 
   if (Number(request.headers.get('content-length') ?? 0) > MAX_BODY_BYTES) {
     return respond(413, { ok: false, message: 'Request too large' }, 'error');

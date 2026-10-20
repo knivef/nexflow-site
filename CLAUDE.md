@@ -28,6 +28,8 @@ Implemented in `src/styles/tokens.css`. Decisions made on top of the design file
 - AA fixes: muted text uses `--color-smoke-text` (#706e6d) instead of Smoke; form controls use `--color-control-border` (#8a8684) instead of Ash. Ash stays for decorative hairlines.
 - The announcement bar sits above the sticky nav. `#top` is the page wrapper, so "back to top" links work even with a sticky nav.
 
+The design above is v1's (also used by v3). **v2 (`src/v2/`) uses a different design**, `design/v2/DESIGN.md`: Bone canvas, white hairline cards, no shadows, one typeface at weight 400 (Inter substituting licensed Lausanne, with `ss01`), 6px buttons, 10px inputs, 16px cards, left-aligned, no gradients, Highlighter Yellow only on actions and active states, Obsidian for inverted bands and footer. v2 AA fixes: labels on Obsidian #a1a09f, control borders #8d8b89, Ink focus rings, 12px micro-labels. v2 scope: no founding partner programme, testimonials or company facts module; FAQ shows `site.faq.featured`; the form shows `site.apply.visibleFields`.
+
 ## Non-negotiable rules
 
 - **No em dashes anywhere:** copy, code comments, meta tags, alt text. Use commas, colons, full stops or hyphens.
@@ -84,7 +86,7 @@ Implemented in `src/styles/tokens.css`. Decisions made on top of the design file
 9. `#verticals`
 10. `#partners`
 11. `#trust`
-12. `#founding-partners`
+12. `#founding-partners` (v1 and v3 only)
 13. `#compare`
 14. `#merchants`
 15. `#faq`
@@ -111,7 +113,7 @@ Implemented in `src/styles/tokens.css`. Decisions made on top of the design file
 - **Form:** `#apply` posts to `/api/apply`, which validates with `src/lib/apply.ts` (shared with the browser) and delivers through the adapter named by `FORM_ADAPTER` (`webhook`, `notion`, `email` stub, `none`). Field names in `ApplyFieldName` are fixed; copy is free to change.
 - **Placeholders in links:** never put a placeholder in an `href`. Use `isReal()` from `src/lib/placeholder.ts` and render placeholder text instead.
 - **Repo hygiene:** `README.md` with local dev and Vercel deploy steps, `.gitignore`, `PLACEHOLDERS.md`, `public/llms.txt`, `public/robots.txt`, sitemap.
-- **Git and versions:** private repo `knivef/nexflow-site`, Vercel project `nexflow-site` (v1 at nexflow-site-one.vercel.app) (team knivef-1268s-projects). `main` is v1 (tag `v1` = first approved version); branches `v2` and `v3` are alternative versions, each with its own Vercel URL (see README "Versions"). Shared changes go on `main`, then merge into `v2` and `v3`. Only v1 is indexable. Commit and push only when the user asks.
+- **Git and versions:** private repo `knivef/nexflow-site`, Vercel project `nexflow-site` (v1 at nexflow-site-one.vercel.app). Everything is on `main`: v1 in `src/`, v2 in `src/v2/` (served at `/v2/`), v3 in `src/v3/` (served at `/v3/`), version list in `src/shared/versions.ts`. Edit only the tree for the version you're changing; a change meant for all versions has to be made in each tree. Only v1 is indexable. Tag `v1` = first approved version. The old `v2`/`v3` branches are superseded. Commit and push only when the user asks.
 
 ## Working style
 

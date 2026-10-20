@@ -1,0 +1,119 @@
+---
+import { site } from '@v3/content/site';
+import Section from '@v3/components/ui/Section.astro';
+import Button from '@v3/components/ui/Button.astro';
+import { renderPlaceholders } from '@v3/lib/placeholder';
+
+const { eyebrow, heading, subheading, intro, benefitLabel, types, callout } = site.partners;
+---
+
+<Section id="partners" eyebrow={eyebrow} heading={heading} subheading={subheading} intro={intro}>
+  <ul class="partners__grid" role="list">
+    {
+      types.map((type) => (
+        <li class="partners__card">
+          <h4 class="t-subheading">{type.title}</h4>
+          <div class="partners__benefit">
+            <p class="t-caption">{benefitLabel}</p>
+            <p class="t-body">{type.benefit}</p>
+          </div>
+          {type.link && (
+            <div class="partners__link">
+              <Button variant="link" href={type.link.href}>
+                {type.link.label}
+              </Button>
+            </div>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+
+  <aside class="partners__callout" aria-labelledby="partners-callout-heading">
+    <h4 id="partners-callout-heading" class="t-heading-sm">{callout.heading}</h4>
+    <p class="t-body-lg" set:html={renderPlaceholders(callout.text)} />
+  </aside>
+</Section>
+
+<style>
+  .partners__grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--spacing-24);
+  }
+
+  /* 3 cards on the first row, 2 wider cards on the second. */
+  .partners__card {
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-24);
+    padding: var(--card-padding);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-cards);
+  }
+
+  .partners__card:nth-child(n + 4) {
+    grid-column: span 3;
+  }
+
+  .partners__benefit {
+    display: grid;
+    gap: var(--spacing-8);
+    padding-top: var(--spacing-16);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .partners__benefit .t-body {
+    color: var(--text-primary);
+  }
+
+  .partners__link {
+    margin-top: auto;
+  }
+
+  .partners__callout {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--spacing-24) var(--spacing-64);
+    margin-top: var(--spacing-24);
+    padding: var(--card-padding);
+    border-radius: var(--radius-cards);
+    background: var(--bg-inverse);
+    color: var(--text-inverse);
+  }
+
+  .partners__callout h4,
+  .partners__callout .t-body-lg {
+    color: var(--text-inverse);
+  }
+
+  @media (max-width: 1023px) {
+    .partners__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .partners__card,
+    .partners__card:nth-child(n + 4) {
+      grid-column: span 1;
+    }
+
+    .partners__card:last-child {
+      grid-column: span 2;
+    }
+
+    .partners__callout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .partners__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .partners__card:last-child {
+      grid-column: span 1;
+    }
+  }
+</style>

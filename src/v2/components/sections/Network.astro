@@ -1,0 +1,556 @@
+---
+import { site } from '@v2/content/site';
+import Section from '@v2/components/ui/Section.astro';
+import { renderPlaceholders, hasPlaceholder } from '@v2/lib/placeholder';
+
+const { eyebrow, heading, intro, diagram, table, footnote } = site.network;
+const { rows, columns, filters } = table;
+
+const slug = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+
+const regions = rows.map((row) => row.region);
+const verticals = [...new Set(rows.flatMap((row) => row.verticals))];
+
+// Fan-out curves from the hub to each region node, in a 100 x 100 box stretched to the region column.
+const curves = rows.map((_, index) => {
+  const y = ((index + 0.5) / rows.length) * 100;
+  return `M0,50 C55,50 45,${y} 100,${y}`;
+});
+
+// The table carries explicit ARIA roles so it keeps table semantics when restyled as stacked cards on small screens.
+const isLocal = (value: string) => value.trim().toLowerCase() === 'yes';
+const badgeFor = (value: string) =>
+  hasPlaceholder(value) ? value : isLocal(value) ? diagram.localBadge : diagram.crossBorderBadge;
+
+const cell = (value: string, placeholder: boolean) =>
+  placeholder && !hasPlaceholder(value)
+    ? `<mark class="placeholder">${renderPlaceholders(value)}</mark>`
+    : renderPlaceholders(value);
+---
+
+<Section id="network" eyebrow={eyebrow} heading={heading} intro={intro}>
+  <figure class="network__map">
+    <figcaption class="visually-hidden">{diagram.label}</figcaption>
+    <div class="network__diagram">
+      <div class="network__node network__node--source">
+        <span class="network__node-label">{diagram.sourceLabel}</span>
+        <span class="network__node-detail">{diagram.sourceDetail}</span>
+      </div>
+
+      <span class="network__link" aria-hidden="true"></span>
+
+      <div class="network__hub">
+          <span class="network__node network__node--hub">
+          <span class="network__node-label">{diagram.hubLabel}</span>
+          <span class="network__node-detail">{diagram.hubDetail}</span>
+        </span>
+      </div>
+
+      <div class="network__fan" aria-hidden="true">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
+          {curves.map((d) => <path d={d} />)}
+        </svg>
+      </div>
+
+      <ul class="network__regions" role="list">
+        {
+          rows.map((row) => (
+            <li class="network__region">
+              <span class="network__node network__node--region">
+                <span class="network__node-label" set:html={renderPlaceholders(row.region)} />
+                <span class="network__badge" set:html={renderPlaceholders(badgeFor(row.localAcquiring))} />
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </figure>
+
+  <div class="network__table-block" data-network>
+    <div class="network__filters" data-network-filters hidden>
+      <div class="network__filter">
+        <label for="network-region" class="network__filter-label">{filters.regionLabel}</label>
+        <div class="network__select">
+          <select id="network-region" data-filter="region">
+            <option value="">{filters.allRegions}</option>
+            {regions.map((region) => <option value={slug(region)}>{region}</option>)}
+          </select>
+          <span aria-hidden="true">↓</span>
+        </div>
+      </div>
+      <div class="network__filter">
+        <label for="network-vertical" class="network__filter-label">{filters.verticalLabel}</label>
+        <div class="network__select">
+          <select id="network-vertical" data-filter="vertical">
+            <option value="">{filters.allVerticals}</option>
+            {verticals.map((vertical) => <option value={slug(vertical)}>{vertical}</option>)}
+          </select>
+          <span aria-hidden="true">↓</span>
+        </div>
+      </div>
+      <button type="button" class="network__reset" data-filter-reset>{filters.reset}</button>
+      <p class="network__status" role="status" data-filter-status data-template={filters.status}>
+        {filters.status.replace('{shown}', String(rows.length)).replace('{total}', String(rows.length))}
+      </p>
+    </div>
+
+    <div class="network__table-wrap">
+      <table class="network__table" role="table">
+        <caption class="network__caption t-caption">{table.caption}</caption>
+        <thead role="rowgroup">
+          <tr role="row">
+            <th scope="col" role="columnheader">{columns.region}</th>
+            <th scope="col" role="columnheader">{columns.localAcquiring}</th>
+            <th scope="col" role="columnheader">{columns.verticals}</th>
+            <th scope="col" role="columnheader">{columns.settlementCurrencies}</th>
+            <th scope="col" role="columnheader">{columns.typicalGoLive}</th>
+          </tr>
+        </thead>
+        <tbody role="rowgroup">
+          {
+            rows.map((row) => (
+              <tr
+                role="row"
+                data-row
+                data-region={slug(row.region)}
+                data-verticals={row.verticals.map(slug).join(' ')}
+                class:list={[row.placeholder && 'is-placeholder']}
+              >
+                <th scope="row" role="rowheader" data-label={columns.region}>
+                  <span set:html={renderPlaceholders(row.region)} />
+                  {row.placeholder && <span class="network__row-flag">{table.placeholderRowLabel}</span>}
+                </th>
+                <td role="cell" data-label={columns.localAcquiring}>
+                  <span set:html={cell(row.localAcquiring, row.placeholder)} />
+                </td>
+                <td role="cell" data-label={columns.verticals}>
+                  <ul class="network__tags" role="list">
+                    {row.verticals.map((vertical) => (
+                      <li set:html={cell(vertical, row.placeholder)} />
+                    ))}
+                  </ul>
+                </td>
+                <td role="cell" data-label={columns.settlementCurrencies}>
+                  <span set:html={cell(row.settlementCurrencies, row.placeholder)} />
+                </td>
+                <td role="cell" data-label={columns.typicalGoLive}>
+                  <span set:html={cell(row.typicalGoLive, row.placeholder)} />
+                </td>
+              </tr>
+            ))
+          }
+          <tr class="network__empty" role="row" data-empty hidden>
+            <td role="cell" colspan="5">{filters.empty}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="network__footnote t-body">{footnote}</p>
+  </div>
+</Section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-network]').forEach((root) => {
+    const controls = root.querySelector<HTMLElement>('[data-network-filters]');
+    const region = root.querySelector<HTMLSelectElement>('[data-filter="region"]');
+    const vertical = root.querySelector<HTMLSelectElement>('[data-filter="vertical"]');
+    const reset = root.querySelector<HTMLButtonElement>('[data-filter-reset]');
+    const status = root.querySelector<HTMLElement>('[data-filter-status]');
+    const empty = root.querySelector<HTMLElement>('[data-empty]');
+    const rows = Array.from(root.querySelectorAll<HTMLElement>('[data-row]'));
+    if (!controls || !region || !vertical || !reset || !status || !empty) return;
+
+    // Filters only appear when JavaScript runs. Without it, the full table is shown.
+    controls.hidden = false;
+
+    const apply = () => {
+      let shown = 0;
+      for (const row of rows) {
+        const regionMatch = !region.value || row.dataset.region === region.value;
+        const verticalMatch = !vertical.value || (row.dataset.verticals ?? '').split(' ').includes(vertical.value);
+        row.hidden = !(regionMatch && verticalMatch);
+        if (!row.hidden) shown += 1;
+      }
+      empty.hidden = shown > 0;
+      reset.hidden = !region.value && !vertical.value;
+      status.textContent = (status.dataset.template ?? '')
+        .replace('{shown}', String(shown))
+        .replace('{total}', String(rows.length));
+    };
+
+    region.addEventListener('change', apply);
+    vertical.addEventListener('change', apply);
+    reset.addEventListener('click', () => {
+      region.value = '';
+      vertical.value = '';
+      apply();
+      region.focus();
+    });
+    apply();
+  });
+</script>
+
+<style>
+  /* Coverage diagram: PSP -> Nexflow hub -> region nodes, drawn like the design's pipeline diagram. */
+  .network__map {
+    margin-bottom: var(--section-gap);
+  }
+
+  .network__diagram {
+    display: grid;
+    grid-template-columns: auto minmax(40px, 1fr) auto minmax(80px, 1.4fr) minmax(240px, auto);
+    align-items: center;
+  }
+
+  .network__node {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 20px;
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-2xl);
+    background: var(--bg-card);
+  }
+
+  .network__node-label {
+    font-size: var(--text-body-sm);
+    color: var(--text-primary);
+  }
+
+  .network__node-detail {
+    font-size: var(--text-caption);
+    color: var(--text-muted);
+  }
+
+  .network__node--source,
+  .network__node--hub {
+    border-radius: var(--radius-pills);
+    padding: 14px 28px;
+    text-align: center;
+  }
+
+  .network__node--hub {
+    position: relative;
+    border-color: var(--text-primary);
+    background: var(--bg-inverse);
+  }
+
+  .network__node--hub .network__node-label {
+    color: var(--text-inverse);
+  }
+
+  .network__node--hub .network__node-detail {
+    color: var(--text-inverse-muted);
+  }
+
+  .network__hub {
+    position: relative;
+    display: grid;
+    place-items: center;
+  }
+
+  .network__link {
+    height: 2px;
+    background-image: linear-gradient(to right, var(--color-ash) 50%, transparent 50%);
+    background-size: 12px 2px;
+  }
+
+  /* The wrapper stretches to the region column's height without adding any height of its own. */
+  .network__fan {
+    position: relative;
+    align-self: stretch;
+  }
+
+  .network__fan svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .network__fan path {
+    fill: none;
+    stroke: var(--color-ash);
+    stroke-width: 2;
+    stroke-dasharray: 6 6;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .network__regions {
+    display: grid;
+  }
+
+  .network__region {
+    padding-block: var(--spacing-8);
+  }
+
+  .network__node--region {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-16);
+    border-radius: var(--radius-pills);
+  }
+
+  .network__badge {
+    font-size: var(--text-caption);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 1023px) {
+    .network__diagram {
+      grid-template-columns: 1fr;
+      justify-items: center;
+    }
+
+    .network__link {
+      width: 2px;
+      height: 40px;
+      background-image: linear-gradient(to bottom, var(--color-ash) 50%, transparent 50%);
+      background-size: 2px 12px;
+    }
+
+    .network__fan {
+      display: none;
+    }
+
+    .network__hub {
+      margin-bottom: var(--spacing-24);
+    }
+
+    .network__regions {
+      width: 100%;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 var(--spacing-16);
+    }
+  }
+
+  @media (max-width: 599px) {
+    .network__regions {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Filters */
+  .network__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--spacing-16) var(--spacing-24);
+    margin-bottom: var(--spacing-24);
+  }
+
+  .network__filters[hidden] {
+    display: none;
+  }
+
+  .network__filter {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    min-width: 220px;
+  }
+
+  .network__filter-label {
+    font-size: var(--text-body-sm);
+  }
+
+  .network__select {
+    position: relative;
+  }
+
+  .network__select select {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 44px 10px 20px;
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-inputs);
+    background: var(--bg-card);
+    font-size: var(--text-body-sm);
+    appearance: none;
+    cursor: pointer;
+  }
+
+  .network__select select:hover {
+    border-color: var(--border-strong);
+  }
+
+  .network__select span {
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .network__reset {
+    min-height: 44px;
+    padding: 10px 4px;
+    border: 0;
+    background: transparent;
+    font-size: var(--text-body-sm);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+    cursor: pointer;
+  }
+
+  .network__reset[hidden] {
+    display: none;
+  }
+
+  .network__status {
+    margin-left: auto;
+    align-self: center;
+    font-size: var(--text-body-sm);
+    color: var(--text-muted);
+  }
+
+  /* Table */
+  .network__table-wrap {
+    border: 1px solid var(--border-hairline);
+    background: var(--bg-card);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+  }
+
+  .network__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-body-sm);
+    text-align: left;
+  }
+
+  .network__caption {
+    padding: var(--spacing-16) var(--spacing-24);
+    text-align: left;
+    caption-side: top;
+  }
+
+  .network__table th,
+  .network__table td {
+    padding: var(--spacing-16) var(--spacing-24);
+    border-top: 1px solid var(--border-hairline);
+    vertical-align: top;
+  }
+
+  .network__table thead th {
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .network__table tbody th {
+    font-weight: var(--font-weight-regular);
+  }
+
+  .network__table tr[hidden] {
+    display: none;
+  }
+
+  .network__row-flag {
+    display: block;
+    margin-top: 6px;
+    font-size: var(--text-caption);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .network__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .network__empty td {
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  .network__footnote {
+    max-width: 72ch;
+    margin-top: var(--spacing-24);
+  }
+
+  /* Small screens: each row becomes a stacked card with its column labels. */
+  @media (max-width: 767px) {
+    .network__filter {
+      flex: 1 1 100%;
+      min-width: 0;
+    }
+
+    .network__status {
+      margin-left: 0;
+    }
+
+    .network__table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    .network__table,
+    .network__table tbody,
+    .network__table tr,
+    .network__table th,
+    .network__table td {
+      display: block;
+    }
+
+    .network__table tbody tr {
+      padding: var(--spacing-16) var(--spacing-24);
+      border-top: 1px solid var(--border-hairline);
+    }
+
+    .network__caption {
+      display: block;
+    }
+
+    .network__table tbody th,
+    .network__table tbody td {
+      display: grid;
+      grid-template-columns: 8rem minmax(0, 1fr);
+      gap: var(--spacing-16);
+      padding: 6px 0;
+      border: 0;
+    }
+
+    .network__table tbody th::before,
+    .network__table tbody td::before {
+      content: attr(data-label);
+      font-size: var(--text-caption);
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .network__table tbody th > :not(.network__row-flag) {
+      grid-column: 2;
+    }
+
+    .network__row-flag {
+      grid-column: 2;
+      margin-top: 0;
+    }
+
+    .network__empty td {
+      display: block;
+      text-align: left;
+    }
+
+    .network__empty td::before {
+      content: none;
+    }
+  }
+</style>

@@ -1,0 +1,421 @@
+---
+import { BOOKING_URL } from 'astro:env/server';
+import { site } from '@v3/content/site';
+import Section from '@v3/components/ui/Section.astro';
+import Field from '@v3/components/ui/Field.astro';
+import Button from '@v3/components/ui/Button.astro';
+import { renderPlaceholders, isReal } from '@v3/lib/placeholder';
+import { HONEYPOT_FIELD, STARTED_AT_FIELD, rulesFromContent } from '@v3/lib/apply';
+import { basePath } from '@v3/lib/version';
+import type { ApplyFieldName } from '@v3/content/types';
+
+const apply = site.apply;
+const order: ApplyFieldName[] = [
+  'fullName',
+  'workEmail',
+  'company',
+  'website',
+  'companyType',
+  'volume',
+  'licenceStatus',
+  'licenceDetails',
+  'verticals',
+  'geographies',
+  'needs',
+  'currentAcquirers',
+  'message',
+];
+
+// Validation rules go to the browser as data, so the script doesn't bundle the whole content file.
+const rules = rulesFromContent(apply);
+
+const [consentBefore, consentAfter] = apply.consent.label.split('{privacyLink}');
+const privacyLink = isReal(apply.consent.privacyHref)
+  ? `<a href="${apply.consent.privacyHref}">${renderPlaceholders(apply.consent.privacyLinkLabel)}</a>`
+  : `${renderPlaceholders(apply.consent.privacyLinkLabel)} ${renderPlaceholders(apply.consent.privacyHref)}`;
+
+const failureEmail = isReal(apply.failure.email)
+  ? `<a href="mailto:${apply.failure.email}">${apply.failure.email}</a>`
+  : renderPlaceholders(apply.failure.email);
+const [failureBefore, failureAfter] = apply.failure.body.split('{email}');
+
+const bookingUrl = isReal(BOOKING_URL) ? BOOKING_URL : '';
+// Each version has its own endpoint, so it validates against its own form fields.
+const applyEndpoint = `${basePath()}api/apply`;
+// The honeypot field is moved off-screen and hidden from assistive tech: people never see it, bots fill it in.
+---
+
+<Section id="apply" eyebrow={apply.eyebrow} heading={apply.heading} intro={apply.intro}>
+  <div class="apply" data-apply>
+    <form class="apply__form" method="post" action={applyEndpoint} novalidate data-apply-form>
+      <p class="apply__summary" role="alert" tabindex="-1" data-apply-summary hidden></p>
+
+      <div class="apply__hp" aria-hidden="true">
+        <label for={HONEYPOT_FIELD}>{apply.honeypotLabel}</label>
+        <input type="text" id={HONEYPOT_FIELD} name={HONEYPOT_FIELD} tabindex="-1" autocomplete="off" />
+      </div>
+      <input type="hidden" name={STARTED_AT_FIELD} value="" data-started-at />
+
+      <div class="apply__grid">
+        {
+          order.map((name) => {
+            const field = apply.fields[name];
+            return (
+              <div class:list={['apply__cell', field.width === 'half' && 'apply__cell--half']}>
+                <Field
+                  kind={field.kind}
+                  name={field.name}
+                  label={field.label}
+                  type={field.type}
+                  required={field.required}
+                  hint={field.hint}
+                  placeholder={field.placeholder}
+                  autocomplete={field.autocomplete as never}
+                  options={field.options}
+                />
+              </div>
+            );
+          })
+        }
+      </div>
+
+      <div class="apply__consent">
+        <label class="apply__consent-label" for="field-consent">
+          <input type="checkbox" id="field-consent" name="consent" aria-describedby="field-consent-error" />
+          <span>
+            {consentBefore}<Fragment set:html={privacyLink} />{consentAfter}
+            <span class="apply__required"> {site.ui.requiredMarker}</span>
+          </span>
+        </label>
+        <p class="apply__error" id="field-consent-error" aria-live="polite"></p>
+      </div>
+
+      <div class="apply__actions">
+        <Button variant="primary" type="submit" data-apply-submit data-label-busy={apply.submittingLabel}>
+          {apply.submitLabel}
+        </Button>
+      </div>
+    </form>
+
+    <div class="apply__result apply__result--success" data-apply-success tabindex="-1" hidden>
+      <h3 class="t-heading-sm">{apply.success.heading}</h3>
+      <p class="t-body-lg" set:html={renderPlaceholders(apply.success.body)} />
+      {
+        bookingUrl && (
+          <div class="apply__booking">
+            <h4 class="t-subheading">{apply.success.bookingHeading}</h4>
+            <iframe
+              class="apply__booking-frame"
+              title={apply.success.bookingFrameTitle}
+              data-src={bookingUrl}
+              loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
+            />
+            <a href={bookingUrl} rel="noopener" target="_blank">
+              {apply.success.bookingLinkLabel}
+              <span aria-hidden="true"> ↗</span>
+            </a>
+          </div>
+        )
+      }
+    </div>
+
+    <div class="apply__result apply__result--failure" data-apply-failure role="alert" hidden>
+      <h3 class="t-subheading">{apply.failure.heading}</h3>
+      <p class="t-body">
+        {failureBefore}<Fragment set:html={failureEmail} />{failureAfter}
+      </p>
+    </div>
+
+    <script type="application/json" data-apply-rules set:html={JSON.stringify(rules)} />
+  </div>
+</Section>
+
+<script>
+  import { parseFormData, validateApply, HONEYPOT_FIELD, STARTED_AT_FIELD, type ApplyRules, type ApplyErrors } from '@v3/lib/apply';
+
+  const root = document.querySelector<HTMLElement>('[data-apply]');
+  const form = root?.querySelector<HTMLFormElement>('[data-apply-form]');
+  const rulesEl = root?.querySelector('[data-apply-rules]');
+
+  if (root && form && rulesEl) {
+    const rules = JSON.parse(rulesEl.textContent ?? '{}') as ApplyRules;
+    const summary = root.querySelector<HTMLElement>('[data-apply-summary]')!;
+    const success = root.querySelector<HTMLElement>('[data-apply-success]')!;
+    const failure = root.querySelector<HTMLElement>('[data-apply-failure]')!;
+    const submit = root.querySelector<HTMLButtonElement>('[data-apply-submit]')!;
+    const submitLabel = submit.querySelector('.btn__label');
+    const startedAt = root.querySelector<HTMLInputElement>('[data-started-at]')!;
+    startedAt.value = String(Date.now());
+
+    const names = ['fullName', 'workEmail', 'company', 'website', 'companyType', 'volume', 'licenceStatus', 'licenceDetails', 'verticals', 'geographies', 'needs', 'currentAcquirers', 'message', 'consent'] as const;
+    let attempted = false;
+
+    const controlsFor = (name: string) =>
+      Array.from(form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(`[name="${name}"]`));
+
+    function showErrors(errors: ApplyErrors) {
+      for (const name of names) {
+        const message = errors[name] ?? '';
+        const errorEl = document.getElementById(`field-${name}-error`);
+        if (errorEl) errorEl.textContent = message;
+        for (const control of controlsFor(name)) {
+          if (message) control.setAttribute('aria-invalid', 'true');
+          else control.removeAttribute('aria-invalid');
+        }
+      }
+    }
+
+    function validate() {
+      const errors = validateApply(parseFormData(new FormData(form!)), rules);
+      showErrors(errors);
+      return errors;
+    }
+
+    // After the first submit attempt, re-check as people fix things.
+    form.addEventListener('input', () => attempted && validate());
+    form.addEventListener('change', () => attempted && validate());
+
+    // Pre-select a partnership type from ?partnership= (set by "Apply for a founding spot") or a live event.
+    const companyType = form.querySelector<HTMLSelectElement>('[name="companyType"]');
+    const preselect = (intent: string | null) => {
+      if (companyType && intent && rules.options.companyType.includes(intent)) companyType.value = intent;
+    };
+    const params = new URLSearchParams(location.search);
+    preselect(params.get('partnership'));
+    document.addEventListener('nexflow:apply-intent', (event) => preselect((event as CustomEvent<{ intent: string }>).detail.intent));
+
+    const setBusy = (busy: boolean) => {
+      submit.disabled = busy;
+      submit.setAttribute('aria-busy', String(busy));
+      if (submitLabel) {
+        submitLabel.textContent = busy ? (submit.dataset.labelBusy ?? '') : (submit.dataset.labelIdle ?? submitLabel.textContent ?? '');
+      }
+    };
+    if (submitLabel) submit.dataset.labelIdle = submitLabel.textContent ?? '';
+
+    const showSuccess = () => {
+      form.hidden = true;
+      failure.hidden = true;
+      success.hidden = false;
+      const frame = success.querySelector<HTMLIFrameElement>('iframe[data-src]');
+      if (frame && !frame.src) frame.src = frame.dataset.src ?? '';
+      success.focus();
+    };
+
+    const showFailure = () => {
+      failure.hidden = false;
+      failure.scrollIntoView({ block: 'nearest' });
+    };
+
+    // Results of a no-JavaScript post come back as ?apply=... on the page URL.
+    const outcome = params.get('apply');
+    if (outcome === 'success') showSuccess();
+    else if (outcome === 'error') showFailure();
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      attempted = true;
+      failure.hidden = true;
+
+      const errors = validate();
+      const invalid = Object.keys(errors);
+      if (invalid.length > 0) {
+        summary.textContent = rules.errors.summary.replace('{count}', String(invalid.length));
+        summary.hidden = false;
+        const first = names.find((name) => errors[name]);
+        if (first) controlsFor(first)[0]?.focus();
+        return;
+      }
+      summary.hidden = true;
+
+      const data = new FormData(form);
+      const payload = {
+        ...parseFormData(data),
+        [HONEYPOT_FIELD]: String(data.get(HONEYPOT_FIELD) ?? ''),
+        [STARTED_AT_FIELD]: String(data.get(STARTED_AT_FIELD) ?? ''),
+      };
+
+      setBusy(true);
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const result = (await response.json().catch(() => ({}))) as { ok?: boolean; errors?: ApplyErrors; message?: string };
+
+        if (response.ok && result.ok) {
+          showSuccess();
+        } else if (response.status === 422 && result.errors) {
+          showErrors(result.errors);
+          summary.textContent = rules.errors.summary.replace('{count}', String(Object.keys(result.errors).length));
+          summary.hidden = false;
+          summary.focus();
+        } else if (response.status === 429) {
+          summary.textContent = rules.errors.rateLimited;
+          summary.hidden = false;
+        } else {
+          showFailure();
+        }
+      } catch {
+        showFailure();
+      } finally {
+        setBusy(false);
+      }
+    });
+  }
+</script>
+
+<style>
+  .apply {
+    display: grid;
+    gap: var(--spacing-24);
+    max-width: 1040px;
+  }
+
+  .apply__form {
+    display: grid;
+    gap: var(--spacing-32);
+    padding: var(--card-padding);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-cards);
+  }
+
+  .apply__form[hidden] {
+    display: none;
+  }
+
+  .apply__summary {
+    padding: var(--spacing-16) var(--spacing-24);
+    border: 1px solid var(--color-error);
+    border-radius: var(--radius-2xl);
+    color: var(--color-error);
+    font-size: var(--text-body-sm);
+  }
+
+  .apply__summary[hidden] {
+    display: none;
+  }
+
+  .apply__hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .apply__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-24) var(--spacing-24);
+  }
+
+  .apply__cell {
+    grid-column: 1 / -1;
+  }
+
+  .apply__cell--half {
+    grid-column: span 1;
+  }
+
+  .apply__consent {
+    display: grid;
+    gap: var(--spacing-8);
+    padding-top: var(--spacing-24);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .apply__consent-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: var(--text-body-sm);
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  .apply__consent-label input {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+    accent-color: var(--color-off-black);
+  }
+
+  .apply__consent-label input[aria-invalid='true'] {
+    outline: 2px solid var(--color-error);
+    outline-offset: 2px;
+  }
+
+  .apply__required {
+    color: var(--text-muted);
+  }
+
+  .apply__error {
+    font-size: var(--text-body-sm);
+    color: var(--color-error);
+  }
+
+  .apply__error:empty {
+    display: none;
+  }
+
+  .apply__actions :global(.btn[aria-busy='true']) {
+    cursor: progress;
+    opacity: 0.8;
+  }
+
+  .apply__result {
+    display: grid;
+    gap: var(--spacing-16);
+    padding: var(--card-padding);
+    border-radius: var(--radius-cards);
+  }
+
+  .apply__result[hidden] {
+    display: none;
+  }
+
+  .apply__result--success {
+    background: var(--bg-elevated);
+  }
+
+  .apply__result--success:focus {
+    outline: none;
+  }
+
+  .apply__result--success .t-body-lg {
+    color: var(--text-primary);
+  }
+
+  .apply__result--failure {
+    border: 1px solid var(--color-error);
+  }
+
+  .apply__booking {
+    display: grid;
+    gap: var(--spacing-16);
+    margin-top: var(--spacing-16);
+  }
+
+  .apply__booking-frame {
+    width: 100%;
+    height: 680px;
+    border: 0;
+    border-radius: var(--radius-2xl);
+    background: var(--bg-page);
+  }
+
+  .apply__booking a {
+    font-size: var(--text-body-sm);
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 767px) {
+    .apply__cell--half {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

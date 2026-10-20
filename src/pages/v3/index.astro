@@ -1,0 +1,38 @@
+---
+import PageLayout from '@v3/layouts/PageLayout.astro';
+import Hero from '@v3/components/sections/Hero.astro';
+import Who from '@v3/components/sections/Who.astro';
+import Problem from '@v3/components/sections/Problem.astro';
+import How from '@v3/components/sections/How.astro';
+import Network from '@v3/components/sections/Network.astro';
+import Features from '@v3/components/sections/Features.astro';
+import Verticals from '@v3/components/sections/Verticals.astro';
+import Partners from '@v3/components/sections/Partners.astro';
+import Trust from '@v3/components/sections/Trust.astro';
+import FoundingPartners from '@v3/components/sections/FoundingPartners.astro';
+import Compare from '@v3/components/sections/Compare.astro';
+import Merchants from '@v3/components/sections/Merchants.astro';
+import Faq from '@v3/components/sections/Faq.astro';
+import Apply from '@v3/components/sections/Apply.astro';
+import { faqPageNode, serviceNode } from '@v3/lib/schema';
+
+const base = Astro.site ?? new URL('http://localhost:4321');
+// Section order and anchor ids follow CLAUDE.md exactly.
+---
+
+<PageLayout schema={[serviceNode(base), faqPageNode(base)]}>
+  <Hero />
+  <Who />
+  <Problem />
+  <How />
+  <Network />
+  <Features />
+  <Verticals />
+  <Partners />
+  <Trust />
+  <FoundingPartners />
+  <Compare />
+  <Merchants />
+  <Faq />
+  <Apply />
+</PageLayout>

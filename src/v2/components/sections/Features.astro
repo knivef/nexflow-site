@@ -1,0 +1,109 @@
+---
+import { site } from '@v2/content/site';
+import Section from '@v2/components/ui/Section.astro';
+import Tabs from '@v2/components/ui/Tabs.astro';
+import { renderPlaceholders } from '@v2/lib/placeholder';
+
+const { eyebrow, heading, intro, tabsLabel, groups } = site.features;
+---
+
+<Section id="features" eyebrow={eyebrow} heading={heading} intro={intro}>
+  <Tabs id="features" label={tabsLabel} tabs={groups.map(({ id, label }) => ({ id, label }))}>
+    {
+      groups.map((group, index) => (
+        <div slot={group.id} class="features__panel">
+          <div class:list={['features__intro', `features__intro--${index % 4}`]}>
+            <p class="features__count t-caption">
+              {String(index + 1).padStart(2, '0')} / {String(groups.length).padStart(2, '0')}
+            </p>
+            <h3 class="t-heading-sm">{group.label}</h3>
+            <p class="t-body">{group.summary}</p>
+          </div>
+          <ul class="features__list" role="list">
+            {group.items.map((item) => (
+              <li class="features__item">
+                <h4 class="features__title">{item.title}</h4>
+                <p class="t-body" set:html={renderPlaceholders(item.body)} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </Tabs>
+</Section>
+
+<style>
+  .features__panel {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--spacing-24);
+    align-items: start;
+  }
+
+  /* v2: inverted Obsidian panel introduces each group. No illustration: the design is type-led. */
+  .features__intro {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+    min-height: 320px;
+    padding: var(--card-padding);
+    border-radius: var(--radius-cards);
+    background: var(--bg-inverse);
+    color: var(--text-inverse);
+  }
+
+  .features__intro h3 {
+    color: var(--text-inverse);
+  }
+
+  .features__intro .t-body {
+    color: var(--text-inverse);
+    max-width: 36ch;
+  }
+
+  .features__count {
+    color: var(--text-inverse-muted);
+  }
+
+  .features__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--spacing-32);
+  }
+
+  .features__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    padding-block: var(--spacing-24);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .features__title {
+    font-size: var(--text-body-lg);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--leading-body-lg);
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+
+  @media (max-width: 1023px) {
+    .features__panel {
+      grid-template-columns: 1fr;
+    }
+
+    .features__intro {
+      min-height: 280px;
+    }
+
+  }
+
+  @media (max-width: 599px) {
+    .features__list {
+      grid-template-columns: 1fr;
+    }
+
+  }
+</style>
