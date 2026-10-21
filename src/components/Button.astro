@@ -1,0 +1,106 @@
+---
+/**
+ * Pill button. Lake Blue is the single primary action per screen, Off-Black is secondary,
+ * ghost is tertiary. Renders an anchor when href is set, otherwise a button.
+ */
+interface Props {
+  variant?: 'primary' | 'secondary' | 'ghost';
+  href?: string;
+  type?: 'button' | 'submit';
+  arrow?: boolean;
+  disabled?: boolean;
+  /** Event name sent to analytics when clicked. */
+  analytics?: string;
+  class?: string;
+  'aria-describedby'?: string;
+}
+
+const {
+  variant = 'primary',
+  href,
+  type = 'button',
+  arrow = variant === 'primary',
+  disabled = false,
+  analytics,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const Tag = href ? 'a' : 'button';
+const classes = ['btn', `btn--${variant}`, className].filter(Boolean).join(' ');
+---
+
+<Tag
+  class={classes}
+  href={href}
+  type={href ? undefined : type}
+  disabled={href ? undefined : disabled || undefined}
+  data-analytics={analytics}
+  {...rest}
+>
+  <span class="btn__label"><slot /></span>
+  {arrow && <span class="btn__arrow" aria-hidden="true">&rarr;</span>}
+</Tag>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-8);
+    min-height: 48px;
+    padding: var(--spacing-16) var(--spacing-32);
+    border: 1px solid transparent;
+    border-radius: var(--radius-buttons);
+    font-family: var(--font-ui);
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    line-height: 1;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color var(--duration-fast) var(--easing),
+      border-color var(--duration-fast) var(--easing);
+  }
+
+  .btn--primary {
+    background-color: var(--accent-fill);
+    color: var(--text-on-accent-fill);
+  }
+
+  .btn--primary:hover {
+    background-color: var(--accent-fill-hover);
+  }
+
+  .btn--secondary {
+    background-color: var(--surface-inverted);
+    color: var(--text-on-inverted);
+  }
+
+  .btn--secondary:hover {
+    opacity: 0.9;
+  }
+
+  .btn--ghost {
+    background-color: transparent;
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+
+  .btn--ghost:hover {
+    background-color: var(--surface-accent);
+  }
+
+  .btn:disabled {
+    background-color: var(--surface-disabled);
+    border-color: transparent;
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+
+  .btn__arrow {
+    font-size: 1em;
+    line-height: 1;
+  }
+</style>

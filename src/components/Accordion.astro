@@ -1,0 +1,77 @@
+---
+/**
+ * Accordion built on native details and summary: keyboard accessible and fully functional
+ * with no JavaScript. Pass a group name to make the items mutually exclusive.
+ */
+interface Props {
+  items: { id: string; label: string }[];
+  /** Shared name makes only one item open at a time. */
+  group?: string;
+  class?: string;
+}
+
+const { items, group, class: className } = Astro.props;
+---
+
+<div class={['accordion', className].filter(Boolean).join(' ')}>
+  {
+    items.map((item) => (
+      <details class="accordion__item" id={item.id} name={group}>
+        <summary class="accordion__summary">
+          <span class="accordion__label">{item.label}</span>
+          <span class="accordion__icon" aria-hidden="true">&darr;</span>
+        </summary>
+        <div class="accordion__panel">
+          <slot name={item.id} />
+        </div>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .accordion__item {
+    border-bottom: 1px solid var(--border-hairline);
+  }
+
+  .accordion__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-24);
+    padding-block: var(--spacing-24);
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-display);
+    font-size: var(--text-subheading);
+    line-height: var(--leading-subheading);
+    letter-spacing: var(--tracking-display);
+    color: var(--text-primary);
+  }
+
+  @media (min-width: 768px) {
+    .accordion__summary {
+      padding-block: var(--spacing-40);
+    }
+  }
+
+  .accordion__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .accordion__icon {
+    flex: none;
+    font-family: var(--font-ui);
+    font-size: var(--text-body-lg);
+    transition: transform var(--duration-fast) var(--easing);
+  }
+
+  .accordion__item[open] .accordion__icon {
+    transform: rotate(180deg);
+  }
+
+  .accordion__panel {
+    padding-bottom: var(--spacing-24);
+    color: var(--text-secondary);
+  }
+</style>

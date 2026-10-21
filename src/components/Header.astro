@@ -1,0 +1,214 @@
+---
+/**
+ * Top bar. Solutions is a menu of 7 pulled from the content collection, so the menu and the
+ * pages cannot drift apart. There is no login link: siteConfig.showLogin gates it and stays
+ * false until the client area exists.
+ *
+ * Below 1024px the whole navigation sits inside a native disclosure, so it works with no
+ * JavaScript and is keyboard operable by default.
+ */
+import { getCollection } from 'astro:content';
+import { site } from '@/content/site';
+import { siteConfig } from '@/config/site.config';
+import MegaMenu from './MegaMenu.astro';
+import Button from './Button.astro';
+
+const solutions = (await getCollection('solutions')).sort((a, b) => a.data.order - b.data.order);
+
+const solutionLinks = solutions.map((entry) => ({
+  label: entry.data.navLabel,
+  href: `/solutions/${entry.id}`,
+  summary: entry.data.navSummary,
+}));
+---
+
+<header class="header">
+  <div class="container header__inner">
+    <a class="header__brand" href="/" data-version-home>
+      <span class="header__wordmark">{site.brand.name}</span>
+      <span class="visually-hidden">, home</span>
+    </a>
+
+    <details class="header__disclosure" data-nav open>
+      <summary class="header__toggle">
+        <span>{site.nav.menuButtonLabel}</span>
+      </summary>
+
+      <nav class="header__nav" aria-label="Main">
+        <ul class="header__items">
+          {
+            site.nav.items.map((item) => (
+              <li class="header__item">
+                {item.kind === 'link' && (
+                  <a class="header__link" href={item.href}>{item.label}</a>
+                )}
+                {item.kind === 'menu' && (
+                  <MegaMenu label={item.label} items={item.items} size="narrow" />
+                )}
+                {item.kind === 'collection' && item.collection === 'solutions' && (
+                  <MegaMenu label={item.label} items={solutionLinks} size="wide" />
+                )}
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="header__actions">
+          {siteConfig.showLogin && (
+            <a class="header__link" href="/login">Log in</a>
+          )}
+          <Button href={site.ctas.primary.href} variant="primary" arrow={false} analytics="nav_open_account">
+            {site.ctas.primary.label}
+          </Button>
+        </div>
+      </nav>
+    </details>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    border-bottom: 1px solid var(--border-hairline);
+    background-color: var(--surface-page);
+  }
+
+  .header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-16);
+    min-height: 72px;
+  }
+
+  .header__brand {
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .header__wordmark {
+    font-family: var(--font-display);
+    font-size: var(--text-subheading);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .header__toggle {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: var(--spacing-8) var(--spacing-16);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-buttons);
+    cursor: pointer;
+    list-style: none;
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    text-transform: uppercase;
+  }
+
+  .header__toggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .header__nav {
+    padding-block: var(--spacing-16) var(--spacing-24);
+  }
+
+  .header__items {
+    list-style: none;
+  }
+
+  .header__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: var(--spacing-8) var(--spacing-16);
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    text-transform: uppercase;
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .header__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-16);
+    margin-top: var(--spacing-16);
+    padding-left: var(--spacing-16);
+  }
+
+  /* On mobile the disclosure panel drops below the bar, full width. */
+  @media (max-width: 1023px) {
+    .header__disclosure[open] .header__nav {
+      position: absolute;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      max-height: calc(100vh - 72px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-inline: var(--page-gutter);
+      padding-bottom: var(--spacing-32);
+      border-bottom: 1px solid var(--border-hairline);
+      background-color: var(--surface-page);
+    }
+
+    .header__inner {
+      position: relative;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .header__toggle {
+      display: none;
+    }
+
+    .header__disclosure > .header__nav {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-24);
+      padding-block: 0;
+    }
+
+    .header__items {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-8);
+    }
+
+    .header__actions {
+      margin-top: 0;
+      padding-left: 0;
+    }
+  }
+</style>
+
+<script>
+  /*
+   * The disclosure ships open, so with no JavaScript the navigation is visible at every
+   * width. The script only collapses it below 1024px, where the Menu toggle takes over.
+   */
+  const sync = () => {
+    const wide = window.matchMedia('(min-width: 1024px)').matches;
+    document.querySelectorAll<HTMLDetailsElement>('[data-nav]').forEach((nav) => {
+      if (wide) nav.setAttribute('open', '');
+      else if (!nav.dataset.userToggled) nav.removeAttribute('open');
+    });
+  };
+
+  document.querySelectorAll<HTMLDetailsElement>('[data-nav]').forEach((nav) => {
+    nav.querySelector<HTMLElement>('summary')?.addEventListener('click', () => {
+      nav.dataset.userToggled = 'true';
+    });
+  });
+
+  sync();
+  window.addEventListener('resize', () => {
+    document.querySelectorAll<HTMLDetailsElement>('[data-nav]').forEach((nav) => delete nav.dataset.userToggled);
+    sync();
+  });
+</script>

@@ -1,0 +1,395 @@
+---
+/**
+ * One template for all 7 solution pages.
+ *
+ * An entry with the template fields filled renders the full page: hero, three benefits,
+ * how it works as a flow, who it is for, a service-specific compliance note, FAQ and two
+ * related solutions. An entry without them still renders as a shell, so the solutions that
+ * are not written yet do not break the build or the navigation.
+ *
+ * The final CTA band and footer come from BaseLayout, so section 7 is version-aware without
+ * this template doing anything.
+ *
+ * The FAQ is rendered, not just stored: FAQ structured data in Step 12 has to match content
+ * the visitor can actually see.
+ */
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/Section.astro';
+import Button from '@/components/Button.astro';
+import Badge from '@/components/Badge.astro';
+import Card from '@/components/Card.astro';
+import Accordion from '@/components/Accordion.astro';
+import FlowDiagram from '@/components/FlowDiagram.astro';
+import DetailPanel from '@/components/DetailPanel.astro';
+import CardRender from '@/components/CardRender.astro';
+import { site } from '@/content/site';
+import { industries } from '@/content/industries';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('solutions');
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const data = entry.data;
+const { Content } = await render(entry);
+
+// Related cards pull their own title and summary from the collection, so they cannot drift.
+const all = await getCollection('solutions');
+const related = (data.related ?? [])
+  .map((slug) => all.find((item) => item.id === slug))
+  .filter((item) => item !== undefined);
+
+const primaryCta = data.cta ?? site.ctas.primary;
+
+// Industries that list this solution. Derived, so every solution page links to its
+// industries and the two can never disagree about which is which.
+const relatedIndustries = industries.sections
+  .filter((section) => section.products.some((product) => product.slug === entry.id))
+  .map((section) => ({ label: section.title, href: `/industries#${section.id}` }));
+const faqItems = (data.faq ?? []).map((item, index) => ({
+  id: `faq-${index + 1}`,
+  label: item.question,
+}));
+---
+
+<BaseLayout
+  title={data.seoTitle}
+  description={data.description}
+  financialService={{ name: data.navLabel, description: data.description, url: `/solutions/${entry.id}` }}
+  faq={data.faq}
+  breadcrumbs={[{ name: data.navLabel, href: `/solutions/${entry.id}` }]}
+>
+  {/* 1. Hero */}
+  <section class="hero" aria-labelledby="solution-heading">
+    <div class="container hero__inner">
+      <div class="hero__copy">
+        <p class="caption hero__eyebrow">{data.navLabel}</p>
+        <h1 id="solution-heading">{data.title}</h1>
+        <p class="hero__sub">{data.subHead ?? data.description}</p>
+
+        {data.confirmations.length > 0 && (
+          <ul class="confirmations" aria-label="Open confirmations before launch">
+            {data.confirmations.map((item) => (
+              <li><Badge tone="muted">{item}</Badge></li>
+            ))}
+          </ul>
+        )}
+
+        <div class="hero__actions">
+          <Button href={primaryCta.href} variant="primary" analytics="solution_cta_primary">{primaryCta.label}</Button>
+          <Button href={site.ctas.secondary.href} variant="ghost" arrow={false} analytics="talk_to_sales_click">
+            {site.ctas.secondary.label}
+          </Button>
+        </div>
+
+        <p class="hero__trust">{site.finalCta.trustLine}</p>
+      </div>
+
+      {(data.heroPanel || data.heroCard) && (
+        <div class="hero__visual">
+          {data.heroPanel && <DetailPanel label={data.heroPanel.label} rows={data.heroPanel.rows} />}
+          {data.heroCard && (
+            <CardRender
+              label={data.heroCard.label}
+              holder={data.heroCard.holder}
+              caption={data.heroCard.caption}
+            />
+          )}
+        </div>
+      )}
+    </div>
+  </section>
+
+  {/* 2. Three benefits */}
+  {data.benefits && (
+    <Section id="benefits" heading={data.benefitsHeading ?? "What you get"}>
+      <ul class="benefits">
+        {
+          data.benefits.map((benefit, index) => (
+            <li class="benefit">
+              <span class="benefit__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              <p class="benefit__text">{benefit.title}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </Section>
+  )}
+
+  {/* 3. How it works */}
+  {data.howItWorks && (
+    <Section id="how-it-works" heading="How it works">
+      <FlowDiagram label={data.howItWorks.label} steps={data.howItWorks.steps} />
+    </Section>
+  )}
+
+  {/* 4. Who it is for */}
+  {data.whoItsFor && (
+    <Section id="who-its-for" heading="Who it's for">
+      <ul class="audience">
+        {
+          data.whoItsFor.map((item) =>
+            item.href ? (
+              <li>
+                <a class="audience__item audience__item--link" href={item.href}>
+                  <span>{item.label}</span>
+                  <span class="audience__arrow" aria-hidden="true">&rarr;</span>
+                </a>
+              </li>
+            ) : (
+              <li><span class="audience__item">{item.label}</span></li>
+            ),
+          )
+        }
+      </ul>
+
+      {relatedIndustries.length > 0 && (
+        <div class="audience__industries">
+          <h3 class="caption audience__industries-title">Industries that use this</h3>
+          <ul class="audience">
+            {relatedIndustries.map((industry) => (
+              <li>
+                <a class="audience__item audience__item--link" href={industry.href}>
+                  <span>{industry.label}</span>
+                  <span class="audience__arrow" aria-hidden="true">&rarr;</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </Section>
+  )}
+
+  {/* Extra on-page section, where a CTA points at a list on this page. */}
+  {data.extraSection && (
+    <Section id={data.extraSection.id} heading={data.extraSection.heading}>
+      <p class="extra-section__body">{data.extraSection.body}</p>
+    </Section>
+  )}
+
+  {/* 5. Compliance note */}
+  {data.complianceNote && (
+    <Section id="compliance-note" heading="Compliance">
+      <p class="compliance-note">{data.complianceNote}</p>
+      {data.partnerAttribution && <p class="attribution">{data.partnerAttribution}</p>}
+      <p class="compliance-note__link">
+        {data.complianceLink && (
+          <>
+            <a href={data.complianceLink.href}>{data.complianceLink.label}</a>
+            <span class="compliance-note__sep" aria-hidden="true">&middot;</span>
+          </>
+        )}
+        <a href="/compliance">Read about compliance and trust</a>
+      </p>
+    </Section>
+  )}
+
+  {/* FAQ, rendered so Step 12 schema matches what is on the page. */}
+  {faqItems.length > 0 && (
+    <Section id="faq" heading="Questions">
+      <Accordion items={faqItems} group="solution-faq">
+        {data.faq?.map((item, index) => (
+          <p slot={`faq-${index + 1}`}>{item.answer}</p>
+        ))}
+      </Accordion>
+    </Section>
+  )}
+
+  {/* 6. Related solutions */}
+  {related.length > 0 && (
+    <Section id="related" heading="Related solutions">
+      <ul class="related">
+        {
+          related.map((item) => (
+            <li>
+              <Card title={item.data.navLabel} as="h3" href={`/solutions/${item.id}`}>
+                <p>{item.data.navSummary}</p>
+              </Card>
+            </li>
+          ))
+        }
+      </ul>
+    </Section>
+  )}
+
+  {/* Any prose in the entry body. Empty for every solution at this point. */}
+  <div class="body"><Content /></div>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: var(--spacing-48) var(--spacing-40);
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      padding-block: var(--section-gap);
+    }
+  }
+
+  .hero__inner {
+    display: grid;
+    gap: var(--spacing-40);
+  }
+
+  @media (min-width: 1024px) {
+    .hero__inner {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+      align-items: center;
+      gap: var(--spacing-64);
+    }
+  }
+
+  .hero__eyebrow {
+    margin-bottom: var(--spacing-16);
+  }
+
+  .hero__sub {
+    margin-top: var(--spacing-24);
+    max-width: 56ch;
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body-lg);
+    letter-spacing: var(--tracking-body-lg);
+    color: var(--text-secondary);
+  }
+
+  .confirmations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+    margin-top: var(--spacing-24);
+    list-style: none;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-16);
+    margin-top: var(--spacing-32);
+  }
+
+  .hero__trust {
+    margin-top: var(--spacing-16);
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    letter-spacing: var(--tracking-caption);
+    color: var(--text-muted);
+  }
+
+  .benefits {
+    display: grid;
+    gap: var(--spacing-24);
+    list-style: none;
+  }
+
+  @media (min-width: 900px) {
+    .benefits {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--spacing-40);
+    }
+  }
+
+  .benefit {
+    padding-top: var(--spacing-16);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .benefit__number {
+    display: block;
+    margin-bottom: var(--spacing-8);
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    color: var(--text-muted);
+  }
+
+  .benefit__text {
+    font-size: var(--text-body);
+    color: var(--text-primary);
+  }
+
+  .audience {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+    list-style: none;
+  }
+
+  .audience__item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-8);
+    min-height: 44px;
+    padding: var(--spacing-8) var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-pills);
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .audience__item--link:hover {
+    border-color: var(--border-strong);
+  }
+
+  .audience__industries {
+    margin-top: var(--spacing-32);
+  }
+
+  .audience__industries-title {
+    margin-bottom: var(--spacing-16);
+  }
+
+  .compliance-note,
+  .attribution {
+    max-width: 72ch;
+    font-size: var(--text-body);
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .attribution {
+    margin-top: var(--spacing-16);
+    color: var(--text-primary);
+  }
+
+  .compliance-note__link {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+    margin-top: var(--spacing-24);
+    font-size: var(--text-body-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-body-sm);
+  }
+
+  .compliance-note__sep {
+    color: var(--text-muted);
+  }
+
+  .extra-section__body {
+    max-width: 72ch;
+    font-size: var(--text-body);
+    line-height: 1.6;
+    color: var(--text-primary);
+  }
+
+  .related {
+    display: grid;
+    gap: var(--spacing-16);
+    list-style: none;
+  }
+
+  @media (min-width: 768px) {
+    .related {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .body:not(:empty) {
+    padding-block: var(--spacing-32);
+  }
+</style>

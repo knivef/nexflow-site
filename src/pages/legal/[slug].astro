@@ -1,0 +1,237 @@
+---
+/**
+ * One template for all 6 legal pages.
+ *
+ * Sections come from frontmatter. A section marked "generated" pulls its content from
+ * config or site content instead, so the legal page and the rest of the site cannot
+ * disagree about registrations, the disclosure wording or the prohibited lists.
+ *
+ * The contents list renders only when a page has more than one section: a one item
+ * contents list helps nobody, and four of these pages are a single placeholder today.
+ *
+ * Print styles live in src/styles/print.css. These pages get printed and filed.
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { site } from '@/content/site';
+import { compliance } from '@/content/compliance';
+import { siteConfig } from '@/config/site.config';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('legal');
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const data = entry.data;
+const showToc = data.sections.length > 1;
+---
+
+<BaseLayout
+  title={data.seoTitle}
+  description={data.description}
+  breadcrumbs={[{ name: data.footerLabel, href: `/legal/${entry.id}` }]}
+>
+  <article class="legal">
+    <div class="container legal__inner">
+      <header class="legal__header">
+        <h1>{data.title}</h1>
+        <p class="legal__updated">Last updated: {data.lastUpdated}</p>
+        {data.intro && <p class="legal__intro">{data.intro}</p>}
+      </header>
+
+      {
+        showToc && (
+          <nav class="legal__toc" aria-labelledby="toc-heading">
+            <h2 class="caption legal__toc-heading" id="toc-heading">On this page</h2>
+            <ol class="legal__toc-list">
+              {data.sections.map((section) => (
+                <li>
+                  <a href={`#${section.id}`}>{section.heading}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+
+      {
+        data.sections.map((section) => (
+          <section class="legal__section" id={section.id} aria-labelledby={`${section.id}-heading`}>
+            <h2 class="legal__heading" id={`${section.id}-heading`}>{section.heading}</h2>
+
+            {section.body && <p class="legal__body">{section.body}</p>}
+
+            {section.generated === 'registrations' && (
+              <dl class="legal__facts">
+                <div class="legal__fact">
+                  <dt>Legal entity</dt>
+                  <dd>{site.brand.legalName}</dd>
+                </div>
+                {compliance.regulatory.registrations.map((registration) => (
+                  <div class="legal__fact">
+                    <dt>{registration.regulator}</dt>
+                    <dd>{registration.statement} {registration.reference}</dd>
+                  </div>
+                ))}
+                <div class="legal__fact">
+                  <dt>{site.contact.registeredAddressLabel}</dt>
+                  <dd>{site.contact.registeredAddress}</dd>
+                </div>
+              </dl>
+            )}
+
+            {section.generated === 'disclosure' && (
+              <p class="legal__disclosure">{site.footer.disclosure}</p>
+            )}
+
+            {section.generated === 'prohibited-businesses' && (
+              <>
+                <ul class="legal__list">
+                  {siteConfig.prohibitedBusinesses.map((item) => <li>{item}</li>)}
+                </ul>
+                <p class="legal__pending">[PLACEHOLDER: full prohibited business list from the AML policy]</p>
+              </>
+            )}
+
+            {section.generated === 'restricted-countries' && (
+              siteConfig.restrictedCountries.length > 0 ? (
+                <ul class="legal__list">
+                  {siteConfig.restrictedCountries.map((country) => <li>{country.name}</li>)}
+                </ul>
+              ) : (
+                <p class="legal__pending">[PLACEHOLDER: restricted countries list]</p>
+              )
+            )}
+          </section>
+        ))
+      }
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .legal {
+    padding-block: var(--spacing-48);
+  }
+
+  @media (min-width: 768px) {
+    .legal {
+      padding-block: var(--section-gap);
+    }
+  }
+
+  /* A single readable measure for the whole document, rather than the full page width. */
+  .legal__inner {
+    max-width: 78ch;
+  }
+
+  .legal__updated {
+    margin-top: var(--spacing-16);
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .legal__intro {
+    margin-top: var(--spacing-24);
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body-lg);
+    color: var(--text-secondary);
+  }
+
+  .legal__toc {
+    margin-top: var(--spacing-40);
+    padding: var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-2xl);
+  }
+
+  .legal__toc-heading {
+    margin-bottom: var(--spacing-16);
+  }
+
+  .legal__toc-list {
+    display: grid;
+    gap: var(--spacing-8);
+    padding-left: var(--spacing-24);
+  }
+
+  .legal__toc-list a {
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+  }
+
+  .legal__section {
+    margin-top: var(--spacing-48);
+  }
+
+  .legal__heading {
+    font-size: var(--text-heading-sm);
+    line-height: var(--leading-heading-sm);
+  }
+
+  .legal__body,
+  .legal__disclosure {
+    margin-top: var(--spacing-24);
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+
+  .legal__disclosure {
+    padding: var(--spacing-24);
+    border-left: 2px solid var(--border-hairline);
+    color: var(--text-primary);
+  }
+
+  .legal__facts {
+    margin: var(--spacing-24) 0 0;
+  }
+
+  .legal__fact {
+    display: grid;
+    gap: 4px var(--spacing-24);
+    padding-block: var(--spacing-16);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  @media (min-width: 640px) {
+    .legal__fact {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+      align-items: baseline;
+    }
+  }
+
+  .legal__fact dt {
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .legal__fact dd {
+    margin: 0;
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+    color: var(--text-primary);
+  }
+
+  .legal__list {
+    margin-top: var(--spacing-24);
+    padding-left: var(--spacing-24);
+    list-style: disc;
+  }
+
+  .legal__list li {
+    margin-top: var(--spacing-8);
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .legal__pending {
+    margin-top: var(--spacing-24);
+    color: var(--text-primary);
+  }
+</style>

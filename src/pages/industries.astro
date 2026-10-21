@@ -1,0 +1,259 @@
+---
+/**
+ * Industries: intro, jump list and 7 anchored sections.
+ *
+ * Two build-time guards run here, because both kinds of link have broken silently before:
+ *   1. every product reference must resolve to a real solution page;
+ *   2. every /industries#anchor linked from the home tiles or from a solution page's
+ *      "Who it's for" chips must exist as a section on this page.
+ * Either failure stops the build rather than shipping a link that goes nowhere.
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/Section.astro';
+import Button from '@/components/Button.astro';
+import TrustStrip from '@/components/TrustStrip.astro';
+import { industries } from '@/content/industries';
+import { home } from '@/content/home';
+import { site } from '@/content/site';
+
+const solutions = await getCollection('solutions');
+const anchors = new Set(industries.sections.map((section) => section.id));
+
+// Guard 1: product references resolve.
+function productLink(slug: string, note?: string) {
+  const entry = solutions.find((item) => item.id === slug);
+  if (!entry) {
+    throw new Error(
+      `Industries content references solution "${slug}", which has no page in src/content/solutions.`,
+    );
+  }
+  return {
+    label: note ? `${entry.data.navLabel} (${note})` : entry.data.navLabel,
+    href: `/solutions/${entry.id}`,
+  };
+}
+
+// Guard 2: every anchor pointed at this page exists here.
+const incoming: { from: string; href: string }[] = [
+  ...home.sections.whoWeServe.tiles.map((tile) => ({ from: 'home tiles', href: tile.href })),
+  ...solutions.flatMap((entry) =>
+    (entry.data.whoItsFor ?? [])
+      .filter((item) => item.href)
+      .map((item) => ({ from: `solutions/${entry.id}`, href: item.href! })),
+  ),
+];
+
+const broken = incoming
+  .filter((link) => link.href.startsWith('/industries#'))
+  .filter((link) => !anchors.has(link.href.split('#')[1]!));
+
+if (broken.length > 0) {
+  const list = broken.map((link) => `  ${link.from} -> ${link.href}`).join('\n');
+  throw new Error(`Links point at Industries anchors that do not exist:\n${list}`);
+}
+---
+
+<BaseLayout
+  title={industries.page.seoTitle}
+  description={industries.page.description}
+  breadcrumbs={[{ name: 'Industries', href: '/industries' }]}
+>
+  <section class="intro" aria-labelledby="industries-heading">
+    <div class="container">
+      <h1 id="industries-heading">{industries.page.title}</h1>
+      <p class="intro__line">{industries.page.intro}</p>
+
+      <nav class="jump" aria-label={industries.jumpListLabel}>
+        <h2 class="caption jump__title">{industries.jumpListLabel}</h2>
+        <ul class="jump__list">
+          {
+            industries.sections.map((section) => (
+              <li>
+                <a class="jump__link" href={`#${section.id}`}>{section.title}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <TrustStrip class="intro__trust" />
+    </div>
+  </section>
+
+  {
+    industries.sections.map((section) => (
+      <Section id={section.id} heading={section.title} as="h2">
+        <p class="problem">{section.problem}</p>
+
+        <h3 class="caption products__title">Products</h3>
+        <ul class="products">
+          {section.products.map((product) => {
+            const link = productLink(product.slug, product.note);
+            return (
+              <li>
+                <a class="products__link" href={link.href}>
+                  <span>{link.label}</span>
+                  <span class="products__arrow" aria-hidden="true">&rarr;</span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+
+        <div class="section-cta">
+          <Button href={site.ctas.primary.href} variant="primary">{site.ctas.primary.label}</Button>
+          <p class="section-cta__trust">{site.trustCues.onboarding}</p>
+        </div>
+      </Section>
+    ))
+  }
+
+  <Section id="other-industries" heading="Not listed here?">
+    <p class="closing">{industries.closing.note}</p>
+    <p class="closing__links">
+      <a href={industries.closing.salesLink.href}>{industries.closing.salesLink.label}</a>
+      <span class="closing__sep" aria-hidden="true">&middot;</span>
+      <a href={industries.closing.prohibitedLink.href}>{industries.closing.prohibitedLink.label}</a>
+    </p>
+  </Section>
+</BaseLayout>
+
+<style>
+  .intro {
+    padding-block: var(--spacing-48) var(--spacing-40);
+  }
+
+  @media (min-width: 768px) {
+    .intro {
+      padding-block: var(--section-gap) var(--spacing-48);
+    }
+  }
+
+  .intro__line {
+    margin-top: var(--spacing-24);
+    max-width: 64ch;
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body-lg);
+    letter-spacing: var(--tracking-body-lg);
+    color: var(--text-secondary);
+  }
+
+  .jump {
+    margin-top: var(--spacing-40);
+    padding-top: var(--spacing-24);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .jump__title {
+    margin-bottom: var(--spacing-16);
+  }
+
+  .jump__list {
+    display: grid;
+    gap: var(--spacing-8);
+    list-style: none;
+  }
+
+  @media (min-width: 640px) {
+    .jump__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .jump__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .jump__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .jump__link:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  /* See the note in compliance.astro: a child component's root needs :global() here. */
+  .intro :global(.trust-strip) {
+    margin-top: var(--spacing-32);
+  }
+
+  .problem {
+    max-width: 64ch;
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body-lg);
+    color: var(--text-secondary);
+  }
+
+  .products__title {
+    margin: var(--spacing-32) 0 var(--spacing-16);
+  }
+
+  .products {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+    list-style: none;
+  }
+
+  .products__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-8);
+    min-height: 44px;
+    padding: var(--spacing-8) var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-pills);
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .products__link:hover {
+    border-color: var(--border-strong);
+  }
+
+  .section-cta {
+    margin-top: var(--spacing-32);
+  }
+
+  .section-cta__trust {
+    margin-top: var(--spacing-16);
+    max-width: 60ch;
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    letter-spacing: var(--tracking-caption);
+    color: var(--text-muted);
+  }
+
+  .closing {
+    max-width: 64ch;
+    font-size: var(--text-body);
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .closing__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+    margin-top: var(--spacing-24);
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    text-transform: uppercase;
+  }
+
+  .closing__sep {
+    color: var(--text-muted);
+  }
+</style>

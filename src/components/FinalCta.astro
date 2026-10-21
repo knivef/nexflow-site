@@ -1,0 +1,61 @@
+---
+/**
+ * Final CTA band, on every page. The headline comes from the active version, so an inner
+ * page shown under version B carries version B's closing line.
+ */
+import { site } from '@/content/site';
+import Button from './Button.astro';
+import VersionText from './VersionText.astro';
+---
+
+<section class="final-cta" aria-labelledby="final-cta-heading">
+  <div class="container final-cta__inner">
+    <h2 class="final-cta__headline" id="final-cta-heading">
+      <VersionText field="finalCtaHeadline" />
+    </h2>
+
+    <div class="final-cta__actions">
+      <Button href={site.ctas.primary.href} variant="primary" analytics="final_cta_open_account">{site.ctas.primary.label}</Button>
+      <Button href={site.ctas.secondary.href} variant="ghost" arrow={false} analytics="final_cta_talk_to_sales">
+        {site.ctas.secondary.label}
+      </Button>
+    </div>
+
+    <p class="final-cta__trust">{site.finalCta.trustLine}</p>
+  </div>
+</section>
+
+<style>
+  .final-cta {
+    padding-block: var(--spacing-48);
+    border-top: 1px solid var(--border-hairline);
+    background-color: var(--surface-accent);
+  }
+
+  @media (min-width: 768px) {
+    .final-cta {
+      padding-block: var(--section-gap);
+    }
+  }
+
+  .final-cta__headline {
+    max-width: 24ch;
+    font-size: var(--text-heading);
+    line-height: var(--leading-heading);
+  }
+
+  .final-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-16);
+    margin-top: var(--spacing-32);
+  }
+
+  .final-cta__trust {
+    margin-top: var(--spacing-16);
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    letter-spacing: var(--tracking-caption);
+    color: var(--text-on-accent-surface);
+  }
+</style>

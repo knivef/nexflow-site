@@ -1,112 +1,215 @@
 ---
 /**
- * Document shell: <head> metadata, favicons, Open Graph, Twitter card and JSON-LD.
- * Every page uses this (usually through PageLayout). Organization schema is sitewide;
- * pages pass extra nodes (Service, FAQPage, Article) through `schema`.
+ * Base layout: head, skip link, sticky header, main landmark, final CTA band, footer,
+ * cookie banner and the review-only version switcher.
+ *
+ * Fonts are self-hosted through Fontsource, so no third-party request is made for type.
+ * No analytics loads here: the cookie banner owns that decision and nothing beyond
+ * essential cookies may load before the viewer chooses.
+ *
+ * Version handling: a home route pins its own version and stores it. Every other page takes
+ * the version from ?v= or from storage. The active version is an attribute on <html>, set by
+ * a small inline script before the body paints, so no wrong copy flashes.
  */
-import '@/styles/global.css';
-import { ANALYTICS_DOMAIN } from 'astro:env/server';
+import '@fontsource-variable/newsreader';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '@/styles/tokens.css';
+import '@/styles/base.css';
+import '@/styles/print.css';
+
 import { site } from '@/content/site';
-import { isReal } from '@/lib/placeholder';
-import { graph, organizationNode } from '@/lib/schema';
-import { isPrimaryVersion } from '@/lib/version';
+import { siteConfig } from '@/config/site.config';
+import { home, defaultVersion, type HomeVersionId } from '@/content/home';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import FinalCta from '@/components/FinalCta.astro';
+import CookieBanner from '@/components/CookieBanner.astro';
+import VersionSwitcher from '@/components/VersionSwitcher.astro';
+import StructuredData from '@/components/StructuredData.astro';
+import Analytics from '@/components/Analytics.astro';
 
 interface Props {
-  title?: string;
-  description?: string;
-  /** Path under /public for the social image. Defaults to the site OG image. */
-  image?: string;
-  imageAlt?: string;
-  type?: 'website' | 'article';
-  /** Extra JSON-LD nodes for this page. */
-  schema?: (Record<string, unknown> | null)[];
+  title: string;
+  description: string;
+  /** Overrides the canonical URL. Home versions B and C canonical to "/". */
+  canonicalPath?: string;
   noindex?: boolean;
+  /** Set on the three home routes only. Pins the version for that page. */
+  version?: HomeVersionId;
+  /** Adds FinancialService to the page's structured data. */
+  financialService?: { name: string; description: string; url: string };
+  /** Adds FAQPage. Answers that are still placeholders are not published. */
+  faq?: { question: string; answer: string }[];
+  /** Adds BreadcrumbList. Home is prepended automatically. */
+  breadcrumbs?: { name: string; href: string }[];
 }
 
 const {
-  title = site.seo.title,
-  description = site.seo.description,
-  image = site.seo.ogImage,
-  imageAlt = site.seo.ogImageAlt,
-  type = 'website',
-  schema = [],
+  title,
+  description,
+  canonicalPath,
   noindex = false,
+  version,
+  financialService,
+  faq,
+  breadcrumbs,
 } = Astro.props;
 
-// Astro.site comes from SITE_URL (astro.config.mjs). Canonical drops query strings and hashes.
-const base = Astro.site ?? new URL('http://localhost:4321');
-const canonical = new URL(Astro.url.pathname, base).href;
-const ogImage = new URL(image, base).href;
-const twitterHandle = site.seo.twitterHandle.replace(/^@/, '');
-const jsonLd = graph([organizationNode(base), ...schema]);
-// Review versions (v2, v3) are never indexed, so they don't compete with the primary version.
-const blockIndexing = noindex || !isPrimaryVersion();
+const canonical = new URL(canonicalPath ?? Astro.url.pathname, Astro.site);
+const showSwitcher = siteConfig.showVersionSwitcher;
+
+// Paths the client script needs to retarget the logo and the switcher buttons.
+const versionPaths = Object.fromEntries(home.versions.map((entry) => [entry.id, entry.path]));
 ---
 
 <!doctype html>
-<html lang="en-GB">
+<html lang="en-CA" data-page-version={version} data-version={version ?? defaultVersion.id}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    {blockIndexing && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="canonical" href={canonical.href} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
 
-    <link rel="icon" href="/favicon.ico" sizes="48x48" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#f6f3f1" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
-
-    <meta property="og:type" content={type} />
-    <meta property="og:site_name" content={site.nav.brand} />
-    <meta property="og:locale" content="en_GB" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.brand.name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={imageAlt} />
+    <meta property="og:url" content={canonical.href} />
+    <meta name="twitter:card" content="summary" />
+    <!-- Social share image is a placeholder. See PLACEHOLDERS.md. -->
 
-    <meta name="twitter:card" content="summary_large_image" />
-    {isReal(twitterHandle) && <meta name="twitter:site" content={`@${twitterHandle}`} />}
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
-    <meta name="twitter:image:alt" content={imageAlt} />
+    <!-- Placeholder mark until the real wordmark lands. See PLACEHOLDERS.md. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
-    <script type="application/ld+json" set:html={jsonLd} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
 
-    {
-      ANALYTICS_DOMAIN && (
-        <script is:inline defer data-domain={ANALYTICS_DOMAIN} src="https://plausible.io/js/script.js" />
-      )
-    }
+    <StructuredData financialService={financialService} faq={faq} breadcrumbs={breadcrumbs} />
+
+    <script type="application/json" id="version-paths" set:html={JSON.stringify(versionPaths)} />
+
+    <script is:inline>
+      /*
+       * Resolve the active version before the body paints. A home route wins, then ?v=,
+       * then the stored choice, then version A. Storage is wrapped: private mode and
+       * blocked site data both throw.
+       */
+      (function () {
+        var VALID = ['a', 'b', 'c'];
+        var KEY = 'nexflow.version';
+        var el = document.documentElement;
+        var active = el.getAttribute('data-page-version');
+
+        if (!active) {
+          try {
+            var param = new URLSearchParams(window.location.search).get('v');
+            if (param && VALID.indexOf(param) !== -1) active = param;
+          } catch (error) {
+            /* URL parsing unavailable: fall through. */
+          }
+        }
+
+        if (!active) {
+          try {
+            var stored = localStorage.getItem(KEY);
+            if (stored && VALID.indexOf(stored) !== -1) active = stored;
+          } catch (error) {
+            /* Storage unavailable: fall through. */
+          }
+        }
+
+        if (!active) active = 'a';
+        el.setAttribute('data-version', active);
+
+        try {
+          localStorage.setItem(KEY, active);
+        } catch (error) {
+          /* Storage unavailable: the version simply is not remembered. */
+        }
+      })();
+    </script>
   </head>
-  <body>
-    <slot />
+
+  <body class={showSwitcher ? 'has-switcher' : undefined}>
+    <a class="skip-link" href="#main">{site.nav.skipLinkLabel}</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <FinalCta />
+    <Footer />
+    {siteConfig.cookieConsentRequired && <CookieBanner />}
+    {showSwitcher && <VersionSwitcher />}
+    <Analytics />
+
     <script>
-      // In-page anchor links: move focus to the target section so keyboard and screen reader
-      // users continue from there. Scrolling and the sticky nav offset are handled in CSS
-      // (scroll-behavior and scroll-padding-top), which also respects prefers-reduced-motion.
-      document.addEventListener('click', (event) => {
-        const link = (event.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="#"]');
-        if (!link) return;
-        const id = link.getAttribute('href')!.slice(1);
-        const target = id ? document.getElementById(id) : null;
-        if (!target) return;
-        if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
-        target.focus({ preventScroll: true });
+      /*
+       * Everything the attribute on <html> cannot do on its own: retarget the logo at the
+       * active version's home page, and drive the switcher buttons.
+       *
+       * On a home route a button navigates to that version's home page. Anywhere else it
+       * switches in place, with no reload.
+       */
+      type VersionId = 'a' | 'b' | 'c';
+
+      const KEY = 'nexflow.version';
+      const root = document.documentElement;
+
+      const paths: Record<string, string> = (() => {
+        try {
+          return JSON.parse(document.getElementById('version-paths')?.textContent ?? '{}');
+        } catch {
+          return {};
+        }
+      })();
+
+      const activeVersion = (): VersionId => (root.getAttribute('data-version') as VersionId) ?? 'a';
+
+      const apply = (version: VersionId): void => {
+        root.setAttribute('data-version', version);
+
+        document.querySelectorAll<HTMLAnchorElement>('[data-version-home]').forEach((link) => {
+          link.setAttribute('href', paths[version] ?? '/');
+        });
+
+        document.querySelectorAll<HTMLButtonElement>('[data-version-switch]').forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.versionSwitch === version));
+        });
+      };
+
+      const remember = (version: VersionId): void => {
+        try {
+          localStorage.setItem(KEY, version);
+        } catch {
+          // Storage unavailable: the switch still applies for this page view.
+        }
+      };
+
+      apply(activeVersion());
+
+      const isHomeRoute = root.hasAttribute('data-page-version');
+
+      document.querySelectorAll<HTMLButtonElement>('[data-version-switch]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const next = button.dataset.versionSwitch as VersionId | undefined;
+          if (!next) return;
+          remember(next);
+          if (isHomeRoute) {
+            window.location.href = button.dataset.versionPath ?? paths[next] ?? '/';
+            return;
+          }
+          apply(next);
+        });
       });
     </script>
   </body>
 </html>
 
 <style is:global>
-  [tabindex='-1']:focus {
-    outline: none;
+  /* The switcher is fixed to the bottom, so the page needs room beneath the footer. */
+  body.has-switcher {
+    padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
   }
 </style>

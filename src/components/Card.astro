@@ -1,0 +1,81 @@
+---
+/**
+ * Card. Hairline border and surface colour carry elevation, never a drop shadow.
+ * The accent variant is the one coloured surface in the system, used sparingly.
+ */
+interface Props {
+  variant?: 'default' | 'accent';
+  title?: string;
+  /** Heading level, so a card inside a section keeps the document outline correct. */
+  as?: 'h2' | 'h3' | 'h4';
+  href?: string;
+  class?: string;
+}
+
+const { variant = 'default', title, as: Heading = 'h3', href, class: className } = Astro.props;
+const Wrapper = href ? 'a' : 'div';
+---
+
+<Wrapper
+  class={['card', `card--${variant}`, href && 'card--link', className].filter(Boolean).join(' ')}
+  href={href}
+>
+  {Astro.slots.has('icon') && (
+    <div class="card__icon"><slot name="icon" /></div>
+  )}
+  {title && <Heading class="card__title">{title}</Heading>}
+  <slot />
+</Wrapper>
+
+<style>
+  .card {
+    display: block;
+    padding: var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-cards);
+    background-color: var(--surface-raised);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  @media (min-width: 768px) {
+    .card {
+      padding: var(--card-padding);
+    }
+  }
+
+  .card--accent {
+    background-color: var(--surface-accent);
+    border-color: transparent;
+  }
+
+  .card--link {
+    transition: border-color var(--duration-fast) var(--easing);
+  }
+
+  .card--link:hover {
+    border-color: var(--border-strong);
+  }
+
+  /* Astro strips the slot attribute, so the wrapper carries the spacing, not the slotted node. */
+  .card__icon {
+    margin-bottom: var(--spacing-24);
+    color: var(--text-muted);
+  }
+
+  .card__title {
+    margin-bottom: var(--spacing-16);
+    font-size: var(--text-subheading);
+    line-height: var(--leading-subheading);
+  }
+
+  .card :global(p) {
+    color: var(--text-secondary);
+  }
+
+  /* Smoke and Lake Blue both fail AA on the accent surface, so body text uses the token
+     that flips with the theme: Graphite in light, dark-secondary in dark. */
+  .card--accent :global(p) {
+    color: var(--text-on-accent-surface);
+  }
+</style>

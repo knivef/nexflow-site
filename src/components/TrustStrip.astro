@@ -1,0 +1,45 @@
+---
+/**
+ * Trust strip: three plain-text badges. No regulator or card network logo appears here or
+ * anywhere else on the site, by rule.
+ */
+import { site } from '@/content/site';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<ul class={['trust-strip', className].filter(Boolean).join(' ')} aria-label={site.trustStrip.label}>
+  {site.trustStrip.items.map((item) => <li class="trust-strip__item">{item}</li>)}
+</ul>
+
+<style>
+  .trust-strip {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    list-style: none;
+  }
+
+  .trust-strip__item {
+    padding: var(--spacing-8) var(--spacing-16);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-tags);
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  @media (min-width: 768px) {
+    .trust-strip {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--spacing-16);
+    }
+  }
+</style>

@@ -1,0 +1,96 @@
+---
+/**
+ * Section wrapper. Owns the vertical rhythm, the container width and the optional
+ * eyebrow and heading, so pages never set their own padding.
+ */
+interface Props {
+  id?: string;
+  eyebrow?: string;
+  heading?: string;
+  /** Heading level. Pages carry exactly one h1, so sections default to h2. */
+  as?: 'h1' | 'h2' | 'h3';
+  lead?: string;
+  variant?: 'default' | 'accent' | 'inverted';
+  /** Removes the container, for a section that manages its own full-bleed layout. */
+  bleed?: boolean;
+  class?: string;
+}
+
+const {
+  id,
+  eyebrow,
+  heading,
+  as: Heading = 'h2',
+  lead,
+  variant = 'default',
+  bleed = false,
+  class: className,
+} = Astro.props;
+
+const headingId = id ? `${id}-heading` : undefined;
+---
+
+<section
+  id={id}
+  class={['section', `section--${variant}`, className].filter(Boolean).join(' ')}
+  aria-labelledby={heading ? headingId : undefined}
+>
+  <div class={bleed ? undefined : 'container'}>
+    {(eyebrow || heading || lead) && (
+      <header class="section__header">
+        {eyebrow && <p class="caption section__eyebrow">{eyebrow}</p>}
+        {heading && <Heading id={headingId} class="section__heading">{heading}</Heading>}
+        {lead && <p class="section__lead">{lead}</p>}
+      </header>
+    )}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .section {
+    padding-block: var(--spacing-48);
+  }
+
+  @media (min-width: 768px) {
+    .section {
+      padding-block: var(--section-gap);
+    }
+  }
+
+  .section--accent {
+    background-color: var(--surface-accent);
+    color: var(--text-primary);
+  }
+
+  .section--inverted {
+    background-color: var(--surface-inverted);
+    color: var(--text-on-inverted);
+  }
+
+  .section--inverted :global(h1),
+  .section--inverted :global(h2),
+  .section--inverted :global(h3) {
+    color: var(--text-on-inverted);
+  }
+
+  .section__header {
+    margin-bottom: var(--spacing-32);
+  }
+
+  .section__eyebrow {
+    margin-bottom: var(--spacing-16);
+  }
+
+  .section__lead {
+    margin-top: var(--spacing-16);
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body-lg);
+    letter-spacing: var(--tracking-body-lg);
+    color: var(--text-secondary);
+  }
+
+  .section--inverted .section__lead {
+    color: var(--text-on-inverted);
+  }
+</style>

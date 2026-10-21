@@ -1,38 +1,9 @@
 ---
-import PageLayout from '@/layouts/PageLayout.astro';
-import Hero from '@/components/sections/Hero.astro';
-import Who from '@/components/sections/Who.astro';
-import Problem from '@/components/sections/Problem.astro';
-import How from '@/components/sections/How.astro';
-import Network from '@/components/sections/Network.astro';
-import Features from '@/components/sections/Features.astro';
-import Verticals from '@/components/sections/Verticals.astro';
-import Partners from '@/components/sections/Partners.astro';
-import Trust from '@/components/sections/Trust.astro';
-import FoundingPartners from '@/components/sections/FoundingPartners.astro';
-import Compare from '@/components/sections/Compare.astro';
-import Merchants from '@/components/sections/Merchants.astro';
-import Faq from '@/components/sections/Faq.astro';
-import Apply from '@/components/sections/Apply.astro';
-import { faqPageNode, serviceNode } from '@/lib/schema';
+// Home version A at "/". The indexed version.
+import HomeShell from './_HomeShell.astro';
+import { home } from '@/content/home';
 
-const base = Astro.site ?? new URL('http://localhost:4321');
-// Section order and anchor ids follow CLAUDE.md exactly.
+const version = home.versions.find((entry) => entry.id === 'a')!;
 ---
 
-<PageLayout schema={[serviceNode(base), faqPageNode(base)]}>
-  <Hero />
-  <Who />
-  <Problem />
-  <How />
-  <Network />
-  <Features />
-  <Verticals />
-  <Partners />
-  <Trust />
-  <FoundingPartners />
-  <Compare />
-  <Merchants />
-  <Faq />
-  <Apply />
-</PageLayout>
+<HomeShell version={version} />

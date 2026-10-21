@@ -1,0 +1,120 @@
+---
+/**
+ * Review-only version switcher. A slim bar fixed to the bottom of the screen, clear of the
+ * home indicator through the safe-area inset.
+ *
+ * On a home page a button goes to that version's home page. On an inner page it switches in
+ * place: the stored version changes, the logo target and the final CTA headline follow, and
+ * the page does not reload.
+ *
+ * Gated by siteConfig.showVersionSwitcher and removed once a winner is chosen.
+ */
+import { home } from '@/content/home';
+import VersionText from './VersionText.astro';
+---
+
+<div class="switcher" role="region" aria-label="Review version switcher">
+  <div class="container switcher__inner">
+    <p class="switcher__status">
+      <span>Reviewing version</span>
+      <strong class="switcher__label"><VersionText field="label" />:</strong>
+      <span class="switcher__pitch"><VersionText field="pitchLine" /></span>
+    </p>
+
+    <div class="switcher__buttons" role="group" aria-label="Switch version">
+      {
+        home.versions.map((version) => (
+          <button
+            class="switcher__button"
+            type="button"
+            data-analytics="version_switch"
+            data-version-switch={version.id}
+            data-version-path={version.path}
+            aria-pressed="false"
+          >
+            <span class="visually-hidden">Version </span>{version.label}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  .switcher {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 50;
+    background-color: var(--surface-bar);
+    color: var(--text-on-inverted);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .switcher__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-8) var(--spacing-16);
+    padding-block: var(--spacing-8);
+  }
+
+  .switcher__status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--spacing-8);
+    max-width: none;
+    font-size: var(--text-caption);
+    line-height: 1.4;
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+    color: var(--text-on-inverted);
+  }
+
+  .switcher__label {
+    font-weight: var(--font-weight-medium);
+  }
+
+  /* The pitch line is long: keep it to one line on small screens rather than pushing the
+     buttons off the bar. */
+  .switcher__pitch {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    .switcher__pitch {
+      display: inline;
+    }
+  }
+
+  .switcher__buttons {
+    display: flex;
+    gap: var(--spacing-8);
+  }
+
+  .switcher__button {
+    min-width: 44px;
+    min-height: 32px;
+    padding-inline: var(--spacing-16);
+    border: 1px solid var(--text-on-inverted);
+    border-radius: var(--radius-pills);
+    background-color: transparent;
+    color: var(--text-on-inverted);
+    font-family: var(--font-ui);
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    cursor: pointer;
+  }
+
+  .switcher__button[aria-pressed='true'] {
+    background-color: var(--text-on-inverted);
+    color: var(--surface-bar);
+  }
+
+  .switcher__button:focus-visible {
+    outline: var(--focus-ring-width) solid var(--text-on-inverted);
+    outline-offset: var(--focus-ring-offset);
+  }
+</style>

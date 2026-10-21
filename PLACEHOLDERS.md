@@ -1,77 +1,115 @@
-# Placeholders
+# Placeholders and confirmations
 
-Every `[PLACEHOLDER: description]` in `src/content/site.ts` (or anywhere else on the site) is logged here.
-Nothing ships to production while a row is still Open.
+Every visible `[PLACEHOLDER: ...]` and `[CONFIRM: ...]` in the codebase is listed here, grouped
+by when it has to be resolved. `npm run build` fails if a marker exists in the source without a
+row in this file, so the two cannot drift.
 
-| Placeholder | Section | What's needed | Status |
-|-------------|---------|---------------|--------|
-| `[PLACEHOLDER: regions, e.g. EU, UK, LatAm]` | `#hero` subheading | The regions where Nexflow has signed acquirer relationships today. Only regions with a signed agreement. | Open |
-| `[PLACEHOLDER: X] acquiring partners` | `#hero` proof strip | Number of acquirers Nexflow has signed agreements with. Signed only, not in negotiation. | Open |
-| `[PLACEHOLDER: Y] markets` | `#hero` proof strip | Number of countries or markets those acquirers can board merchants in. | Open |
-| `Target MID go-live: [PLACEHOLDER: X] business days` | `#hero` proof strip | Realistic target from complete application to live MID, in business days. Must match what ops can deliver and the timeline in `#how`. | Open |
-| `Partner due diligence: [PLACEHOLDER: X] days` | `#how` onboarding timeline | Target days to complete Nexflow's due diligence on a new PSP partner. Confirm whether the three timeline numbers are cumulative (days from first contact) or per stage, and label accordingly. | Open |
-| `First merchant placed: [PLACEHOLDER: X] days` | `#how` onboarding timeline | Target days until a partner's first merchant is placed with an acquirer. | Open |
-| `Live processing: [PLACEHOLDER: X] days` | `#how` onboarding timeline | Target days until that merchant is live and processing. Must be consistent with the hero's "Target MID go-live" number. | Open |
-| `[PLACEHOLDER: regions and local acquiring availability]` | `#network` coverage diagram and table | Real regions where Nexflow can place merchants, and whether each has local (domestic) acquiring. The diagram is generated from the table rows, so filling the rows fills both. | Open |
-| `[PLACEHOLDER: Region 1]` to `[PLACEHOLDER: Region 4]` (4 example rows) | `#network` table | Replace all four seeded rows with real ones: region, local acquiring Yes/No, verticals accepted, settlement currencies, typical go-live in days. Add or remove rows as needed. The example verticals (iGaming, Ecommerce, Affiliate) are illustrative only and render highlighted until replaced. | Open |
-| `[PLACEHOLDER: Y/N]` | `#network` table, Local acquiring column | Yes or No per region. "Yes" shows a "Local acquiring" badge on the diagram, "No" shows "Cross-border". | Open |
-| `[PLACEHOLDER: currencies]` | `#network` table, Settlement currencies column | Settlement currencies available per region. | Open |
-| `[PLACEHOLDER: X] days` | `#network` table, Typical go-live column | Typical go-live per region. Must be consistent with the hero and `#how` timeline. | Open |
-| `MGA, UKGC, Curaçao and [PLACEHOLDER: others]` | `#features` Underwriting and compliance | Any other gambling licence regimes Nexflow verifies (e.g. Isle of Man, Kahnawake, Ontario). Only list ones the network accepts. | Open |
-| `Settlement in [PLACEHOLDER: currencies]` | `#features` Settlement and economics | Settlement currencies available across the network. | Open |
-| `Optional stablecoin settlement (USDC, USDT, EURC) ... [PLACEHOLDER: confirm]` | `#features` Settlement and economics | Confirm at least one acquirer supports stablecoin settlement and which coins. Remove the line if none do. | Open |
-| `via API and dashboard [PLACEHOLDER: confirm]` | `#features` Settlement and economics | Confirm Nexflow offers both an API and a dashboard for reconciliation and reporting. Edit to match what exists at launch. | Open |
-| `MGA, UKGC, Curaçao, [PLACEHOLDER: other licences]` | `#verticals-igaming` capabilities | Other gambling licence regimes the network places. Keep in sync with the same list in `#features`. | Open |
-| `Local acquiring in [PLACEHOLDER: markets]` | `#verticals-ecommerce` | Markets where the network offers local (domestic) acquiring for ecommerce. Must match the "Yes" rows in the `#network` table. | Open |
-| `[PLACEHOLDER: referral terms]` | `#verticals-affiliate` referral partner block | Revenue share terms for consultants, agencies and ISOs who refer PSPs or portfolios (share, duration, payout basis). | Open |
-| `[PLACEHOLDER: regulators accepted, e.g. CySEC, FCA, ASIC]` | `#verticals-trading` capabilities | Which financial regulators' licences the network's acquirers accept for forex and CFD brokers. Only list confirmed ones. | Open |
-| `MCC 6051 [PLACEHOLDER: confirm appetite]` | `#verticals-crypto` | Confirm at least one acquirer in the network accepts MCC 6051 card-to-crypto. If none do, remove this tab. | Open |
-| `[PLACEHOLDER: confirm non-solicit clause]` | `#partners` callout | Confirm the partner agreement contains a non-solicit / no-direct-contact clause covering partners' merchants. If not, change the copy before launch. | Open |
-| `[PLACEHOLDER: team bios]` (3 placeholder team cards) | `#trust` The people | Real team members: full name, photo (in `/public/team/`), role, years in payments, real previous companies, LinkedIn URL. Add or remove cards to match the real team. | Open |
-| `[PLACEHOLDER: advisors]` | `#trust` Advisors | Named advisors with background and LinkedIn. Module is hidden while the list is empty, so leaving it empty is safe. | Open |
-| `[PLACEHOLDER: legal entity name]`, `company number`, `registered address`, `jurisdiction`, `link to company registry entry` | `#trust` Company and regulatory facts | Exact details as they appear on the company registry, plus the registry URL. | Open |
-| `[PLACEHOLDER: entity and licence status]` | `#trust` Company and regulatory facts | Confirm Nexflow holds no licence (keep the "not an acquirer" statement) or add each licence/registration with regulator, number and register link. Also confirm all acquiring partners hold Visa and Mastercard principal membership. | Open |
-| `[PLACEHOLDER: other exclusions set by acquiring partners]` | `#trust` Partner criteria, What we can't place | Any further exclusions from acquirer partner agreements. Also review the criteria and exclusions I drafted. | Open |
-| `30 days' notice ... [PLACEHOLDER: confirm]` | `#trust` Partner charter | Confirm 30 days is what the partner agreement says. | Open |
-| `PCI DSS`, `GDPR`, `ISO 27001`, `SOC 2` statuses | `#trust` Security and compliance | Honest status for each: PCI DSS level or "In progress", GDPR position, ISO 27001 and SOC 2 status. Remove any that don't apply. | Open |
-| `[PLACEHOLDER: memberships and events]` | `#trust` Industry presence | Real memberships and confirmed events only (e.g. MRC, EPSM, ETA, SiGMA, ICE, Money20/20 Europe, iGB Affiliate if attending). | Open |
-| Resources: 3 summaries and 3 URLs | `#trust` Resources (hidden, `showResources: false`) | One-line summary and published URL for each article. Only turn the flag on once all three are live. | Open |
-| Contact: name, role, email, Telegram handle, calendar link | `#trust` Talk to a human | A real named person and their contact details. If `BOOKING_URL` is set in env, it is used as the calendar link. | Open |
-| `Founding partner cohort: [PLACEHOLDER: number] spots` | `#founding-partners` H2 | Number of founding spots. Set `foundingSpotsTotal` in `src/config/site.config.ts` and the heading fills itself. | Open |
-| `[PLACEHOLDER: e.g. preferential wholesale rates ...]` | `#founding-partners` What founding partners get | The actual founding benefits, one per line. Only offer what can be honoured. | Open |
-| `[PLACEHOLDER: e.g. minimum monthly volume ...]` | `#founding-partners` What we ask | The actual asks of founding partners, one per line. | Open |
-| `foundingSpotsFilled` (config) | `#founding-partners` progress bar | Real count of founding spots taken. The bar stays hidden until `showFoundingProgress` is true and both numbers are set. | Open |
-| `Target: [PLACEHOLDER: X] business days` | `#compare` Time to first live MID | Same number as the hero's "Target MID go-live". | Open |
-| `[PLACEHOLDER: privacy note and link to privacy policy]` | `#merchants` referral form (hidden, `merchantReferralForm: false`) | Privacy note for the merchant referral form. Needed only if the form is switched on. | Open |
-| `[PLACEHOLDER: entity and licence status]` | `#faq` Is Nexflow an acquirer? | Same fact as the `#trust` corporate block. Fill both together. | Open |
-| `[PLACEHOLDER: X] acquiring partners across [PLACEHOLDER: Y] markets` | `#faq` Who are your acquiring partners? | Same numbers as the hero proof strip. | Open |
-| `[PLACEHOLDER: other licences]` (x2) | `#faq` MCC 7995 and unlicensed gambling answers | Same list as `#features` and `#verticals-igaming`. | Open |
-| `MCC 6051, [PLACEHOLDER: confirm appetite]` | `#faq` Which verticals and MCCs | Same as `#verticals-crypto`. | Open |
-| `[PLACEHOLDER: X] business days` and `[PLACEHOLDER: X] days` | `#faq` How long to get a live MID | Same numbers as the hero and the `#how` timeline. | Open |
-| `30 days' notice ... [PLACEHOLDER: confirm]` | `#faq` How does pricing work | Same as the partner charter. | Open |
-| `[PLACEHOLDER: any pricing detail you are willing to publish]` | `#faq` How does pricing work | Optional: setup fees, typical margin range, minimums. Delete the sentence if nothing will be published. | Open |
-| `[PLACEHOLDER: confirm non-solicit clause]` | `#faq` Who owns the merchant relationship | Same as the `#partners` callout. | Open |
-| `[PLACEHOLDER: direct answer once the technical model is confirmed]` | `#faq` Do you require technical integration? | The direct 1 to 2 sentence answer: does a PSP integrate with Nexflow, the acquirer, or neither? | Open |
-| `[PLACEHOLDER: supported gateways and platforms]` | `#faq` Do you require technical integration? | Gateways and platforms that already connect to the network's acquirers. | Open |
-| `via API and dashboard [PLACEHOLDER: confirm]` | `#faq` Do you require technical integration? | Same as `#features` settlement group. | Open |
-| `[PLACEHOLDER: typical acquirer notice period]` | `#faq` What happens if an acquirer exits a vertical? | Typical notice an acquirer gives before exiting a vertical, from the acquirer agreements. | Open |
-| `USDC, USDT or EURC [PLACEHOLDER: confirm]`, `[PLACEHOLDER: currencies]` | `#faq` Can you settle in stablecoins? | Same as `#features` settlement group. | Open |
-| `[PLACEHOLDER: confirm OCT coverage]` | `#faq` Payouts and withdrawals (OCT) | Confirm which acquirers, regions and verticals support Visa Direct and Mastercard Move payouts. | Open |
-| `[PLACEHOLDER: full due diligence document list]` | `#faq` What do you need to start due diligence? | The complete document checklist sent to new partners. | Open |
-| `[PLACEHOLDER: referral terms]` | `#faq` Referral programme | Same as `#verticals-affiliate`. | Open |
-| `[PLACEHOLDER: privacy notice URL]` | `#apply` consent checkbox | URL of the privacy notice. The consent text shows the placeholder until a real URL is set. | Open |
-| `Thanks. [PLACEHOLDER: contact name] will reply within 24 hours.` | `#apply` success message | Name of the person who replies to applications. Same person as `#trust` Talk to a human. | Open |
-| `[PLACEHOLDER: partnerships email]` | `#apply` failure message | Fallback email shown when the form can't be sent. Must be monitored. | Open |
-| `FORM_ADAPTER` and its credentials (env) | `#apply` delivery | Choose webhook or Notion for production and set its env vars in Vercel. Until then the form shows the fallback email on every submission. | Open |
-| `[PLACEHOLDER: privacy policy URL]`, `terms URL`, `cookie policy URL`, `responsible gambling statement URL` | Footer, Legal column | The four legal pages. They don't exist on this site yet: either link to hosted versions or add pages. | Open |
-| `[PLACEHOLDER: contact email]` | Footer, Contact column | Public contact email. | Open |
-| `[PLACEHOLDER: LinkedIn URL]`, `X URL`, `Telegram URL` | Footer, Contact column | Company social profiles. Remove any that won't exist at launch. | Open |
-| `[PLACEHOLDER: legal entity name, company number, registered address]` | Footer | Same facts as the `#trust` corporate block. | Open |
-| `[PLACEHOLDER: adjust to actual status]` | Footer disclaimer | Confirm "Nexflow is not a bank or card acquirer. Acquiring services are provided by our regulated partners." matches the real regulatory position. | Open |
-| `/og/nexflow-og.png` (labelled placeholder image) | `<head>` Open Graph and Twitter image | Final 1200 x 630 social image. Replace the file at the same path, or change `site.seo.ogImage`. | Open |
-| Favicons: `favicon.ico`, `favicon.svg`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png` | `<head>`, web manifest, Organization logo | Final brand mark in each size. The current files are a plain dark circle. | Open |
-| `[PLACEHOLDER: X handle]` | `<head>` twitter:site | Company X handle without the @. The tag is left out until set. | Open |
-| `[PLACEHOLDER: LinkedIn company URL]`, `Crunchbase URL`, `X profile URL` | Organization schema `sameAs` | Real profile URLs. Left out of schema until set. Same LinkedIn and X URLs as the footer. | Open |
-| `[PLACEHOLDER: legal entity name]` | Organization schema `legalName` | Same as the `#trust` corporate block. Left out of schema until set. | Open |
-| `SITE_URL` (env) | Canonical, Open Graph URLs, sitemap, robots.txt, schema, llms.txt | Production URL, set in Vercel. Without it everything points at localhost. | Open |
-| `vamp-2026-threshold.mdx` (draft guide) | `/guides/vamp-2026-threshold` | Write the article, fill in the description, set `draft: false`. Then point the matching Resources card at it. | Open |
+A placeholder needs a real fact. A confirmation needs a yes from the person who can give it, or
+the content comes off the site.
+
+**Status: 47 markers in the source, 47 rows below, plus 9 tracked items that have no inline
+marker (listed in their own table at the end).** Counts reconciled on 22 October 2026.
+
+---
+
+## 1. Must fill before launch
+
+The site cannot go live with any of these unresolved. Most appear on every page.
+
+| Placeholder | Where | What's needed | Status |
+| --- | --- | --- | --- |
+| `[PLACEHOLDER: LEGAL ENTITY NAME]` | `content/site.ts`. Footer disclosure on every page, compliance, regulatory information | Registered legal entity name, exactly as filed | Open |
+| `[PLACEHOLDER: M number]` | `content/site.ts`, `content/compliance.ts`. Footer, compliance, trust strip, every trust cue | FINTRAC Money Services Business registration number | Open |
+| `[PLACEHOLDER: Bank of Canada reference]` | `content/compliance.ts`. Compliance, regulatory information | Bank of Canada RPAA registration reference | Open |
+| `[PLACEHOLDER: Canadian address on the FINTRAC and Bank of Canada registrations]` | `content/site.ts`. Footer, contact, regulatory information | Registered address exactly as it appears on both registrations | Open |
+| `[PLACEHOLDER: domain]` | `content/site.ts`. Footer mailboxes on every page, partners, compliance, support | Mailbox domain for sales@, support@, compliance@ and partners@. The four render as selectable text, not links, until it lands | Open |
+| `[PLACEHOLDER: regulated EMI or bank partner]` | `content/solutions/virtual-ibans.md`. Virtual IBANs | The account partner, once contracted and cleared for naming. The "provided in partnership with" wording is already in place around it | Open |
+| `[PLACEHOLDER: regulator]` | `content/solutions/virtual-ibans.md`. Virtual IBANs compliance note and FAQ | The regulator that authorises the account partner | Open |
+| `[PLACEHOLDER: issuing partner]` | `content/solutions/cards.md`. Cards | Card issuer name, once cleared for naming | Open |
+| `[PLACEHOLDER: card network]` | `content/solutions/cards.md`. Cards | Network name in plain text. The logo may only follow after issuer approval | Open |
+| `[PLACEHOLDER: supported countries list]` | `config/site.config.ts`, `components/Field.astro`. Account and sales forms | Countries where an account can be opened. **Until this lands every application is declined**, because the only country option is "Other" | Open |
+| `[PLACEHOLDER: restricted countries list]` | `config/site.config.ts`, legal template. Prohibited businesses page | Countries where services are not available | Open |
+| `[PLACEHOLDER: full prohibited business list from the AML policy]` | `config/site.config.ts`, legal template. Prohibited businesses page | The full list. Three activities are already listed from config | Open |
+| `[PLACEHOLDER: assets and networks]` | `content/solutions/crypto-acceptance.md`, `conversion-otc.md`. Hero panels and FAQs | The coins, stablecoins and networks supported on launch day | Open |
+| `[PLACEHOLDER: settlement currencies]` | `content/solutions/crypto-acceptance.md`, `conversion-otc.md`. Hero panels and FAQs | Fiat currencies clients can settle and withdraw in | Open |
+| `[PLACEHOLDER: supported currencies from partner contracts]` | `content/solutions/fx-multi-currency.md`. Hero panel, the on-page list its CTA points at, and the FAQ | Currencies that can be held and converted | Open |
+| `[PLACEHOLDER: payout countries]` | `content/solutions/global-payouts.md`. FAQ | Countries payouts can reach | Open |
+| `[PLACEHOLDER: OTC minimum ticket size]` | `content/solutions/conversion-otc.md`. FAQ | Minimum ticket for the desk, or confirmation there is none | Open |
+| `[PLACEHOLDER: security statement, for example encryption and access controls]` | `content/site.ts`. Trust cue beside CTAs | One or two sentences on security that are contractually true | Open |
+| `[PLACEHOLDER: response time]` | `content/forms.ts`. Partner enquiry success message | How quickly partnerships replies. Only state it if the team can hold to it | Open |
+| `[PLACEHOLDER: date]` | All 6 legal pages | Last updated date. Each page carries its own | Open |
+| `[PLACEHOLDER: terms of service, supplied by legal]` | `content/legal/terms.md` | Terms of service from counsel | Open |
+| `[PLACEHOLDER: privacy policy, supplied by legal, referencing PIPEDA]` | `content/legal/privacy.md` | Privacy policy from counsel, referencing PIPEDA | Open |
+| `[PLACEHOLDER: cookie table, supplied by legal, listing each cookie set by analytics and consent with its purpose and lifetime]` | `content/legal/cookies.md` | Cookie table. It must match the cookies the live site actually sets | Open |
+| `[PLACEHOLDER: how to change or withdraw consent, supplied by legal]` | `content/legal/cookies.md` | How a visitor changes or withdraws consent | Open |
+| `[PLACEHOLDER: how to raise a complaint, supplied by legal]` | `content/legal/complaints.md` | How to complain | Open |
+| `[PLACEHOLDER: acknowledgement and resolution times, supplied by legal]` | `content/legal/complaints.md` | Response times, only if they can be met | Open |
+| `[PLACEHOLDER: escalation route, supplied by legal]` | `content/legal/complaints.md` | Where a complaint goes if the client is not satisfied | Open |
+| `[PLACEHOLDER: approved mission line]` | `content/company.ts`. About | The mission sentence, approved. A suggested draft is on the page beside a "Not approved" badge | Open |
+
+---
+
+## 2. Must confirm before launch
+
+Content that is already written and visible. Each needs a yes, or it comes off the site.
+
+| Confirmation | Where | What's needed | Status |
+| --- | --- | --- | --- |
+| `[CONFIRM: partner converts at point of payment]` | `content/solutions/crypto-acceptance.md`, `conversion-otc.md`. Rendered as a badge | The whole "you don't hold crypto price exposure" claim rests on this. If the partner does not convert at the point of payment, the wording is wrong | Open |
+| `[CONFIRM: OTC desk live at launch]` | `content/solutions/conversion-otc.md`. Badge in the hero and in a benefit | If the desk is not live, the page comes off the site | Open |
+| `[CONFIRM: crypto-funded cards live at launch]` | `content/solutions/cards.md`. Badge in the hero | If not live, that part comes off the site | Open |
+| `[CONFIRM: compliance approval for affiliate networks as a payouts use case]` | `content/solutions/global-payouts.md`. Badge in the hero, chip in the audience list | Compliance approval before affiliate networks appear as a use case | Open |
+| `[CONFIRM: legal review of this explainer]` | `content/compliance.ts`. Badge under "What our two registrations mean" | Counsel to review the plain-English explanation of what each registration covers | Open |
+| `[CONFIRM: compliance approval of the accepted industry list]` | `config/site.config.ts`. Drives the account form's industry list | Approval of the 7 industries the form accepts | Open |
+| `[CONFIRM: actual next step]` | `content/forms.ts`. Account application success screen | The copy promises a secure verification link by email. Confirm that is the real next step | Open |
+| `[CONFIRM: the free mail domain list]` | `config/site.config.ts`. Account and sales forms | The list of free mail domains the forms refuse. A judgement list, not a regulatory one | Open |
+| `[CONFIRM: analytics provider]` | `components/Analytics.astro` | The loader targets a Plausible-compatible endpoint, which is what a bare domain implies. Confirm the provider or swap the script src | Open |
+| `[PLACEHOLDER: name, if approved for publication]` | `content/compliance.ts`. Safeguards list | The Chief Compliance Officer's name, only if they agree to be named. The role itself is stated without it | Open |
+
+---
+
+## 3. Can fill after launch
+
+The site is honest and complete without these. Each is additive.
+
+| Placeholder | Where | What's needed | Status |
+| --- | --- | --- | --- |
+| `[PLACEHOLDER: leadership names, titles, photos and short bios]` | `content/company.ts`. About, hidden while `showLeadership` is false | Names, titles, photos and bios. The section does not render until the flag is turned on | Open |
+| `[PLACEHOLDER: founding story, two or three sentences]` | `content/company.ts`. About | How the company started. Left blank rather than invented | Open |
+| `[PLACEHOLDER: list or remove]` | `content/compliance.ts`. Data security, certifications | Certifications actually held, with evidence. If none are held, the line comes off the page entirely rather than being softened | Open |
+| `[PLACEHOLDER: typical onboarding time, if contractually backed]` | `content/home.ts`. Live in three steps | A typical onboarding time, only if a partner service level backs it. Otherwise the line comes off | Open |
+| `[PLACEHOLDER: expected response time]` | `content/company.ts`. Support | How long a support reply takes | Open |
+| `[PLACEHOLDER: Canadian office address]` | `content/company.ts`. About | The office address, which may differ from the registered address | Open |
+| `[PLACEHOLDER: LinkedIn company page URL]` | `content/site.ts`. Organization structured data, `sameAs` | LinkedIn page URL. Left out of the published schema until it exists, because a placeholder there would be read as a real profile | Open |
+| `[PLACEHOLDER: X profile URL]` | `content/site.ts`. Organization structured data, `sameAs` | X profile URL, on the same basis | Open |
+| `[PLACEHOLDER: option list]` | `components/Field.astro` | A safety net for any config-fed dropdown that is empty. It should never render while the industry list is populated. If it appears, a config list has been emptied | Open |
+
+---
+
+## Tracked items with no inline marker
+
+Real work that does not appear as a marker in the source, so the build check cannot see it.
+
+| Item | Where | What's needed | Status |
+| --- | --- | --- | --- |
+| Production domain | `astro.config.mjs`, every canonical tag, robots.txt, llms.txt | The real domain. The build falls back to the interim Vercel URL | Open |
+| Logo and wordmark | Header, footer, card render | The NexFlow wordmark asset. The header renders the brand name as type | Open |
+| Favicon and app icons | `public/favicon.svg` | A placeholder mark is in place to stop a 404. Replace with the real icon set | Open |
+| Social share image | Head of every page, `og:image` and `twitter:image` | One 1200 by 630 image. The tags are omitted rather than pointing at a missing file | Open |
+| `[CONFIRM: rate shown before you confirm]` | Home offerings grid, conversion card | The card says customers see a rate before confirming. Confirm the partner flow works that way | Open |
+| `[CONFIRM: designated Chief Compliance Officer in post]` | Home, Compliance first paragraph | The copy states a designated CCO oversees the program. Confirm the role is filled on launch day | Open |
+| `[CONFIRM: example dashboard figures approved for display]` | Home version B hero | Balances are illustrative, labelled Example and captioned as not a real account. Confirm that is acceptable | Open |
+| `[CONFIRM: both regulator registry links open correctly]` | Compliance, regulatory status | Click both. The Bank of Canada link returned HTTP 200 from the build machine; FINTRAC could not be reached from it | Open |
+| `[CONFIRM: the seven industry segments]` | Home "Who we serve", Industries, account form | The seven names are used as anchors and as the form's industry list | Open |
+
+---
+
+## Removed on 22 October 2026
+
+These rows were superseded when the content around them was rewritten, and no longer match
+anything in the source: sales email address, business phone number, registered office address,
+support email address, support hours and time zone (replaced by the `[PLACEHOLDER: domain]`
+mailbox pattern and the registered address); compliance programme detail, summary of the
+compliance programme, partner requirements (replaced when the compliance and partners pages
+were written); leadership bios (replaced by a more specific row); form endpoint not yet
+connected (resolved, the endpoint is built and tested).

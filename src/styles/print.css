@@ -1,0 +1,61 @@
+/*
+ * Print styles. Legal pages get printed, filed and sent to counsel, so a printed copy has
+ * to read as a document: no navigation, no review furniture, and link destinations spelled
+ * out because a printed link that only says "privacy policy" is useless.
+ */
+@media print {
+  /* Everything that is screen furniture rather than document. */
+  .header,
+  .footer,
+  .switcher,
+  .cookies,
+  .final-cta,
+  .skip-link {
+    display: none !important;
+  }
+
+  body {
+    padding-bottom: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+  }
+
+  .container {
+    max-width: none;
+    padding-inline: 0;
+  }
+
+  a {
+    color: #000000 !important;
+    text-decoration: underline;
+  }
+
+  /* Spell out destinations, but not for in-page anchors, which mean nothing on paper. */
+  .legal a[href^='http']::after,
+  .legal a[href^='/']::after {
+    content: ' (' attr(href) ')';
+    font-size: 9pt;
+    word-break: break-all;
+  }
+
+  .legal a[href^='#']::after {
+    content: '';
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .legal__section {
+    break-inside: avoid-page;
+  }
+
+  /* The contents list is a screen aid. On paper the headings do the work. */
+  .legal__toc {
+    display: none;
+  }
+}

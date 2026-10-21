@@ -1,0 +1,120 @@
+---
+/**
+ * Support. Where to write, how long a reply takes, and the two escalation routes.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/Section.astro';
+import { company } from '@/content/company';
+import { site } from '@/content/site';
+
+const mailbox = `${company.support.mailbox}@${site.contact.emailDomain}`;
+---
+
+<BaseLayout
+  title={company.support.seoTitle}
+  description={company.support.description}
+  breadcrumbs={[{ name: 'Company', href: '/company/about' }, { name: 'Support', href: '/company/support' }]}
+>
+  <section class="intro" aria-labelledby="support-heading">
+    <div class="container">
+      <h1 id="support-heading">{company.support.title}</h1>
+      <p class="intro__line">{company.support.intro}</p>
+    </div>
+  </section>
+
+  <Section id="contact" heading="Write to support">
+    <p class="mailbox"><span class="mailbox__address">{mailbox}</span></p>
+    <dl class="response">
+      <dt class="response__term">{company.support.responseTime.label}</dt>
+      <dd class="response__value">{company.support.responseTime.value}</dd>
+    </dl>
+  </Section>
+
+  <Section id="escalate" heading="If you need to escalate">
+    <ul class="links">
+      {
+        company.support.links.map((link) => (
+          <li class="links__item">
+            <a class="links__link" href={link.href}>{link.label}</a>
+            <p class="links__note">{link.note}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+</BaseLayout>
+
+<style>
+  .intro {
+    padding-block: var(--spacing-48) var(--spacing-24);
+  }
+
+  @media (min-width: 768px) {
+    .intro {
+      padding-block: var(--section-gap) var(--spacing-32);
+    }
+  }
+
+  .intro__line {
+    margin-top: var(--spacing-24);
+    max-width: 64ch;
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body-lg);
+    color: var(--text-secondary);
+  }
+
+  .mailbox__address {
+    user-select: all;
+    font-size: var(--text-body-lg);
+    color: var(--text-primary);
+  }
+
+  .response {
+    margin: var(--spacing-32) 0 0;
+    padding-top: var(--spacing-24);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .response__term {
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .response__value {
+    margin: var(--spacing-8) 0 0;
+    color: var(--text-primary);
+  }
+
+  .links {
+    display: grid;
+    gap: var(--spacing-24);
+    list-style: none;
+  }
+
+  @media (min-width: 768px) {
+    .links {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .links__item {
+    padding: var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-2xl);
+  }
+
+  .links__link {
+    font-size: var(--text-body-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-body-sm);
+  }
+
+  .links__note {
+    margin-top: var(--spacing-8);
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+</style>

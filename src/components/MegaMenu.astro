@@ -1,0 +1,179 @@
+---
+/**
+ * Navigation menu built on native details and summary, so it opens with a click or the
+ * keyboard and works with no JavaScript at all. The script only adds the niceties:
+ * Escape to close and closing when focus or a click leaves the menu.
+ *
+ * Deliberately not hover-only, which would be unusable on touch and for keyboard users.
+ */
+interface Props {
+  label: string;
+  /** Optional link to the section index, shown inside the panel. */
+  href?: string;
+  indexLabel?: string;
+  items: { label: string; href: string; summary?: string }[];
+  /** Wide panel for the 7 solutions, narrow for a short list such as Company. */
+  size?: 'wide' | 'narrow';
+}
+
+const { label, href, indexLabel, items, size = 'narrow' } = Astro.props;
+---
+
+<details class={`menu menu--${size}`} data-menu>
+  <summary class="menu__trigger">
+    <span>{label}</span>
+    <span class="menu__caret" aria-hidden="true">&darr;</span>
+  </summary>
+
+  <div class="menu__panel">
+    <ul class="menu__list">
+      {
+        items.map((item) => (
+          <li>
+            <a class="menu__link" href={item.href}>
+              <span class="menu__link-label">{item.label}</span>
+              {item.summary && <span class="menu__link-summary">{item.summary}</span>}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    {href && (
+      <a class="menu__index" href={href}>{indexLabel ?? label}</a>
+    )}
+  </div>
+</details>
+
+<script>
+  document.querySelectorAll<HTMLDetailsElement>('[data-menu]').forEach((menu) => {
+    const close = (): void => menu.removeAttribute('open');
+
+    menu.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && menu.hasAttribute('open')) {
+        close();
+        menu.querySelector<HTMLElement>('summary')?.focus();
+      }
+    });
+
+    menu.addEventListener('focusout', () => {
+      // Let focus land before deciding whether it left the menu.
+      requestAnimationFrame(() => {
+        if (!menu.contains(document.activeElement)) close();
+      });
+    });
+
+    document.addEventListener('click', (event: MouseEvent) => {
+      const target = event.target as Node | null;
+      if (menu.hasAttribute('open') && target && !menu.contains(target)) close();
+    });
+  });
+</script>
+
+<style>
+  .menu {
+    position: relative;
+  }
+
+  .menu__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-8);
+    min-height: 44px;
+    padding: var(--spacing-8) var(--spacing-16);
+    cursor: pointer;
+    list-style: none;
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+
+  .menu__trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .menu__caret {
+    font-size: var(--text-caption);
+    transition: transform var(--duration-fast) var(--easing);
+  }
+
+  .menu[open] .menu__caret {
+    transform: rotate(180deg);
+  }
+
+  .menu__panel {
+    padding: var(--spacing-16) 0 var(--spacing-24) var(--spacing-16);
+  }
+
+  .menu__list {
+    display: grid;
+    gap: var(--spacing-8);
+    list-style: none;
+  }
+
+  .menu__link {
+    display: block;
+    padding: var(--spacing-8);
+    border-radius: var(--radius-2xl);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .menu__link:hover {
+    background-color: var(--surface-accent);
+  }
+
+  .menu__link-label {
+    display: block;
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    text-transform: uppercase;
+  }
+
+  .menu__link-summary {
+    display: block;
+    margin-top: 4px;
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    color: var(--text-muted);
+    text-transform: none;
+  }
+
+  .menu__index {
+    display: inline-block;
+    margin-top: var(--spacing-16);
+    margin-left: var(--spacing-8);
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+  }
+
+  /* From the medium breakpoint up the panel floats as a dropdown. Below that it stays in
+     the flow, inside the mobile navigation disclosure. */
+  @media (min-width: 1024px) {
+    .menu__panel {
+      position: absolute;
+      top: calc(100% + var(--spacing-8));
+      left: 0;
+      z-index: 20;
+      padding: var(--spacing-24);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-2xl);
+      background-color: var(--surface-page);
+      box-shadow: var(--shadow-md);
+    }
+
+    .menu--narrow .menu__panel {
+      min-width: 260px;
+    }
+
+    .menu--wide .menu__panel {
+      width: min(760px, calc(100vw - var(--spacing-80)));
+    }
+
+    .menu--wide .menu__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--spacing-16);
+    }
+  }
+</style>

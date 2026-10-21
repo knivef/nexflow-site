@@ -1,0 +1,118 @@
+---
+/**
+ * JSON-LD for search engines and AI crawlers.
+ *
+ * A deliberate decision about placeholders: structured data is read by machines that cannot
+ * tell a placeholder from a fact. Emitting a placeholder string as a postal address or a
+ * social profile would publish it as if it were real, so unknown values are left out of the
+ * graph entirely and tracked in PLACEHOLDERS.md instead. Everything emitted here is true.
+ *
+ * The same rule applies to FAQ answers: a question whose answer is still a placeholder is
+ * not published as an answered question, because FAQ structured data has to match content
+ * a visitor can actually read.
+ */
+import { site } from '@/content/site';
+import { siteConfig } from '@/config/site.config';
+import { compliance } from '@/content/compliance';
+
+interface Props {
+  /** Adds FinancialService. Home and solution pages. */
+  financialService?: { name: string; description: string; url: string };
+  /** Adds FAQPage. Solution pages. Answers that are placeholders are dropped. */
+  faq?: { question: string; answer: string }[];
+  /** Adds BreadcrumbList. Every page below the home page. */
+  breadcrumbs?: { name: string; href: string }[];
+}
+
+const { financialService, faq, breadcrumbs } = Astro.props;
+
+const origin = Astro.site?.origin ?? '';
+const abs = (path: string): string => new URL(path, Astro.site ?? 'http://localhost:4321').href;
+
+const isPlaceholder = (value: string): boolean => /\[(PLACEHOLDER|CONFIRM):/.test(value);
+
+/* ---------------------------------------------------------------
+   Organization, on every page.
+   --------------------------------------------------------------- */
+const organization: Record<string, unknown> = {
+  '@type': 'Organization',
+  '@id': `${origin}/#organization`,
+  name: site.brand.name,
+  url: origin || undefined,
+  description: site.footer.aboutLine,
+};
+
+// Legal name, address and social profiles are still placeholders, so they stay out.
+if (!isPlaceholder(site.brand.legalName)) organization.legalName = site.brand.legalName;
+if (!isPlaceholder(site.contact.registeredAddress)) {
+  organization.address = { '@type': 'PostalAddress', streetAddress: site.contact.registeredAddress };
+}
+const sameAs = (site.social ?? []).map((profile) => profile.url).filter((url) => !isPlaceholder(url));
+if (sameAs.length > 0) organization.sameAs = sameAs;
+
+// Registrations are facts, minus the numbers we do not have yet.
+const identifiers = compliance.regulatory.registrations
+  .filter((registration) => !isPlaceholder(registration.reference))
+  .map((registration) => ({
+    '@type': 'PropertyValue',
+    name: registration.regulator,
+    value: registration.reference,
+  }));
+if (identifiers.length > 0) organization.identifier = identifiers;
+
+const graph: Record<string, unknown>[] = [organization];
+
+/* ---------------------------------------------------------------
+   FinancialService, on the home page and the solution pages.
+   --------------------------------------------------------------- */
+if (financialService) {
+  const service: Record<string, unknown> = {
+    '@type': 'FinancialService',
+    name: financialService.name,
+    description: financialService.description,
+    url: abs(financialService.url),
+    provider: { '@id': `${origin}/#organization` },
+  };
+  // areaServed comes from the approved country list, which is empty for now.
+  const areas = siteConfig.supportedCountries.map((country) => ({
+    '@type': 'Country',
+    name: country.name,
+  }));
+  if (areas.length > 0) service.areaServed = areas;
+  graph.push(service);
+}
+
+/* ---------------------------------------------------------------
+   FAQPage, on the solution pages. Answered questions only.
+   --------------------------------------------------------------- */
+const answered = (faq ?? []).filter((item) => !isPlaceholder(item.answer));
+if (answered.length > 0) {
+  graph.push({
+    '@type': 'FAQPage',
+    mainEntity: answered.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })),
+  });
+}
+
+/* ---------------------------------------------------------------
+   BreadcrumbList, on inner pages.
+   --------------------------------------------------------------- */
+if (breadcrumbs && breadcrumbs.length > 0) {
+  graph.push({
+    '@type': 'BreadcrumbList',
+    itemListElement: [{ name: 'Home', href: '/' }, ...breadcrumbs].map((crumb, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: crumb.name,
+      item: abs(crumb.href),
+    })),
+  });
+}
+
+const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />

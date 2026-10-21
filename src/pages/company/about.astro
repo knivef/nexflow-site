@@ -1,0 +1,117 @@
+---
+/**
+ * About.
+ *
+ * The mission line and the founding story are placeholders on purpose: both are claims
+ * about the company, and writing a plausible-sounding version would be inventing facts.
+ * The suggested mission draft is shown as a review suggestion, clearly marked as not
+ * approved, so it can be judged without being mistaken for live copy.
+ *
+ * Leadership stays hidden while siteConfig.showLeadership is false.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/Section.astro';
+import Badge from '@/components/Badge.astro';
+import RegulatoryBlock from '@/components/RegulatoryBlock.astro';
+import { company } from '@/content/company';
+import { siteConfig } from '@/config/site.config';
+---
+
+<BaseLayout
+  title={company.about.seoTitle}
+  description={company.about.description}
+  breadcrumbs={[{ name: 'About', href: '/company/about' }]}
+>
+  <section class="intro" aria-labelledby="about-heading">
+    <div class="container">
+      <h1 id="about-heading">{company.about.title}</h1>
+      <p class="intro__line">{company.about.description}</p>
+    </div>
+  </section>
+
+  <Section id="mission" heading={company.about.mission.heading}>
+    <p class="mission__line">{company.about.mission.line}</p>
+    <p class="mission__draft">
+      <Badge tone="muted">Not approved</Badge>
+      <span class="mission__draft-text">{company.about.mission.suggestedDraft}</span>
+    </p>
+  </Section>
+
+  <Section id="story" heading={company.about.story.heading}>
+    <p class="body">{company.about.story.body}</p>
+  </Section>
+
+  {
+    siteConfig.showLeadership && (
+      <Section id="leadership" heading={company.about.leadership.heading}>
+        <p class="body">{company.about.leadership.body}</p>
+      </Section>
+    )
+  }
+
+  <Section id="office" heading={company.about.office.heading}>
+    <address class="address">{company.about.office.address}</address>
+  </Section>
+
+  <Section id="regulatory-information">
+    <RegulatoryBlock as="h2" />
+  </Section>
+</BaseLayout>
+
+<style>
+  .intro {
+    padding-block: var(--spacing-48) var(--spacing-24);
+  }
+
+  @media (min-width: 768px) {
+    .intro {
+      padding-block: var(--section-gap) var(--spacing-32);
+    }
+  }
+
+  .intro__line {
+    margin-top: var(--spacing-24);
+    max-width: 64ch;
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body-lg);
+    color: var(--text-secondary);
+  }
+
+  .mission__line {
+    max-width: 60ch;
+    font-size: var(--text-heading-sm);
+    line-height: var(--leading-heading-sm);
+    font-family: var(--font-display);
+    color: var(--text-primary);
+  }
+
+  .mission__draft {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--spacing-16);
+    margin-top: var(--spacing-24);
+    padding-top: var(--spacing-24);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .mission__draft-text {
+    max-width: 64ch;
+    font-size: var(--text-body-sm);
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .body {
+    max-width: 68ch;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .address {
+    max-width: 40ch;
+    font-style: normal;
+    line-height: 1.6;
+    color: var(--text-primary);
+  }
+</style>

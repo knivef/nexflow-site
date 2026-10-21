@@ -1,0 +1,391 @@
+---
+/**
+ * Renders a form from its definition in src/content/forms.ts. Fields, labels, submit label,
+ * messages and trust cue all come from content, never from this markup.
+ *
+ * Works without JavaScript: the form posts normally and the endpoint redirects back with a
+ * status flag. With JavaScript it validates inline first, then submits in the background and
+ * swaps in the success state.
+ *
+ * Errors are announced, linked from a summary, and tied to each control through
+ * aria-describedby and aria-invalid. Colour is never the only signal.
+ */
+import Field from './Field.astro';
+import Button from './Button.astro';
+import TrustNote from './TrustNote.astro';
+import { HONEYPOT_FIELD } from '@/lib/submissions';
+import { site } from '@/content/site';
+import type { FormDefinition } from '@/content/forms';
+
+interface Props {
+  form: FormDefinition;
+}
+
+const { form } = Astro.props;
+
+// Set by the no-script round trip: /partners?submitted=ok
+const submitted = Astro.url.searchParams.get('submitted');
+const reason = Astro.url.searchParams.get('reason');
+const showSuccess = submitted === 'ok';
+const showError = submitted === 'error';
+const showDecline = submitted === 'declined';
+
+// Without JavaScript only the category reaches this page, so the copy names the category.
+const declineFallback = reason === 'industry' ? 'that industry' : 'that country';
+---
+
+<div class="form-wrap" data-form-wrap>
+  <div
+    class="form__success"
+    data-success
+    role="status"
+    aria-live="polite"
+    hidden={!showSuccess}
+  >
+    <p>{form.successMessage}</p>
+  </div>
+
+  <div class="form__decline" data-decline role="status" aria-live="polite" hidden={!showDecline}>
+    <p>
+      Thanks for applying. We can't support businesses in
+      {' '}<strong data-decline-value>{declineFallback}</strong>{' '}
+      right now.
+    </p>
+    <p class="form__decline-links">
+      <a href="/legal/prohibited-businesses">Supported countries and prohibited businesses</a>
+      <span class="form__decline-sep" aria-hidden="true">&middot;</span>
+      <a href={site.ctas.secondary.href}>Talk to sales</a>
+    </p>
+  </div>
+
+  <form
+    class="form"
+    method="post"
+    action={`/api/forms/${form.id}`}
+    novalidate
+    data-form
+    hidden={showSuccess || showDecline}
+  >
+    <div class="form__summary" data-summary role="alert" hidden={!showError}>
+      {showError && <p>{form.errorMessage}</p>}
+    </div>
+
+    {form.fields.map((field) => <Field field={field} />)}
+
+    {/* Honeypot. Hidden from people and from assistive technology; bots fill it in. */}
+    <div class="form__hp" aria-hidden="true">
+      <label for={HONEYPOT_FIELD}>Leave this field empty</label>
+      <input id={HONEYPOT_FIELD} name={HONEYPOT_FIELD} type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="form__actions">
+      <Button type="submit" variant="primary" arrow={false}>{form.submitLabel}</Button>
+    </div>
+
+    <TrustNote cue={form.trustCue} />
+  </form>
+</div>
+
+<script>
+  type FieldState = { name: string; required: boolean; type: string; message: string };
+
+  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  /*
+   * Pre-select a dropdown from the URL, so a solution page can link straight to a form with
+   * its subject chosen, for example ?service=platform-payments. Only values that already
+   * exist as options are accepted, so nothing arbitrary from the URL reaches the form.
+   */
+  const params = new URLSearchParams(window.location.search);
+  if (params.size > 0) {
+    document.querySelectorAll<HTMLSelectElement>('form.form select').forEach((select) => {
+      const wanted = params.get(select.name);
+      if (!wanted) return;
+      if (Array.from(select.options).some((option) => option.value === wanted)) select.value = wanted;
+    });
+
+    // Checkbox groups take a repeated or comma separated parameter, for example
+    // ?products=platform-payments or ?products=cards,global-payouts
+    document.querySelectorAll<HTMLInputElement>('form.form input[type="checkbox"][value]').forEach((box) => {
+      const wanted = params.getAll(box.name).flatMap((entry) => entry.split(','));
+      if (wanted.includes(box.value)) box.checked = true;
+    });
+  }
+
+  document.querySelectorAll<HTMLFormElement>('[data-form]').forEach((form) => {
+    const wrap = form.closest('[data-form-wrap]');
+    const summary = form.querySelector<HTMLElement>('[data-summary]');
+    const success = wrap?.querySelector<HTMLElement>('[data-success]');
+
+    /** Reads what to validate straight from the rendered markup. */
+    const states = (): FieldState[] =>
+      Array.from(form.querySelectorAll<HTMLElement>('[data-field]')).map((group) => {
+        const name = group.dataset.field ?? '';
+        const control = group.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(
+          `[name="${name}"]`,
+        );
+        const isGroup = group.tagName === 'FIELDSET';
+        return {
+          name,
+          required: isGroup
+            ? group.querySelector('legend')?.textContent?.includes('*') === true
+            : Boolean(control?.required),
+          type: isGroup ? 'checkbox-group' : (control?.getAttribute('type') ?? control?.tagName.toLowerCase() ?? 'text'),
+          message: group.querySelector<HTMLElement>('[data-error]')?.dataset.message ?? '',
+        };
+      });
+
+    /** Shows or hides fields whose showWhen condition depends on another field. */
+    const applyConditions = (): void => {
+      form.querySelectorAll<HTMLElement>('[data-show-when-field]').forEach((group) => {
+        const source = group.dataset.showWhenField ?? '';
+        const wanted = (group.dataset.showWhenValues ?? '').split(',').filter(Boolean);
+        const chosen = Array.from(
+          form.querySelectorAll<HTMLInputElement>(`[name="${source}"]`),
+        )
+          .filter((input) => (input.type === 'checkbox' ? input.checked : true))
+          .map((input) => input.value);
+        const applies = wanted.some((value) => chosen.includes(value));
+        group.hidden = !applies;
+        if (!applies) {
+          const name = group.dataset.field;
+          if (name) setError(name, null);
+        }
+      });
+    };
+
+    const valueOf = (name: string, type: string): string => {
+      if (type === 'checkbox-group') {
+        return Array.from(form.querySelectorAll<HTMLInputElement>(`[name="${name}"]:checked`))
+          .map((input) => input.value)
+          .join(',');
+      }
+      const control = form.querySelector<HTMLInputElement>(`[name="${name}"]`);
+      if (!control) return '';
+      if (control.type === 'checkbox') return control.checked ? 'on' : '';
+      return control.value.trim();
+    };
+
+    const setError = (name: string, message: string | null): void => {
+      const group = form.querySelector<HTMLElement>(`[data-field="${name}"]`);
+      const error = group?.querySelector<HTMLElement>('[data-error]');
+      const control = form.querySelector<HTMLElement>(`[name="${name}"]`);
+      if (!group || !error) return;
+
+      if (message) {
+        error.textContent = message;
+        error.hidden = false;
+        if (group.tagName === 'FIELDSET') group.setAttribute('aria-invalid', 'true');
+        else control?.setAttribute('aria-invalid', 'true');
+      } else {
+        error.textContent = '';
+        error.hidden = true;
+        group.removeAttribute('aria-invalid');
+        control?.removeAttribute('aria-invalid');
+      }
+    };
+
+    const check = (): { name: string; message: string }[] => {
+      const problems: { name: string; message: string }[] = [];
+
+      states().forEach((state) => {
+        const group = form.querySelector<HTMLElement>(`[data-field="${state.name}"]`);
+        if (group?.hidden) return; // Not shown, so not required. The server agrees.
+        const value = valueOf(state.name, state.type);
+        let message: string | null = null;
+
+        if (state.required && value === '') message = state.message || 'This field is required.';
+        else if (value !== '' && state.type === 'email' && !EMAIL.test(value))
+          message = state.message || 'Enter a valid email address.';
+        else if (value !== '' && state.type === 'url' && !/^https?:\/\/.+\..+/i.test(value))
+          message = state.message || 'Enter a full URL, including https://';
+
+        setError(state.name, message);
+        if (message) problems.push({ name: state.name, message });
+      });
+
+      return problems;
+    };
+
+    const formId = form.getAttribute('action')?.split('/').pop() ?? 'unknown';
+    const raise = (outcome: string, extra?: Record<string, unknown>): void => {
+      window.dispatchEvent(
+        new CustomEvent('nexflow:form', { detail: { outcome, form: formId, ...extra } }),
+      );
+    };
+
+    const showSummary = (problems: { name: string; message: string }[]): void => {
+      if (!summary) return;
+      if (problems.length === 0) {
+        summary.hidden = true;
+        summary.innerHTML = '';
+        return;
+      }
+      const items = problems
+        .map((problem) => `<li><a href="#${problem.name}">${problem.message}</a></li>`)
+        .join('');
+      summary.innerHTML = `<p>Please check the following:</p><ul>${items}</ul>`;
+      summary.hidden = false;
+    };
+
+    applyConditions();
+    form.addEventListener('change', applyConditions);
+
+    form.addEventListener('submit', async (event) => {
+      const problems = check();
+      showSummary(problems);
+
+      if (problems.length > 0) {
+        event.preventDefault();
+        raise('errors', { errors: problems.length });
+        const first = problems[0];
+        if (first) {
+          const control = form.querySelector<HTMLElement>(`[name="${first.name}"]`);
+          control?.focus();
+        }
+        return;
+      }
+
+      // Valid: take over the submit so the page does not reload.
+      event.preventDefault();
+      const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      if (submit) submit.disabled = true;
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          headers: { accept: 'application/json' },
+          body: new FormData(form),
+        });
+        const payload = (await response.json()) as {
+          ok: boolean;
+          message?: string;
+          error?: string;
+          errors?: Record<string, string>;
+          declined?: { reason: string; value: string };
+        };
+
+        if (payload.declined) {
+          raise('declined');
+          const panel = wrap?.querySelector<HTMLElement>('[data-decline]');
+          const slot = panel?.querySelector<HTMLElement>('[data-decline-value]');
+          if (slot) slot.textContent = payload.declined.value;
+          if (panel) panel.hidden = false;
+          form.hidden = true;
+          return;
+        }
+
+        if (payload.ok) {
+          raise('submit_success');
+          if (success) {
+            if (payload.message) {
+              const text = success.querySelector('p');
+              if (text) text.textContent = payload.message;
+            }
+            success.hidden = false;
+            success.focus?.();
+          }
+          form.hidden = true;
+          return;
+        }
+
+        if (payload.errors) {
+          const list = Object.entries(payload.errors).map(([name, message]) => ({ name, message }));
+          list.forEach((problem) => setError(problem.name, problem.message));
+          showSummary(list);
+        } else if (summary) {
+          summary.innerHTML = `<p>${payload.error ?? 'Something went wrong. Please try again.'}</p>`;
+          summary.hidden = false;
+        }
+      } catch {
+        if (summary) {
+          summary.innerHTML = '<p>Something went wrong. Please try again.</p>';
+          summary.hidden = false;
+        }
+      } finally {
+        if (submit) submit.disabled = false;
+      }
+    });
+  });
+</script>
+
+<style>
+  .form {
+    max-width: 44rem;
+    margin-top: var(--spacing-32);
+  }
+
+  .form__actions {
+    margin-top: var(--spacing-32);
+  }
+
+  .form__summary {
+    margin-bottom: var(--spacing-24);
+    padding: var(--spacing-16);
+    border: 1px solid var(--text-error);
+    border-radius: var(--radius-2xl);
+    color: var(--text-error);
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+  }
+
+  .form__summary :global(ul) {
+    margin-top: var(--spacing-8);
+    padding-left: var(--spacing-24);
+    list-style: disc;
+  }
+
+  .form__summary :global(a) {
+    color: var(--text-error);
+  }
+
+  .form__success {
+    max-width: 44rem;
+    margin-top: var(--spacing-32);
+    padding: var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-cards);
+    background-color: var(--surface-accent);
+  }
+
+  .form__success p {
+    color: var(--text-on-accent-surface);
+  }
+
+  .form__decline {
+    max-width: 44rem;
+    margin-top: var(--spacing-32);
+    padding: var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-cards);
+    background-color: var(--surface-raised);
+  }
+
+  .form__decline p {
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .form__decline-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+    margin-top: var(--spacing-16);
+    font-size: var(--text-body-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-body-sm);
+  }
+
+  .form__decline-sep {
+    color: var(--text-muted);
+  }
+
+  /* Honeypot: off screen, not display:none, so bots that check visibility still fill it. */
+  .form__hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+</style>

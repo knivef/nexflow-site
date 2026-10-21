@@ -1,0 +1,217 @@
+---
+/**
+ * Footer, on every page.
+ *
+ * Carries the full regulatory disclosure from CLAUDE.md, never collapsed and never
+ * truncated, including on mobile. Legal pages are linked here and nowhere else.
+ *
+ * Contact addresses render as selectable plain text rather than mailto links, because the
+ * domain is still a placeholder and a broken mailto is worse than text you can copy.
+ */
+import { getCollection } from 'astro:content';
+import { site } from '@/content/site';
+
+const solutions = (await getCollection('solutions')).sort((a, b) => a.data.order - b.data.order);
+const legal = (await getCollection('legal')).sort((a, b) => a.data.order - b.data.order);
+
+function linksFor(group: (typeof site.footer.groups)[number]) {
+  if (group.collection === 'solutions') {
+    return solutions.map((entry) => ({ label: entry.data.navLabel, href: `/solutions/${entry.id}` }));
+  }
+  if (group.collection === 'legal') {
+    return legal.map((entry) => ({ label: entry.data.footerLabel, href: `/legal/${entry.id}` }));
+  }
+  return group.links;
+}
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__groups">
+      {
+        site.footer.groups.map((group) => (
+          <nav class="footer__group" aria-label={group.title}>
+            <h2 class="caption footer__group-title">{group.title}</h2>
+            <ul class="footer__list">
+              {linksFor(group).map((link) => (
+                <li>
+                  <a class="footer__link" href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))
+      }
+    </div>
+
+    <div class="footer__about">
+      <h2 class="caption footer__group-title">About {site.brand.name}</h2>
+      <p class="footer__about-line">{site.footer.aboutLine}</p>
+    </div>
+
+    <div class="footer__contact">
+      <div>
+        <h2 class="caption footer__group-title">Contact</h2>
+        <ul class="footer__emails">
+          {
+            site.contact.mailboxes.map((mailbox) => (
+              <li class="footer__email">
+                <span class="footer__email-label">{mailbox.label}</span>
+                <span class="footer__email-address">{mailbox.user}@{site.contact.emailDomain}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="caption footer__group-title">{site.contact.registeredAddressLabel}</h2>
+        <address class="footer__address">{site.contact.registeredAddress}</address>
+      </div>
+    </div>
+
+    <div class="footer__disclosure">
+      <h2 class="visually-hidden">Regulatory disclosure</h2>
+      <p>{site.footer.disclosure}</p>
+    </div>
+
+    <p class="footer__copyright">
+      {site.footer.copyrightPrefix} {year} {site.brand.legalName}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-block: var(--spacing-48);
+    border-top: 1px solid var(--border-hairline);
+    background-color: var(--surface-page);
+  }
+
+  .footer__groups {
+    display: grid;
+    gap: var(--spacing-32);
+  }
+
+  @media (min-width: 768px) {
+    .footer__groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .footer__groups {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--spacing-40);
+    }
+  }
+
+  .footer__group-title {
+    margin-bottom: var(--spacing-16);
+  }
+
+  .footer__list {
+    display: grid;
+    gap: var(--spacing-8);
+    list-style: none;
+  }
+
+  .footer__link {
+    display: inline-block;
+    padding-block: 6px;
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .footer__link:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .footer__about {
+    margin-top: var(--spacing-40);
+    padding-top: var(--spacing-24);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .footer__about-line {
+    max-width: 80ch;
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+
+  .footer__contact {
+    display: grid;
+    gap: var(--spacing-32);
+    margin-top: var(--spacing-32);
+  }
+
+  @media (min-width: 768px) {
+    .footer__contact {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+
+  .footer__emails {
+    display: grid;
+    gap: var(--spacing-8);
+    list-style: none;
+  }
+
+  .footer__email {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+    align-items: baseline;
+    font-size: var(--text-body-sm);
+  }
+
+  .footer__email-label {
+    min-width: 7ch;
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* Selectable text, not a link: the domain is a placeholder. */
+  .footer__email-address {
+    user-select: all;
+    color: var(--text-primary);
+  }
+
+  .footer__address {
+    max-width: 40ch;
+    font-size: var(--text-body-sm);
+    font-style: normal;
+    line-height: 1.5;
+    color: var(--text-primary);
+  }
+
+  .footer__disclosure {
+    margin-top: var(--spacing-40);
+    padding-top: var(--spacing-24);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .footer__disclosure p {
+    max-width: 90ch;
+    font-size: var(--text-caption);
+    line-height: 1.6;
+    letter-spacing: 0;
+    color: var(--text-secondary);
+  }
+
+  .footer__copyright {
+    margin-top: var(--spacing-24);
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+</style>

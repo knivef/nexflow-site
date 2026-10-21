@@ -1,0 +1,330 @@
+---
+/**
+ * Form field: text, email, url, tel, textarea, select, a single checkbox and a checkbox group.
+ *
+ * Option lists come from siteConfig or the partners content, never from markup. When a list
+ * is still empty, for example supported countries before compliance supplies it, the control
+ * renders disabled next to a visible placeholder rather than an empty dropdown that would
+ * imply any country is supported.
+ *
+ * Accessibility: every control has a visible label, help text and errors are wired through
+ * aria-describedby, and the error element is always present so the script only has to fill
+ * it in. Control borders use --border-control (3.26:1 on parchment), not the decorative
+ * hairline.
+ */
+import { siteConfig } from '@/config/site.config';
+import { partners } from '@/content/partners';
+
+interface FieldDef {
+  name: string;
+  label: string;
+  type: 'text' | 'email' | 'url' | 'tel' | 'textarea' | 'select' | 'checkbox' | 'checkbox-group';
+  required?: boolean;
+  autocomplete?: string;
+  help?: string;
+  link?: { label: string; href: string };
+  errorMessage?: string;
+  optionsFrom?: 'supportedCountries' | 'acceptedIndustries' | 'partnerTypes';
+  options?: { value: string; label: string }[];
+  showWhen?: { field: string; hasAnyOf: string[] };
+  allowOther?: boolean;
+}
+
+interface Props {
+  field: FieldDef;
+}
+
+const { field } = Astro.props;
+
+function resolveOptions(def: FieldDef): { value: string; label: string }[] {
+  if (def.options) return def.options;
+  switch (def.optionsFrom) {
+    case 'supportedCountries':
+      return siteConfig.supportedCountries.map((country) => ({ value: country.code, label: country.name }));
+    case 'acceptedIndustries':
+      return siteConfig.acceptedIndustries.map((industry) => ({ value: industry.id, label: industry.label }));
+    case 'partnerTypes':
+      return partners.partnerTypes.items.map((type) => ({ value: type.id, label: type.label }));
+    default:
+      return [];
+  }
+}
+
+const resolved = field.type === 'select' || field.type === 'checkbox-group' ? resolveOptions(field) : [];
+
+// The config list is still empty: say so in the open, rather than render a bare dropdown.
+const awaitingList = field.type === 'select' && Boolean(field.optionsFrom) && resolved.length === 0;
+
+// "Other" keeps the control usable while a config list is still being compiled, and the
+// eligibility check treats it as not supported.
+const options = field.allowOther ? [...resolved, { value: 'other', label: 'Other' }] : resolved;
+
+const helpId = `${field.name}-help`;
+const errorId = `${field.name}-error`;
+const describedBy = [field.help || awaitingList ? helpId : null, errorId].filter(Boolean).join(' ');
+
+const isPlainInput = !['textarea', 'select', 'checkbox', 'checkbox-group'].includes(field.type);
+const inputType: 'text' | 'email' | 'url' | 'tel' =
+  field.type === 'email' || field.type === 'url' || field.type === 'tel' ? field.type : 'text';
+
+const pendingNote =
+  field.optionsFrom === 'supportedCountries'
+    ? '[PLACEHOLDER: supported countries list]'
+    : '[PLACEHOLDER: option list]';
+---
+
+{
+  field.type === 'checkbox' ? (
+    <div
+      class="field field--checkbox"
+      data-field={field.name}
+      data-show-when-field={field.showWhen?.field}
+      data-show-when-values={field.showWhen?.hasAnyOf.join(',')}
+    >
+      <input
+        class="field__checkbox"
+        type="checkbox"
+        id={field.name}
+        name={field.name}
+        required={field.required}
+        aria-describedby={describedBy}
+      />
+      <label class="field__checkbox-label" for={field.name}>
+        {field.label}
+        {field.link && (
+          <> <a href={field.link.href}>{field.link.label}</a></>
+        )}
+        {field.required && <span class="field__required" aria-hidden="true">*</span>}
+      </label>
+      {field.help && <p class="field__help" id={helpId}>{field.help}</p>}
+      <p class="field__error" id={errorId} data-error data-message={field.errorMessage} hidden />
+    </div>
+  ) : field.type === 'checkbox-group' ? (
+    <fieldset
+      class="field field--group"
+      data-field={field.name}
+      data-show-when-field={field.showWhen?.field}
+      data-show-when-values={field.showWhen?.hasAnyOf.join(',')}
+      aria-describedby={describedBy}
+    >
+      <legend class="field__label">
+        {field.label}
+        {field.required && <span class="field__required" aria-hidden="true">*</span>}
+      </legend>
+
+      <div class="field__options">
+        {options.map((option) => (
+          <div class="field__option">
+            <input
+              class="field__checkbox"
+              type="checkbox"
+              id={`${field.name}-${option.value}`}
+              name={field.name}
+              value={option.value}
+            />
+            <label for={`${field.name}-${option.value}`}>{option.label}</label>
+          </div>
+        ))}
+      </div>
+
+      {field.help && <p class="field__help" id={helpId}>{field.help}</p>}
+      <p class="field__error" id={errorId} data-error data-message={field.errorMessage} hidden />
+    </fieldset>
+  ) : (
+    <div
+      class="field"
+      data-field={field.name}
+      data-show-when-field={field.showWhen?.field}
+      data-show-when-values={field.showWhen?.hasAnyOf.join(',')}
+    >
+      <label class="field__label" for={field.name}>
+        {field.label}
+        {field.required && <span class="field__required" aria-hidden="true">*</span>}
+      </label>
+
+      {field.type === 'textarea' && (
+        <textarea
+          class="field__control"
+          id={field.name}
+          name={field.name}
+          rows="5"
+          required={field.required}
+          aria-describedby={describedBy}
+        />
+      )}
+
+      {field.type === 'select' && (
+        <select
+          class="field__control"
+          id={field.name}
+          name={field.name}
+          required={field.required && options.length > 0}
+          disabled={options.length === 0}
+          aria-describedby={describedBy}
+        >
+          <option value="">Select</option>
+          {options.map((option) => (
+            <option value={option.value}>{option.label}</option>
+          ))}
+        </select>
+      )}
+
+      {isPlainInput && (
+        <input
+          class="field__control"
+          type={inputType}
+          id={field.name}
+          name={field.name}
+          required={field.required}
+          autocomplete={field.autocomplete}
+          aria-describedby={describedBy}
+        />
+      )}
+
+      {(field.help || awaitingList) && (
+        <p class="field__help" id={helpId}>
+          {field.help}
+          {awaitingList && <span class="field__pending">{pendingNote}</span>}
+        </p>
+      )}
+
+      <p class="field__error" id={errorId} data-error data-message={field.errorMessage} hidden />
+    </div>
+  )
+}
+
+<style>
+  .field {
+    display: block;
+  }
+
+  .field + :global(.field) {
+    margin-top: var(--spacing-24);
+  }
+
+  .field--group {
+    margin-inline: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .field__label {
+    display: block;
+    margin-bottom: var(--spacing-8);
+    padding: 0;
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+
+  .field__required {
+    margin-left: 4px;
+    color: var(--text-link);
+  }
+
+  .field__control {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    padding: var(--spacing-16);
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-input);
+    background-color: var(--surface-page);
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    font-size: var(--text-body);
+    letter-spacing: var(--tracking-body);
+  }
+
+  .field__control:disabled {
+    background-color: var(--surface-disabled);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+
+  textarea.field__control {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .field--checkbox {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--spacing-16);
+    align-items: start;
+  }
+
+  .field__checkbox {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    accent-color: var(--accent-fill);
+  }
+
+  .field__checkbox-label {
+    font-size: var(--text-body-sm);
+    line-height: 1.45;
+    color: var(--text-secondary);
+  }
+
+  .field--checkbox .field__help,
+  .field--checkbox .field__error {
+    grid-column: 2;
+  }
+
+  .field__options {
+    display: grid;
+    gap: var(--spacing-16);
+    margin-top: var(--spacing-8);
+  }
+
+  @media (min-width: 640px) {
+    .field__options {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .field__option {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--spacing-16);
+    align-items: center;
+  }
+
+  .field__option label {
+    font-size: var(--text-body-sm);
+    line-height: 1.45;
+    color: var(--text-secondary);
+  }
+
+  .field__help {
+    margin-top: var(--spacing-8);
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    letter-spacing: var(--tracking-caption);
+    color: var(--text-muted);
+  }
+
+  .field__pending {
+    display: block;
+    color: var(--text-primary);
+  }
+
+  /* Errors are red plus a visible marker, never colour alone. */
+  .field__error {
+    margin-top: var(--spacing-8);
+    font-size: var(--text-body-sm);
+    line-height: 1.45;
+    color: var(--text-error);
+  }
+
+  .field__error::before {
+    content: '! ';
+    font-weight: var(--font-weight-medium);
+  }
+
+  :global([aria-invalid='true']) {
+    border-color: var(--text-error);
+  }
+</style>

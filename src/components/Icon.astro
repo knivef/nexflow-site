@@ -1,0 +1,50 @@
+---
+/**
+ * Line icons for the offering cards. Decorative only: each card already has a text title,
+ * so the icon is hidden from assistive technology.
+ */
+interface Props {
+  name: 'accept' | 'convert' | 'account' | 'payout' | 'currencies' | 'card';
+  class?: string;
+}
+
+const { name, class: className } = Astro.props;
+
+const paths: Record<Props['name'], string> = {
+  // Arrow landing in a tray: money coming in.
+  accept: 'M12 3v10m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2',
+  // Two arrows swapping: conversion.
+  convert: 'M4 8h13m0 0-3-3m3 3-3 3M20 16H7m0 0 3-3m-3 3 3 3',
+  // Ledger lines in a frame: an account.
+  account: 'M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM7 9h10M7 13h6',
+  // Arrow leaving towards several points: payouts.
+  payout: 'M3 12h10m0 0-3-3m3 3-3 3M17 6h4M17 12h4M17 18h4',
+  // Overlapping circles: several currencies held together.
+  currencies: 'M9 15a6 6 0 1 1 0-12 6 6 0 0 1 0 12Zm6 6a6 6 0 1 1 0-12 6 6 0 0 1 0 12Z',
+  // Card with a stripe.
+  card: 'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 10h18M7 15h3',
+};
+---
+
+<svg
+  class={['icon', className].filter(Boolean).join(' ')}
+  viewBox="0 0 24 24"
+  width="24"
+  height="24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path d={paths[name]} />
+</svg>
+
+<style>
+  .icon {
+    display: block;
+    color: var(--text-primary);
+  }
+</style>

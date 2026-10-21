@@ -1,0 +1,378 @@
+---
+/**
+ * Home page: one component tree for all three versions. Everything version-specific comes
+ * from the version object, so A, B and C differ in copy, offering order and hero visual and
+ * in nothing else.
+ *
+ * Sections 8 and 9, the final CTA band and the footer, come from BaseLayout, which renders
+ * them on every page.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/Section.astro';
+import Button from '@/components/Button.astro';
+import Card from '@/components/Card.astro';
+import Icon from '@/components/Icon.astro';
+import TrustStrip from '@/components/TrustStrip.astro';
+import HeroVisual from '@/components/HeroVisual.astro';
+import { site } from '@/content/site';
+import { home, offeringsFor, type HomeVersion } from '@/content/home';
+
+interface Props {
+  version: HomeVersion;
+}
+
+const { version } = Astro.props;
+const sections = home.sections;
+const offerings = offeringsFor(version);
+---
+
+<BaseLayout
+  title={version.metaTitle}
+  description={version.metaDescription}
+  canonicalPath={version.canonicalPath}
+  noindex={version.noindex}
+  version={version.id}
+  financialService={{
+    name: 'NexFlow business payments',
+    description: version.metaDescription,
+    url: '/',
+  }}
+>
+  {/* 1. Hero */}
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="container hero__inner">
+      <div class="hero__copy">
+        <p class="caption hero__eyebrow">{sections.hero.eyebrow}</p>
+        <h1 id="hero-heading">{version.pitchLine}</h1>
+        <p class="hero__sub">{version.subHead}</p>
+
+        <div class="hero__actions">
+          <Button href={site.ctas.primary.href} variant="primary" analytics="hero_cta_open_account">{site.ctas.primary.label}</Button>
+          <Button href={site.ctas.secondary.href} variant="ghost" arrow={false} analytics="hero_cta_talk_to_sales">
+            {site.ctas.secondary.label}
+          </Button>
+        </div>
+
+        <p class="hero__trust">{site.finalCta.trustLine}</p>
+      </div>
+
+      <div class="hero__visual">
+        <HeroVisual type={version.heroVisual} />
+      </div>
+    </div>
+  </section>
+
+  {/* 2. Trust strip */}
+  <div class="trust-band">
+    <div class="container">
+      <TrustStrip />
+    </div>
+  </div>
+
+  {/* 3. Offerings */}
+  <Section id="offerings" heading={sections.offerings.heading}>
+    <ul class="offerings">
+      {
+        offerings.map((item) => (
+          <li>
+            <Card title={item.title} as="h3" class="offering">
+              <Icon slot="icon" name={item.icon} />
+              <p>{item.line}</p>
+              <a class="offering__link" href={item.href} data-analytics="solution_card_click">
+                {sections.offerings.learnMoreLabel}
+                <span class="visually-hidden"> about {item.title}</span>
+                <span aria-hidden="true">&rarr;</span>
+              </a>
+            </Card>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  {/* 4. How it works */}
+  <Section id="how-it-works" heading={sections.howItWorks.heading}>
+    <ol class="steps">
+      {
+        sections.howItWorks.steps.map((step, index) => (
+          <li class="step">
+            <span class="step__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+            <p class="step__text">{step}</p>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="steps__note">{sections.howItWorks.note}</p>
+  </Section>
+
+  {/* 5. Who we serve */}
+  <Section id="who-we-serve" heading={sections.whoWeServe.heading}>
+    <ul class="tiles">
+      {
+        sections.whoWeServe.tiles.map((tile) => (
+          <li>
+            <a class="tile" href={tile.href}>
+              <span>{tile.label}</span>
+              <span class="tile__arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  {/* 6. Compliance first */}
+  <Section id="compliance-first" heading={sections.compliance.heading}>
+    <p class="compliance__body">{sections.compliance.body}</p>
+    <p class="compliance__link">
+      <a href={sections.compliance.href}>{sections.compliance.linkLabel}</a>
+    </p>
+  </Section>
+
+  {/* 7. Partner with us */}
+  <section class="partner-band" aria-labelledby="partner-heading">
+    <div class="container partner-band__inner">
+      <h2 class="partner-band__text" id="partner-heading">{sections.partner.body}</h2>
+      <div class="partner-band__action">
+        <Button href={site.ctas.partner.href} variant="secondary" arrow={false} analytics="become_partner_click">
+          {site.ctas.partner.label}
+        </Button>
+        <p class="partner-band__trust">{site.trustCues.registration}</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* 1. Hero */
+  .hero {
+    padding-block: var(--spacing-48) var(--spacing-40);
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      padding-block: var(--section-gap);
+    }
+  }
+
+  .hero__inner {
+    display: grid;
+    gap: var(--spacing-40);
+  }
+
+  @media (min-width: 1024px) {
+    .hero__inner {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+      align-items: center;
+      gap: var(--spacing-64);
+    }
+  }
+
+  .hero__eyebrow {
+    margin-bottom: var(--spacing-16);
+  }
+
+  .hero__sub {
+    margin-top: var(--spacing-24);
+    max-width: 56ch;
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body-lg);
+    letter-spacing: var(--tracking-body-lg);
+    color: var(--text-secondary);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-16);
+    margin-top: var(--spacing-32);
+  }
+
+  .hero__trust {
+    margin-top: var(--spacing-16);
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    letter-spacing: var(--tracking-caption);
+    color: var(--text-muted);
+  }
+
+  /* 2. Trust strip */
+  .trust-band {
+    padding-block: var(--spacing-24);
+    border-block: 1px solid var(--border-hairline);
+  }
+
+  /* 3. Offerings */
+  .offerings {
+    display: grid;
+    gap: var(--spacing-16);
+    list-style: none;
+  }
+
+  @media (min-width: 640px) {
+    .offerings {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .offerings {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .offerings > li {
+    display: flex;
+  }
+
+  /* Same scoping rule as the trust strips: the class lands on Card's root, which carries
+     Card's scope, so this has to be :global(), kept inside .offerings. */
+  .offerings :global(.offering) {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .offering__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-8);
+    margin-top: var(--spacing-24);
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .offering__link:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  /* 4. How it works */
+  .steps {
+    display: grid;
+    gap: var(--spacing-24);
+    list-style: none;
+    counter-reset: step;
+  }
+
+  @media (min-width: 900px) {
+    .steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--spacing-40);
+    }
+  }
+
+  .step {
+    padding-top: var(--spacing-16);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .step__number {
+    display: block;
+    margin-bottom: var(--spacing-8);
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    color: var(--text-muted);
+  }
+
+  .step__text {
+    font-size: var(--text-body);
+    color: var(--text-primary);
+  }
+
+  .steps__note {
+    margin-top: var(--spacing-32);
+    max-width: 70ch;
+    font-size: var(--text-caption);
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+
+  /* 5. Who we serve */
+  .tiles {
+    display: grid;
+    gap: var(--spacing-8);
+    list-style: none;
+  }
+
+  @media (min-width: 640px) {
+    .tiles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .tiles {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .tile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-16);
+    min-height: 64px;
+    padding: var(--spacing-16) var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-2xl);
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .tile:hover {
+    border-color: var(--border-strong);
+  }
+
+  /* 6. Compliance */
+  .compliance__body {
+    max-width: 76ch;
+    font-size: var(--text-body);
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .compliance__link {
+    margin-top: var(--spacing-24);
+    font-size: var(--text-body-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-body-sm);
+  }
+
+  /* 7. Partner band */
+  .partner-band {
+    padding-block: var(--spacing-48);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .partner-band__inner {
+    display: grid;
+    gap: var(--spacing-24);
+  }
+
+  @media (min-width: 900px) {
+    .partner-band__inner {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--spacing-40);
+    }
+  }
+
+  .partner-band__text {
+    max-width: 44ch;
+    font-size: var(--text-heading-sm);
+    line-height: var(--leading-heading-sm);
+  }
+
+  .partner-band__trust {
+    margin-top: var(--spacing-16);
+    max-width: 44ch;
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+</style>

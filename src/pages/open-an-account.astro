@@ -1,0 +1,68 @@
+---
+/**
+ * Open an account: the qualifying form.
+ *
+ * Server-rendered, not prerendered: it reads ?submitted= to show the success, error or
+ * decline state after a submission made with JavaScript off, and a prerendered page is
+ * built once with no query string.
+ *
+ * Country and industry options come from siteConfig, so no unsupported country can appear.
+ * Eligibility is decided on the server, and a decline is answered politely rather than
+ * treated as an error.
+ */
+export const prerender = false;
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/Section.astro';
+import Form from '@/components/Form.astro';
+import TrustStrip from '@/components/TrustStrip.astro';
+import { forms } from '@/content/forms';
+---
+
+<BaseLayout
+  title={forms.openAccount.seoTitle}
+  description={forms.openAccount.description}
+  breadcrumbs={[{ name: 'Open an account', href: '/open-an-account' }]}
+>
+  <section class="intro" aria-labelledby="account-heading">
+    <div class="container">
+      <p class="caption intro__eyebrow">Open an account</p>
+      <h1 id="account-heading">{forms.openAccount.title}</h1>
+      <p class="intro__line">{forms.openAccount.description}</p>
+      <TrustStrip class="intro__trust" />
+    </div>
+  </section>
+
+  <Section id="application">
+    <Form form={forms.openAccount} />
+  </Section>
+</BaseLayout>
+
+<style>
+  .intro {
+    padding-block: var(--spacing-48) var(--spacing-32);
+  }
+
+  @media (min-width: 768px) {
+    .intro {
+      padding-block: var(--section-gap) var(--spacing-40);
+    }
+  }
+
+  .intro__eyebrow {
+    margin-bottom: var(--spacing-16);
+  }
+
+  .intro__line {
+    margin-top: var(--spacing-24);
+    max-width: 56ch;
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body-lg);
+    letter-spacing: var(--tracking-body-lg);
+    color: var(--text-secondary);
+  }
+
+  .intro :global(.trust-strip) {
+    margin-top: var(--spacing-32);
+  }
+</style>

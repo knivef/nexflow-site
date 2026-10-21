@@ -1,0 +1,29 @@
+---
+/**
+ * Trust cue. CLAUDE.md requires one beside every call to action: a registration line,
+ * a verified onboarding line or a security note. Plain text only, never a regulator logo.
+ */
+import { site } from '@/content/site';
+
+interface Props {
+  cue?: keyof typeof site.trustCues;
+  id?: string;
+  class?: string;
+}
+
+const { cue = 'registration', id, class: className } = Astro.props;
+const text = site.trustCues[cue];
+---
+
+<p class={['trust-note', className].filter(Boolean).join(' ')} id={id}>{text}</p>
+
+<style>
+  .trust-note {
+    margin-top: var(--spacing-16);
+    max-width: 60ch;
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    letter-spacing: var(--tracking-caption);
+    color: var(--text-muted);
+  }
+</style>

@@ -1,124 +1,121 @@
-# Nexflow marketing site: project rules
+# NexFlow marketing website: project rules
 
 These rules apply to every step of this project. Read them before writing any code or copy.
 
-## About Nexflow
+Repo: https://github.com/knivef/nexflow-site
 
-Nexflow is a new B2B payments brand. It signs partnerships with acquirers and gives other payment companies (PSPs, payfacs, ISOs, gateways, orchestrators) access to them. Nexflow does NOT sell to merchants. Its customers are other payment companies only.
+## About NexFlow
 
-The page has three jobs:
+NexFlow is a Canadian-registered payments company. It gives businesses one place to accept crypto, settle in fiat, hold virtual accounts and pay globally, delivered through a network of regulated banking, EMI and liquidity partners.
 
-1. Make it clear within 5 seconds that Nexflow is infrastructure for PSPs, not a merchant processor.
-2. Build trust for a brand with no track record, no famous logos and no volume stats yet.
-3. Turn qualified PSPs into partner applications through a qualification form.
+Regulatory basis (use these exact facts, numbers stay as placeholders until supplied):
 
-## Design
+- Registered Money Services Business with FINTRAC, registration no. [PLACEHOLDER: M number]
+- Registered payment service provider with the Bank of Canada under the Retail Payment Activities Act, reference [PLACEHOLDER: Bank of Canada reference]
+- Services delivered with regulated partners. Each partner's licence is theirs, never ours.
 
-Design references and design instructions are supplied separately (Step 2). Follow them for layout, visual style, typography, colour, spacing, motion and components. These rules cover structure, content, copy, functionality and technical requirements. If anything here conflicts with the design instructions, the design instructions win for anything visual.
+## Two audiences, one site
 
-Design source files live in `design/` (copied from the user's originals):
+1. **Business clients:** crypto-native companies, fintechs, merchants, marketplaces, exporters, remote-first teams. They need clear offerings, how fast they can go live, and proof the company is regulated and safe. CTAs: "Open an account" (primary) and "Talk to sales".
+2. **Prospective partners:** banks, EMIs, crypto liquidity and card-issuing providers. They need who we are, regulatory status, the client segments we bring, how we run compliance. CTA: "Become a partner".
 
-- `design/DESIGN.md` (style reference: parchment canvas, serif headings at weight 400, mono for all UI text, pill buttons, 40px card radius, hairline Ash borders, no shadows)
-- `design/tokens.json`, `design/variables.css`, `design/theme.css`
+## Core messages, in this order
 
-Implemented in `src/styles/tokens.css`. Decisions made on top of the design files:
+1. **Crypto in, fiat out, fast.** Get paid in stablecoins or crypto and receive fiat in your account.
+2. **Accounts in your name.** Dedicated virtual IBANs and multi-currency accounts to collect and pay.
+3. **Global payouts.** Pay suppliers, contractors and teams across borders, in fiat or stablecoins.
+4. **Cards.** Issue prepaid and crypto-funded cards for teams and customers.
+5. **Built on regulated rails.** Registered in Canada with FINTRAC and the Bank of Canada; services delivered with licensed partners.
 
-- Lake Blue is the single primary CTA per screen (DESIGN.md wins over the tokens.json note).
-- Fonts: Newsreader (display) and IBM Plex Mono (UI), self-hosted, as substitutes for the licensed Untitled Serif and ABC Diatype Mono.
-- AA fixes: muted text uses `--color-smoke-text` (#706e6d) instead of Smoke; form controls use `--color-control-border` (#8a8684) instead of Ash. Ash stays for decorative hairlines.
-- The announcement bar sits above the sticky nav. `#top` is the page wrapper, so "back to top" links work even with a sticky nav.
+## Tone
 
-The design above is v1's (also used by v3). **v2 (`src/v2/`) uses a different design**, `design/v2/DESIGN.md`: Bone canvas, white hairline cards, no shadows, one typeface at weight 400 (Inter substituting licensed Lausanne, with `ss01`), 6px buttons, 10px inputs, 16px cards, left-aligned, no gradients, Highlighter Yellow only on actions and active states, Obsidian for inverted bands and footer. v2 AA fixes: labels on Obsidian #a1a09f, control borders #8d8b89, Ink focus rings, 12px micro-labels. v2 scope: no founding partner programme, testimonials or company facts module; FAQ shows `site.faq.featured`; the form shows `site.apply.visibleFields`.
+Institutional fintech, not crypto hype. Confident, plain and precise. Short sentences. Business-to-business, never consumer. No promises about rates or speed that aren't contractually backed.
 
 ## Non-negotiable rules
 
-- **No em dashes anywhere:** copy, code comments, meta tags, alt text. Use commas, colons, full stops or hyphens.
-- **Never invent facts.** No made-up stats, customer logos, testimonials, licence numbers, acquirer names, certifications or volumes. Wherever a real fact is needed, insert a visible placeholder in the format `[PLACEHOLDER: description]` and log it in `PLACEHOLDERS.md`.
-- **No fake social proof.** No stock testimonials, no "trusted by 500+ companies", no logo walls of brands we haven't worked with. Never render empty testimonial UI.
-- **Copy voice:** direct, plain, operator-to-operator, like one payments person talking to another.
-- **Banned words:** seamless, unlock, empower, revolutionise, elevate, game-changer, cutting-edge, "in today's fast-paced world".
-- **Be specific:** name scheme programmes, MCCs, settlement models and timelines. Specificity is how a new brand earns credibility.
-- **Accessibility and build quality:** WCAG 2.2 AA, semantic HTML, keyboard navigable, responsive, respects `prefers-reduced-motion`.
-- **All copy lives in a content file**, never hardcoded in components.
+- **No em dashes or en dashes anywhere:** copy, code comments, meta tags, alt text. Use commas, colons, full stops or hyphens.
+- **Every claim must be true on launch day.** Only live services are listed. Never write "coming soon"; use a waitlist form instead.
+- **Never invent facts:** no stats, client logos, testimonials, volumes, partner names, certifications or registration numbers. Use a visible `[PLACEHOLDER: description]` and log it in `PLACEHOLDERS.md`.
+- **Never use regulator or card network logos** (FINTRAC, Bank of Canada, Visa, Mastercard). Use plain-text registration statements.
+- **No live rates, calculators or volume figures** until a partner supplies an approved feed.
+- **No stock photos of coins.** Show product: dashboard mock-ups, flow diagrams (crypto, conversion, fiat account), card renders.
+- **Trust cue near every CTA:** registration line, "verified onboarding" or a security note.
+- **All copy lives in content files**, never hardcoded in components.
+- **Mobile-first. WCAG 2.2 AA. Semantic HTML. Keyboard navigable. Respects `prefers-reduced-motion`.**
 
-## Positioning
+## Copy guardrails (banned words and replacements)
 
-**One-liner:** Nexflow connects PSPs to acquirers that actually want their merchants. One partnership, many acquiring relationships, built for the verticals mainstream acquirers turn away.
+| Never write | Write instead | Why |
+| --- | --- | --- |
+| bank, banking, bank account, neobank | payments company, business account, virtual account | "Bank" is restricted in Canada; we don't take deposits |
+| deposit, savings, earn interest, yield | balance, funds held, collect | Deposits and yield need other licences |
+| licensed bank, licensed in the EU or UK | our own registrations; "provided in partnership with [partner], authorised by [regulator]" | Only claim our own registrations |
+| instant, guaranteed, zero fees, best rates | fast, same-day where supported, transparent fees | Must be backed by partner service levels |
+| invest, trade, buy crypto, crypto exchange | convert, settle, pay | Trading falls under securities law |
+| custody, store your crypto, our wallet | crypto balances held with our regulated partner | We don't hold client crypto ourselves |
+| anonymous, no KYC, no questions asked | fast, verified onboarding | Anonymous accounts are prohibited |
+| available worldwide | available to businesses in supported countries (link the list) | Some countries are restricted |
+| coming soon | leave it off, or a waitlist form | Partners treat listed services as live |
 
-**Category label** (use this exact wording everywhere: copy, schema, llms.txt):
-"Nexflow is an acquiring partner network for PSPs, payfacs and ISOs."
+"Wallet" is allowed only for the client's own wallet (e.g. "send from a verified wallet").
 
-**Never** call Nexflow a "payment gateway" or "payment processor". Those terms signal a merchant-facing product.
+### Extra guardrails from the brief review
 
-**Pillars:**
+- Do not write "no price risk" or "no crypto on your balance sheet" as absolutes. Write "converted at the point of payment, so you don't hold crypto price exposure" and add `[CONFIRM: partner converts at point of payment]`.
+- The OTC desk and crypto-funded cards carry `[CONFIRM: live at launch]`. If not live, they come off the site before launch.
+- "Affiliate networks" as a payouts use case carries `[CONFIRM: compliance approval]`.
+- Video game studios are in scope. Copy must never mention gambling, betting, casinos, loot boxes or skins trading.
+- Excluded industries: gambling, adult content, unlicensed financial services. Never list or imply them.
+- Virtual accounts are always "provided in partnership with [PLACEHOLDER: regulated EMI or bank partner]". Never call them bank accounts.
+- Cards: "Cards are issued by [PLACEHOLDER: issuing partner] under licence from [PLACEHOLDER: card network]." Network logo only after issuer approval.
 
-1. PSP-only, by design. We never compete with you for merchants.
-2. Acquiring appetite matched to your book: the right acquirer for each MCC, geography and risk profile.
-3. Speed to live: pre-packaged underwriting, so MIDs go live in days instead of months.
-4. Transparent economics: wholesale pricing, IC++ pass-through, clear reserve terms.
+## Footer disclosure (every page, visible on mobile)
 
-## Competitor context (do not copy their wording)
+> [PLACEHOLDER: LEGAL ENTITY NAME] is registered with the Financial Transactions and Reports Analysis Centre of Canada (FINTRAC) as a Money Services Business, registration no. [PLACEHOLDER: M number], and with the Bank of Canada as a payment service provider under the Retail Payment Activities Act. [PLACEHOLDER: LEGAL ENTITY NAME] is not a bank and does not accept deposits. Virtual accounts, card and crypto conversion services are provided in partnership with third-party regulated providers; the provider for each service is named in the client terms. Services are available to businesses only, in supported jurisdictions, subject to verification and approval.
 
-- Clearhaus started partner-only but its homepage now speaks to merchants. Being strictly PSP-only is a gap we can own.
-- Paynetics is broad embedded finance with no depth in iGaming or other high-risk verticals.
-- Paystrax builds trust without customer logos, using licences, people and media coverage.
-- PPRO speaks to PSPs as "we handle local complexity".
-- Finix publishes a status page, docs and a sandbox, which builds trust without big customer names.
-- PSPs buy on: speed to live MIDs, approval rates, vertical appetite (especially high-risk), and economics and control.
+## Site map
 
-## SEO keyword rules (from a live SERP analysis)
+- Home (three versions, see below)
+- Solutions (7 pages, one template): Crypto acceptance, Crypto-to-fiat conversion and OTC, Virtual IBANs and business accounts, Global payouts, FX and multi-currency, Cards, Platform and marketplace payments
+- Industries (one page, 7 sections)
+- Partners
+- Compliance and trust
+- Company: About, Contact and sales, Support
+- Open an account (qualifying form)
+- Legal (footer only): Terms, Privacy, Cookies, Regulatory information, Prohibited businesses and restricted countries, Complaints procedure
 
-- **Primary cluster:** acquiring for PSPs, acquiring partner for PSPs, high-risk acquiring for PSPs, acquiring as a service.
-- **Secondary:** iGaming acquiring, MCC 7995 acquiring, local acquiring, sponsor acquiring for payfacs and ISOs, multi-acquiring, backup acquirer.
-- **Never** use "wholesale acquiring" or "iGaming acquirer" as headings (Google reads them as non-payments or M&A queries).
-- **Never** target merchant terms like "merchant account" or "high risk merchant account".
+## Navigation
 
-## Section order (anchor IDs)
+Top bar: Solutions (menu of 7), Industries, Partners, Compliance, Company, Open an account (primary button).
 
-1. `#top` nav
-2. Announcement bar
-3. `#hero`
-4. `#who`
-5. `#problem`
-6. `#how`
-7. `#network`
-8. `#features`
-9. `#verticals`
-10. `#partners`
-11. `#trust`
-12. `#founding-partners` (v1 and v3 only)
-13. `#compare`
-14. `#merchants`
-15. `#faq`
-16. `#apply`
-17. Footer
+No "Log in" link. Client login is out of scope and will be added later behind a config flag (`showLogin: false`).
 
-## Config flags (single config file)
+## Three home page versions (one per pitch line)
 
-| Flag | Default |
-|------|---------|
-| `showAnnouncementBar` | (set per step) |
-| `showTestimonials` | `false` |
-| `showFoundingProgress` | (set per step) |
-| `foundingSpotsTotal` | (set per step) |
-| `foundingSpotsFilled` | (set per step) |
-| `merchantReferralForm` | `false` |
-| `showResources` | `false` |
+- **Version A** at `/`: "Accept crypto. Settle in fiat. Pay anywhere."
+- **Version B** at `/b`: "One account for digital-asset and fiat payments."
+- **Version C** at `/c`: "Business payments that move between crypto and fiat in one flow."
 
-## Delivery and stack
+Inner pages are shared. The selected version is remembered and carried across the site (details in Step 3). Versions B and C are noindex with canonical to `/` until a winner is chosen.
 
-- **Final output:** a GitHub repo that deploys to Vercel with zero extra setup (import repo, click deploy).
-- **Stack:** Astro with the `@astrojs/vercel` adapter, TypeScript, plain CSS using the design tokens as CSS custom properties. Pages are prerendered static HTML; only `src/pages/api/apply.ts` runs on demand (`prerender = false`). No client-side framework; small interactions use vanilla JS.
-- **Content and config:** all copy in `src/content/site.ts` (single content file), all flags in `src/config/site.config.ts` (single config file).
-- **Form:** `#apply` posts to `/api/apply`, which validates with `src/lib/apply.ts` (shared with the browser) and delivers through the adapter named by `FORM_ADAPTER` (`webhook`, `notion`, `email` stub, `none`). Field names in `ApplyFieldName` are fixed; copy is free to change.
-- **Placeholders in links:** never put a placeholder in an `href`. Use `isReal()` from `src/lib/placeholder.ts` and render placeholder text instead.
-- **Repo hygiene:** `README.md` with local dev and Vercel deploy steps, `.gitignore`, `PLACEHOLDERS.md`, `public/llms.txt`, `public/robots.txt`, sitemap.
-- **Git and versions:** private repo `knivef/nexflow-site`, Vercel project `nexflow-site` (v1 at nexflow-site-one.vercel.app). Everything is on `main`: v1 in `src/`, v2 in `src/v2/` (served at `/v2/`), v3 in `src/v3/` (served at `/v3/`), version list in `src/shared/versions.ts`. Edit only the tree for the version you're changing; a change meant for all versions has to be made in each tree. Only v1 is indexable. Tag `v1` = first approved version. The old `v2`/`v3` branches are superseded. Commit and push only when the user asks.
+## SEO map (from SERP research, 21 Oct 2026)
+
+- **Home A:** crypto payment gateway Canada, accept crypto payments and settle in fiat
+- **Crypto acceptance:** accept crypto payments for business, crypto payment gateway for business, stablecoin payment gateway
+- **Conversion and OTC:** crypto to fiat conversion for business, convert USDT to EUR for business, OTC desk for businesses
+- **Virtual IBANs:** virtual IBAN for crypto companies, business account for crypto companies
+- **Global payouts:** stablecoin payouts, pay contractors in USDC, global payouts in crypto and fiat
+- **FX:** multi-currency account for crypto businesses
+- **Cards:** stablecoin-funded card program, white-label crypto card for fintechs
+- **Platform:** marketplace payouts in crypto and fiat, split payments API
+- **Compliance:** FINTRAC MSB and RPAA registered payment company
+
+Never target "crypto bank", "crypto bank account", "buy crypto" or "crypto exchange" (banned by the guardrails).
+
+## Config flags (one config file)
+
+`showVersionSwitcher` (true during review), `showLogin` (false), `cookieConsentRequired` (true), `showLeadership` (false until bios exist), plus `supportedCountries` and `acceptedIndustries` lists used by the account form.
 
 ## Working style
 
-Build one step at a time. At the end of each step:
-
-1. List what was built.
-2. List any new placeholders (and confirm they are logged in `PLACEHOLDERS.md`).
-3. Stop for review. Do not start the next step until the user approves.
+Build one step at a time. At the end of each step, list what you built and any new placeholders, then stop for review.

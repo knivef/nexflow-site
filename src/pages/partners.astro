@@ -1,0 +1,256 @@
+---
+/**
+ * Partners page.
+ *
+ * The client segment links point at Industries anchors, so the same build-time guard used
+ * on /industries applies here: a link to an anchor that does not exist stops the build.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/Section.astro';
+import Button from '@/components/Button.astro';
+import TrustStrip from '@/components/TrustStrip.astro';
+import FlowDiagram from '@/components/FlowDiagram.astro';
+import Form from '@/components/Form.astro';
+import { partners } from '@/content/partners';
+import { industries } from '@/content/industries';
+import { forms } from '@/content/forms';
+import { site } from '@/content/site';
+
+const anchors = new Set(industries.sections.map((section) => section.id));
+const brokenSegments = partners.segments.items.filter(
+  (item) => item.href.startsWith('/industries#') && !anchors.has(item.href.split('#')[1]!),
+);
+
+if (brokenSegments.length > 0) {
+  throw new Error(
+    `Partners page links at Industries anchors that do not exist:\n${brokenSegments
+      .map((item) => `  ${item.href}`)
+      .join('\n')}`,
+  );
+}
+
+const mailbox = `${partners.contact.mailbox}@${site.contact.emailDomain}`;
+
+/*
+ * Server-rendered, not prerendered.
+ *
+ * This page reads ?submitted= to show the success or error state after a submission made
+ * with JavaScript off, and a prerendered page is built once with no query string, so that
+ * state could never appear. Rendering on demand is what makes the no-script path work.
+ */
+export const prerender = false;
+---
+
+<BaseLayout
+  title={partners.page.seoTitle}
+  description={partners.page.description}
+  breadcrumbs={[{ name: 'Partners', href: '/partners' }]}
+>
+  <section class="hero" aria-labelledby="partners-heading">
+    <div class="container">
+      <p class="caption hero__eyebrow">Partners</p>
+      <h1 id="partners-heading">{partners.page.title}</h1>
+      <p class="hero__sub">{partners.page.subHead}</p>
+
+      <div class="hero__actions">
+        <Button href="#partner-form" variant="primary" analytics="become_partner_click">{site.ctas.partner.label}</Button>
+      </div>
+      <p class="hero__trust">{site.trustCues.registration}</p>
+    </div>
+  </section>
+
+  <Section id="offer" heading={partners.offer.heading}>
+    <ul class="offer">
+      {
+        partners.offer.items.map((item, index) => (
+          <li class="offer__item">
+            <span class="offer__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+            <p class="offer__text">{item}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section id="partner-types" heading={partners.partnerTypes.heading}>
+    <ul class="types">
+      {partners.partnerTypes.items.map((type) => <li class="types__item">{type.label}</li>)}
+    </ul>
+  </Section>
+
+  <Section id="segments" heading={partners.segments.heading} lead={partners.segments.intro}>
+    <ul class="segments">
+      {
+        partners.segments.items.map((item) => (
+          <li>
+            <a class="segments__link" href={item.href}>
+              <span>{item.label}</span>
+              <span aria-hidden="true">&rarr;</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section id="how-it-works" heading={partners.howItWorks.heading}>
+    <FlowDiagram label={partners.howItWorks.heading} steps={partners.howItWorks.steps} />
+  </Section>
+
+  <Section id="regulatory" heading={partners.regulatory.heading}>
+    <p class="regulatory__body">{partners.regulatory.body}</p>
+    <TrustStrip class="regulatory__strip" />
+    <p class="regulatory__link">
+      <a href={partners.regulatory.href}>{partners.regulatory.linkLabel}</a>
+    </p>
+  </Section>
+
+  <Section id="contact" heading={partners.contact.heading}>
+    <p class="mailbox"><span class="mailbox__address">{mailbox}</span></p>
+  </Section>
+
+  <Section id="partner-form" heading={forms.partner.title} lead={forms.partner.description}>
+    <Form form={forms.partner} />
+  </Section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: var(--spacing-48) var(--spacing-40);
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      padding-block: var(--section-gap) var(--spacing-48);
+    }
+  }
+
+  .hero__eyebrow {
+    margin-bottom: var(--spacing-16);
+  }
+
+  .hero__sub {
+    margin-top: var(--spacing-24);
+    max-width: 60ch;
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body-lg);
+    letter-spacing: var(--tracking-body-lg);
+    color: var(--text-secondary);
+  }
+
+  .hero__actions {
+    margin-top: var(--spacing-32);
+  }
+
+  .hero__trust {
+    margin-top: var(--spacing-16);
+    max-width: 60ch;
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    letter-spacing: var(--tracking-caption);
+    color: var(--text-muted);
+  }
+
+  .offer {
+    display: grid;
+    gap: var(--spacing-24);
+    list-style: none;
+  }
+
+  @media (min-width: 768px) {
+    .offer {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--spacing-32);
+    }
+  }
+
+  .offer__item {
+    padding-top: var(--spacing-16);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .offer__number {
+    display: block;
+    margin-bottom: var(--spacing-8);
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    color: var(--text-muted);
+  }
+
+  .offer__text {
+    font-size: var(--text-body);
+    color: var(--text-primary);
+  }
+
+  .types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+    list-style: none;
+  }
+
+  .types__item {
+    padding: var(--spacing-8) var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-pills);
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    color: var(--text-primary);
+  }
+
+  .segments {
+    display: grid;
+    gap: var(--spacing-8);
+    list-style: none;
+  }
+
+  @media (min-width: 640px) {
+    .segments {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .segments__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-16);
+    min-height: 56px;
+    padding: var(--spacing-8) var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-2xl);
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .segments__link:hover {
+    border-color: var(--border-strong);
+  }
+
+  .regulatory__body {
+    max-width: 76ch;
+    font-size: var(--text-body);
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  /* See the note in compliance.astro: a child component's root needs :global() here. */
+  #regulatory :global(.trust-strip) {
+    margin-top: var(--spacing-32);
+  }
+
+  .regulatory__link {
+    margin-top: var(--spacing-24);
+    font-size: var(--text-body-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-body-sm);
+  }
+
+  .mailbox__address {
+    user-select: all;
+    font-size: var(--text-body-lg);
+    color: var(--text-primary);
+  }
+</style>

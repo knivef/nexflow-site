@@ -1,0 +1,99 @@
+---
+/**
+ * Regulatory information block: legal entity name, both registrations and the registered
+ * address. Used on Compliance and on About, so the two can never drift apart.
+ *
+ * Plain text only. No regulator logo, and no claim to a partner's authorisation.
+ */
+import { site } from '@/content/site';
+import { compliance } from '@/content/compliance';
+
+interface Props {
+  /** Heading level, so the block sits correctly in each page's outline. */
+  as?: 'h2' | 'h3';
+  class?: string;
+}
+
+const { as: Heading = 'h2', class: className } = Astro.props;
+---
+
+<div class={['reg-block', className].filter(Boolean).join(' ')}>
+  <Heading class="reg-block__heading">{compliance.regulatoryBlock.heading}</Heading>
+
+  <dl class="reg-block__list">
+    <div class="reg-block__row">
+      <dt class="reg-block__term">Legal entity</dt>
+      <dd class="reg-block__value">{site.brand.legalName}</dd>
+    </div>
+
+    {
+      compliance.regulatory.registrations.map((registration) => (
+        <div class="reg-block__row">
+          <dt class="reg-block__term">{registration.regulator}</dt>
+          <dd class="reg-block__value">
+            {registration.statement} {registration.reference}
+          </dd>
+        </div>
+      ))
+    }
+
+    <div class="reg-block__row">
+      <dt class="reg-block__term">{site.contact.registeredAddressLabel}</dt>
+      <dd class="reg-block__value">{site.contact.registeredAddress}</dd>
+    </div>
+  </dl>
+</div>
+
+<style>
+  .reg-block {
+    padding: var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-cards);
+    background-color: var(--surface-raised);
+  }
+
+  @media (min-width: 768px) {
+    .reg-block {
+      padding: var(--spacing-32);
+    }
+  }
+
+  .reg-block__heading {
+    margin-bottom: var(--spacing-24);
+    font-size: var(--text-subheading);
+    line-height: var(--leading-subheading);
+  }
+
+  .reg-block__list {
+    margin: 0;
+  }
+
+  .reg-block__row {
+    display: grid;
+    gap: 4px var(--spacing-24);
+    padding-block: var(--spacing-16);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  @media (min-width: 640px) {
+    .reg-block__row {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+      align-items: baseline;
+    }
+  }
+
+  .reg-block__term {
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .reg-block__value {
+    margin: 0;
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+    color: var(--text-primary);
+  }
+</style>

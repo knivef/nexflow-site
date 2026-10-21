@@ -1,0 +1,262 @@
+---
+/**
+ * Compliance and trust.
+ *
+ * Registration statements are plain text: no FINTRAC, Bank of Canada, Visa or Mastercard
+ * logo appears anywhere on this site. The registry links are the regulators' own public
+ * search pages, so a partner can verify our status instead of taking our word for it.
+ *
+ * External links open in a new tab and carry rel="noopener", with the destination named in
+ * the link text rather than hidden behind "click here".
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/Section.astro';
+import Badge from '@/components/Badge.astro';
+import TrustStrip from '@/components/TrustStrip.astro';
+import RegulatoryBlock from '@/components/RegulatoryBlock.astro';
+import { compliance } from '@/content/compliance';
+import { site } from '@/content/site';
+
+const reportMailbox = `${compliance.report.mailbox}@${site.contact.emailDomain}`;
+---
+
+<BaseLayout
+  title={compliance.page.seoTitle}
+  description={compliance.page.description}
+  breadcrumbs={[{ name: 'Compliance and trust', href: '/compliance' }]}
+>
+  <section class="intro" aria-labelledby="compliance-heading">
+    <div class="container">
+      <h1 id="compliance-heading">{compliance.page.title}</h1>
+      <p class="intro__line">{compliance.page.intro}</p>
+      <TrustStrip class="intro__trust" />
+    </div>
+  </section>
+
+  {/* 1. Regulatory status */}
+  <Section id="regulatory-status" heading={compliance.regulatory.heading}>
+    <dl class="registrations">
+      {
+        compliance.regulatory.registrations.map((registration) => (
+          <div class="registration" id={registration.id}>
+            <dt class="registration__regulator">{registration.regulator}</dt>
+            <dd class="registration__detail">
+              <p>{registration.statement}</p>
+              <p class="registration__reference">{registration.reference}</p>
+              <p class="registration__registry">
+                <a href={registration.registry.href} target="_blank" rel="noopener noreferrer">
+                  {registration.registry.label}
+                  <span class="visually-hidden"> (opens in a new tab)</span>
+                </a>
+              </p>
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <p class="partners-note">{compliance.regulatory.partnersNote}</p>
+
+    <div class="explainer">
+      <h3 class="explainer__heading">{compliance.regulatory.explainer.heading}</h3>
+      {compliance.regulatory.explainer.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+      <p class="explainer__confirm">
+        <Badge tone="muted">{compliance.regulatory.explainer.confirm}</Badge>
+      </p>
+    </div>
+  </Section>
+
+  {/* 2. How we keep clients and partners safe */}
+  <Section id="safeguards" heading={compliance.safety.heading}>
+    <ul class="safeguards">
+      {compliance.safety.items.map((item) => <li class="safeguards__item">{item}</li>)}
+    </ul>
+  </Section>
+
+  {/* 3. Data security */}
+  <Section id="data-security" heading={compliance.dataSecurity.heading}>
+    <p class="data-security__body">{compliance.dataSecurity.body}</p>
+    <p class="data-security__certs">
+      <span class="data-security__certs-label">{compliance.dataSecurity.certificationsLabel}:</span>
+      {' '}{compliance.dataSecurity.certifications}
+    </p>
+  </Section>
+
+  {/* 4. Prohibited businesses */}
+  <Section id="prohibited" heading={compliance.prohibited.heading}>
+    <p class="prohibited__body">{compliance.prohibited.body}</p>
+    <p class="prohibited__link">
+      <a href={compliance.prohibited.link.href}>{compliance.prohibited.link.label}</a>
+    </p>
+  </Section>
+
+  {/* 5. Report a concern */}
+  <Section id="report" heading={compliance.report.heading}>
+    <p class="report__body">{compliance.report.body}</p>
+    <p class="report__mailbox"><span class="report__address">{reportMailbox}</span></p>
+  </Section>
+
+  {/* 6. Regulatory information block */}
+  <Section id="regulatory-information">
+    <RegulatoryBlock as="h2" />
+  </Section>
+</BaseLayout>
+
+<style>
+  .intro {
+    padding-block: var(--spacing-48) var(--spacing-40);
+  }
+
+  @media (min-width: 768px) {
+    .intro {
+      padding-block: var(--section-gap) var(--spacing-48);
+    }
+  }
+
+  .intro__line {
+    margin-top: var(--spacing-24);
+    max-width: 64ch;
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body-lg);
+    letter-spacing: var(--tracking-body-lg);
+    color: var(--text-secondary);
+  }
+
+  /* The class lands on TrustStrip's root, which carries that component's scope, not this
+     page's, so a plain .intro__trust rule never matches. Reach it with :global(), kept inside
+     .intro so it cannot affect trust strips elsewhere. */
+  .intro :global(.trust-strip) {
+    margin-top: var(--spacing-32);
+  }
+
+  .registrations {
+    display: grid;
+    gap: var(--spacing-24);
+    margin: 0;
+  }
+
+  @media (min-width: 900px) {
+    .registrations {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .registration {
+    padding: var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-2xl);
+  }
+
+  .registration__regulator {
+    font-size: var(--text-body-sm);
+    line-height: 1.45;
+    letter-spacing: var(--tracking-body-sm);
+    text-transform: uppercase;
+  }
+
+  .registration__detail {
+    margin: var(--spacing-16) 0 0;
+    color: var(--text-secondary);
+  }
+
+  .registration__reference {
+    margin-top: var(--spacing-8);
+    color: var(--text-primary);
+  }
+
+  .registration__registry {
+    margin-top: var(--spacing-16);
+    font-size: var(--text-body-sm);
+    line-height: 1.45;
+  }
+
+  .partners-note {
+    margin-top: var(--spacing-32);
+    max-width: 72ch;
+    color: var(--text-secondary);
+  }
+
+  .explainer {
+    margin-top: var(--spacing-40);
+    padding-top: var(--spacing-32);
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  .explainer__heading {
+    margin-bottom: var(--spacing-16);
+    font-size: var(--text-subheading);
+    line-height: var(--leading-subheading);
+  }
+
+  .explainer p {
+    max-width: 76ch;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .explainer p + p {
+    margin-top: var(--spacing-16);
+  }
+
+  .explainer__confirm {
+    margin-top: var(--spacing-24);
+  }
+
+  .safeguards {
+    display: grid;
+    gap: var(--spacing-16);
+    list-style: none;
+  }
+
+  @media (min-width: 768px) {
+    .safeguards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .safeguards__item {
+    padding: var(--spacing-16) var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-2xl);
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+    color: var(--text-primary);
+  }
+
+  .data-security__body,
+  .prohibited__body,
+  .report__body {
+    max-width: 72ch;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .data-security__certs {
+    margin-top: var(--spacing-24);
+    color: var(--text-primary);
+  }
+
+  .data-security__certs-label {
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .prohibited__link {
+    margin-top: var(--spacing-24);
+    font-size: var(--text-body-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-body-sm);
+  }
+
+  .report__mailbox {
+    margin-top: var(--spacing-24);
+  }
+
+  .report__address {
+    user-select: all;
+    font-size: var(--text-body-lg);
+    color: var(--text-primary);
+  }
+</style>

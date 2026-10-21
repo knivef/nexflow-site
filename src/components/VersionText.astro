@@ -1,0 +1,40 @@
+---
+/**
+ * Renders all three versions' wording and lets CSS show the active one, keyed off the
+ * data-version attribute on <html>. This avoids a flash of the wrong copy: the attribute is
+ * set by a tiny inline script in the head, before the body paints. With no JavaScript the
+ * default version's wording shows and nothing is broken.
+ *
+ * Hidden variants use display:none, so they are out of the accessibility tree too.
+ */
+import { home } from '@/content/home';
+
+interface Props {
+  /** Which version field to show. */
+  field: 'pitchLine' | 'finalCtaHeadline' | 'label' | 'subHead';
+  class?: string;
+}
+
+const { field, class: className } = Astro.props;
+---
+
+<span class={['version-text', className].filter(Boolean).join(' ')}>
+  {home.versions.map((version) => <span data-version-text={version.id}>{version[field]}</span>)}
+</span>
+
+<style is:global>
+  [data-version-text] {
+    display: none;
+  }
+
+  html[data-version='a'] [data-version-text='a'],
+  html[data-version='b'] [data-version-text='b'],
+  html[data-version='c'] [data-version-text='c'] {
+    display: inline;
+  }
+
+  /* No data-version attribute yet, for example with JavaScript disabled: show version A. */
+  html:not([data-version]) [data-version-text='a'] {
+    display: inline;
+  }
+</style>

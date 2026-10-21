@@ -1,0 +1,90 @@
+---
+/**
+ * Hero product visual for a solution page: a labelled panel of facts.
+ *
+ * Deliberately not a rate card or a number-filled mock-up. Values that are not yet
+ * confirmed render as visible placeholders rather than plausible-looking inventions.
+ */
+interface Props {
+  label: string;
+  rows: { term: string; value: string }[];
+  class?: string;
+}
+
+const { label, rows, class: className } = Astro.props;
+---
+
+<div class={['panel', className].filter(Boolean).join(' ')}>
+  <p class="panel__label">{label}</p>
+  <dl class="panel__list">
+    {
+      rows.map((row) => (
+        <div class="panel__row">
+          <dt class="panel__term">{row.term}</dt>
+          <dd class="panel__value">{row.value}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</div>
+
+<style>
+  .panel {
+    padding: var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-cards);
+    background-color: var(--surface-raised);
+  }
+
+  @media (min-width: 768px) {
+    .panel {
+      padding: var(--spacing-32);
+    }
+  }
+
+  .panel__label {
+    padding-bottom: var(--spacing-16);
+    border-bottom: 1px solid var(--border-hairline);
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+
+  .panel__list {
+    margin: 0;
+  }
+
+  .panel__row {
+    display: grid;
+    gap: 4px var(--spacing-16);
+    padding-block: var(--spacing-16);
+    border-bottom: 1px solid var(--border-hairline);
+  }
+
+  @media (min-width: 480px) {
+    .panel__row {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+      align-items: baseline;
+    }
+  }
+
+  .panel__row:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .panel__term {
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .panel__value {
+    margin: 0;
+    font-size: var(--text-body-sm);
+    line-height: 1.45;
+    color: var(--text-primary);
+  }
+</style>

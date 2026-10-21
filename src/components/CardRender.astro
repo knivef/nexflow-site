@@ -1,0 +1,106 @@
+---
+/**
+ * Neutral card render for the cards page hero.
+ *
+ * Carries the NexFlow wordmark only. No card network logo appears here or anywhere else
+ * on the site until the issuer approves it, and the number is masked so nothing reads as a
+ * real card. A caption says plainly that it is an illustration.
+ */
+import { site } from '@/content/site';
+
+interface Props {
+  label: string;
+  holder: string;
+  caption: string;
+}
+
+const { label, holder, caption } = Astro.props;
+---
+
+<figure class="card-render">
+  <div class="card-render__card" role="img" aria-label={`Illustration of a ${label} carrying the ${site.brand.name} wordmark`}>
+    <div class="card-render__top">
+      <span class="card-render__brand">{site.brand.name}</span>
+      <span class="card-render__label">{label}</span>
+    </div>
+
+    <p class="card-render__number" aria-hidden="true">
+      <span>&bull;&bull;&bull;&bull;</span>
+      <span>&bull;&bull;&bull;&bull;</span>
+      <span>&bull;&bull;&bull;&bull;</span>
+      <span>&bull;&bull;&bull;&bull;</span>
+    </p>
+
+    <div class="card-render__bottom">
+      <span class="card-render__holder">{holder}</span>
+      <span class="card-render__expiry" aria-hidden="true">&bull;&bull; / &bull;&bull;</span>
+    </div>
+  </div>
+
+  <figcaption class="card-render__caption">{caption}</figcaption>
+</figure>
+
+<style>
+  .card-render {
+    margin: 0;
+  }
+
+  .card-render__card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--spacing-32);
+    aspect-ratio: 1.586;
+    max-width: 420px;
+    padding: var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-2xl);
+    background-color: var(--surface-inverted);
+    color: var(--text-on-inverted);
+  }
+
+  .card-render__top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-16);
+  }
+
+  .card-render__brand {
+    font-family: var(--font-display);
+    font-size: var(--text-subheading);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .card-render__label {
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .card-render__number {
+    display: flex;
+    gap: var(--spacing-16);
+    font-size: var(--text-body-lg);
+    letter-spacing: 0.1em;
+  }
+
+  .card-render__bottom {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-16);
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    text-transform: uppercase;
+  }
+
+  .card-render__caption {
+    margin-top: var(--spacing-16);
+    max-width: 44ch;
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+</style>

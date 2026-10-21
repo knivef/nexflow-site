@@ -1,0 +1,120 @@
+---
+/**
+ * Privacy-friendly analytics.
+ *
+ * Two gates, both of which must open before anything loads:
+ *   1. ANALYTICS_DOMAIN is set. With no domain there is nothing to send to, so no script.
+ *   2. The visitor accepted analytics cookies. The cookie banner dispatches nexflow:consent.
+ *
+ * Nothing is loaded speculatively and no identifier is set before consent. Events raised
+ * before the script is ready are queued and flushed once it loads, so a click on the hero
+ * CTA seconds after accepting is not lost.
+ *
+ * Every event carries the active home page version, read from the attribute on <html>, so
+ * A, B and C can be compared.
+ *
+ * [CONFIRM: analytics provider] The loader below is written for a Plausible-compatible
+ * endpoint, which is what a bare domain name implies. Swap the src if the provider differs.
+ */
+import { ANALYTICS_DOMAIN } from 'astro:env/server';
+
+const domain = ANALYTICS_DOMAIN ?? '';
+---
+
+{
+  domain && (
+    <script is:inline define:vars={{ domain }}>
+      (function () {
+        var queue = [];
+        var ready = false;
+
+        function version() {
+          return document.documentElement.getAttribute('data-version') || 'a';
+        }
+
+        /* Public hook. Queues until the provider script is in place. */
+        window.nexflowTrack = function (name, props) {
+          var payload = Object.assign({ version: version() }, props || {});
+          if (!ready) {
+            queue.push([name, payload]);
+            return;
+          }
+          if (typeof window.plausible === 'function') {
+            window.plausible(name, { props: payload });
+          }
+        };
+
+        function load() {
+          if (ready) return;
+          ready = true;
+
+          window.plausible =
+            window.plausible ||
+            function () {
+              (window.plausible.q = window.plausible.q || []).push(arguments);
+            };
+
+          var script = document.createElement('script');
+          script.defer = true;
+          script.setAttribute('data-domain', domain);
+          script.src = 'https://plausible.io/js/script.js';
+          document.head.appendChild(script);
+
+          queue.forEach(function (entry) {
+            window.plausible(entry[0], { props: entry[1] });
+          });
+          queue = [];
+        }
+
+        /* Gate 2: consent. The banner replays the stored choice on every page load. */
+        window.addEventListener('nexflow:consent', function (event) {
+          if (event.detail && event.detail.analytics) load();
+        });
+      })();
+    </script>
+  )
+}
+
+<script>
+  /*
+   * Event wiring. Safe to run whether or not analytics ever loads: nexflowTrack is a no-op
+   * until the provider is in place, and absent entirely when ANALYTICS_DOMAIN is unset.
+   */
+  type Tracker = (name: string, props?: Record<string, unknown>) => void;
+
+  const track: Tracker = (name, props) => {
+    const fn = (window as unknown as { nexflowTrack?: Tracker }).nexflowTrack;
+    if (typeof fn === 'function') fn(name, props);
+  };
+
+  // Clicks, by delegation, so content added later is covered too.
+  document.addEventListener('click', (event) => {
+    const target = event.target as Element | null;
+    const el = target?.closest<HTMLElement>('[data-analytics]');
+    if (!el) return;
+    track(el.dataset.analytics ?? 'click', {
+      label: (el.textContent ?? '').trim().slice(0, 60),
+      href: el.getAttribute('href') ?? undefined,
+    });
+  });
+
+  // Form start: the first interaction with any field in a form, once per form.
+  document.querySelectorAll<HTMLFormElement>('[data-form]').forEach((form) => {
+    let started = false;
+    form.addEventListener(
+      'input',
+      () => {
+        if (started) return;
+        started = true;
+        track('form_start', { form: form.getAttribute('action')?.split('/').pop() });
+      },
+      { once: false },
+    );
+  });
+
+  // Submit outcomes are raised by Form.astro so they reflect what actually happened.
+  window.addEventListener('nexflow:form', (event) => {
+    const detail = (event as CustomEvent).detail as { outcome: string; form: string; errors?: number };
+    track(`form_${detail.outcome}`, { form: detail.form, errors: detail.errors });
+  });
+</script>

@@ -1,11 +1,23 @@
 /*
-  Nexflow design tokens.
-  Source: design/variables.css and design/DESIGN.md (raw palette, type scale, spacing, radii, shadow).
-  Semantic aliases below map those raw values to roles. Components use the semantic aliases.
-*/
+ * NexFlow design tokens.
+ *
+ * Layer 1: the raw palette from design/variables.css, kept verbatim for provenance.
+ * Layer 2: semantic tokens (surface, text, border, accent). Components only ever use layer 2,
+ *   so the light and dark themes swap underneath without touching a single component.
+ * Layer 3: dark theme overrides.
+ *
+ * Accessibility overrides on the supplied palette, all measured against WCAG 2.2 AA:
+ *   Smoke #797776 on Parchment is 4.03:1 and fails body text, so muted text uses #706e6d (4.59:1).
+ *   Ash #cecac8 on Parchment is 1.47:1, fine as a decorative hairline but failing the 3:1
+ *   non-text rule for form controls, so controls use #8a8684 (3.26:1).
+ *   Smoke on Periwinkle is 3.18:1 and Lake Blue text on Periwinkle is 4.34:1, so neither is
+ *   allowed on that surface. Periwinkle carries Off-Black or Graphite text only.
+ */
 
 :root {
-  /* Raw palette (from design/variables.css) */
+  /* ---------------------------------------------------------------
+     Layer 1: supplied palette (design/variables.css)
+     --------------------------------------------------------------- */
   --color-parchment: #f6f3f1;
   --color-lake-blue: #2b59d1;
   --color-periwinkle-mist: #cfdaf5;
@@ -20,83 +32,65 @@
   --color-smoke: #797776;
   --color-ash: #cecac8;
 
-  /*
-    Accessibility adjustments (WCAG 2.2 AA).
-    Smoke on Parchment is 4.03:1, below the 4.5:1 needed for small text, so muted text uses a slightly darker Smoke.
-    Ash on Parchment is 1.47:1, below the 3:1 needed for form control boundaries, so inputs use a darker control border.
-    Ash stays the hairline colour for decorative dividers and card edges, as the design specifies.
-  */
-  --color-smoke-text: #706e6d; /* 4.59:1 on Parchment */
-  --color-control-border: #8a8684; /* 3.26:1 on Parchment */
-  --color-error: #b3261e; /* 5.9:1 on Parchment, used only for form errors */
+  /* Additions required for AA. Smoke and Ash stay decorative only. */
+  --color-smoke-text: #706e6d;
+  --color-control-border: #8a8684;
+  /* Error state. 5.92:1 on parchment, and the dark variant is 7.69:1 on the dark canvas. */
+  --color-error: #b3261e;
+  --color-error-dark: #ff8a80;
 
-  /* Semantic roles */
-  --bg-page: var(--color-parchment);
-  --bg-elevated: var(--color-periwinkle-mist);
-  --bg-inverse: var(--color-off-black);
-  --bg-announcement: var(--color-ink);
-  --text-primary: var(--color-off-black);
-  --text-secondary: var(--color-graphite);
-  --text-muted: var(--color-smoke-text);
-  --text-inverse: var(--color-parchment);
-  --border-hairline: var(--color-ash);
-  --border-control: var(--color-control-border);
-  --border-strong: var(--color-off-black);
-  --action-primary-bg: var(--color-lake-blue);
-  --action-primary-text: #ffffff;
-  --action-secondary-bg: var(--color-off-black);
-  --action-secondary-text: var(--color-parchment);
-  --focus-ring: var(--color-lake-blue);
+  /* Dark theme palette. Designed for NexFlow, not present in the reference. */
+  --color-dark-base: #1a1918;
+  --color-dark-raised: #242221;
+  --color-dark-sunken: #0e0d0d;
+  --color-dark-text: #f2efec;
+  --color-dark-text-secondary: #c0bcb8;
+  --color-dark-text-muted: #a39f9b;
+  --color-dark-hairline: #383533;
+  --color-dark-control-border: #7a7572;
+  --color-lake-blue-bright: #3f6ae0;
+  --color-lake-blue-text: #8fa8f5;
 
-  /*
-    Fonts. Untitled Serif and ABC Diatype Mono are licensed, so self-hosted open substitutes are used
-    (Newsreader for display, IBM Plex Mono for UI). Swap the first family name here if licences are bought.
-  */
-  --font-serif: 'Untitled Serif', 'Newsreader Variable', ui-serif, Georgia, Cambria, 'Times New Roman', serif;
-  --font-mono: 'ABC Diatype Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-
-  /* Type scale (from design/variables.css) */
-  --text-caption: 12px;
-  --leading-caption: 1.2;
-  --tracking-caption: -0.4px;
-  --text-body-sm: 14px;
-  --leading-body-sm: 1.35;
-  --tracking-body-sm: -0.28px;
-  --text-body: 16px;
-  --leading-body: 1.35;
-  --tracking-body: -0.4px;
-  --text-label: 18px;
-  --leading-label: 1.2;
-  --tracking-label: -0.4px;
-  --text-body-lg: 20px;
-  --leading-body-lg: 1.35;
-  --tracking-body-lg: -0.4px;
-  --text-subheading: 24px;
-  --leading-subheading: 1.2;
-  --tracking-subheading: -0.48px;
-  --text-heading-sm: 32px;
-  --leading-heading-sm: 1.2;
-  --tracking-heading-sm: -0.64px;
-  --text-heading: 40px;
-  --leading-heading: 1.2;
-  --tracking-heading: -0.8px;
-  --text-heading-lg: 48px;
-  --leading-heading-lg: 1.2;
-  --tracking-heading-lg: -0.96px;
-  --text-display: 80px;
-  --leading-display: 1.2;
-  --tracking-display: -1.6px;
-
-  /* Fluid display sizes: hit the design sizes on desktop, scale down on small screens */
-  --fs-display: clamp(44px, 6.5vw + 12px, var(--text-display));
-  --fs-heading-lg: clamp(34px, 3vw + 20px, var(--text-heading-lg));
-  --fs-heading: clamp(30px, 2vw + 20px, var(--text-heading));
-  --fs-heading-sm: clamp(26px, 1vw + 20px, var(--text-heading-sm));
+  /* ---------------------------------------------------------------
+     Layer 1: typography, spacing, radii, shadows (design/variables.css)
+     --------------------------------------------------------------- */
+  --font-display: 'Newsreader Variable', 'Newsreader', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-ui: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --font-weight-regular: 400;
   --font-weight-medium: 500;
 
-  /* Spacing (8px base) */
+  /* Fixed steps, mono, used for body and all UI strings. */
+  --text-caption: 0.75rem;      /* 12px */
+  --leading-caption: 1.2;
+  --tracking-caption: -0.033em;
+  --text-body-sm: 0.875rem;     /* 14px */
+  --leading-body-sm: 1.35;
+  --tracking-body-sm: -0.02em;
+  --text-body: 1rem;            /* 16px */
+  --leading-body: 1.35;
+  --tracking-body: -0.025em;
+  --text-label: 1.125rem;       /* 18px */
+  --leading-label: 1.2;
+  --tracking-label: -0.022em;
+  --text-body-lg: 1.25rem;      /* 20px */
+  --leading-body-lg: 1.35;
+  --tracking-body-lg: -0.02em;
+
+  /* Fluid steps, serif, used for display and headings. The reference supplies desktop sizes
+     only, so each step clamps down for small screens. Upper bound is the reference value. */
+  --text-subheading: clamp(1.25rem, 1.1rem + 0.7vw, 1.5rem);   /* 20px to 24px */
+  --leading-subheading: 1.2;
+  --text-heading-sm: clamp(1.5rem, 1.3rem + 1vw, 2rem);        /* 24px to 32px */
+  --leading-heading-sm: 1.2;
+  --text-heading: clamp(1.75rem, 1.4rem + 1.8vw, 2.5rem);      /* 28px to 40px */
+  --leading-heading: 1.2;
+  --text-heading-lg: clamp(2rem, 1.5rem + 2.5vw, 3rem);        /* 32px to 48px */
+  --leading-heading-lg: 1.2;
+  --text-display: clamp(2.5rem, 1.6rem + 4.5vw, 5rem);         /* 40px to 80px */
+  --leading-display: 1.2;
+  --tracking-display: -0.02em;
+
   --spacing-unit: 8px;
   --spacing-8: 8px;
   --spacing-16: 16px;
@@ -108,46 +102,123 @@
   --spacing-80: 80px;
   --spacing-200: 200px;
   --spacing-216: 216px;
+  /* Additions, needed for section rhythm between 40px and 64px and above 80px. */
+  --spacing-48: 48px;
+  --spacing-96: 96px;
+  --spacing-120: 120px;
 
-  /* Layout */
   --page-max-width: 1432px;
-  --page-gutter: clamp(16px, 4vw, 40px);
   --section-gap: 64px;
-  --section-padding-block: clamp(64px, 8vw, 120px);
-  --card-padding: clamp(24px, 3vw, 40px);
+  --card-padding: 40px;
   --element-gap: 16px;
-  --nav-height: 80px;
-  --announcement-height: 40px;
+  --page-gutter: 20px;
 
-  /* Radii */
   --radius-2xl: 16px;
   --radius-3xl: 40px;
   --radius-full: 100px;
-  --radius-full-3: 9999px;
   --radius-tags: 9999px;
   --radius-cards: 40px;
   --radius-pills: 9999px;
   --radius-buttons: 100px;
-  --radius-inputs: 16px;
+  --radius-input: 16px;
 
-  /* Shadow: reserved for floating UI only (dropdowns, sticky nav on scroll). Cards never get shadows. */
   --shadow-md: rgba(0, 0, 0, 0.1) 0px 0px 10px 0px;
 
-  /* Motion */
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --duration-fast: 150ms;
-  --duration-base: 250ms;
+  /* ---------------------------------------------------------------
+     Layer 2: semantic tokens. Components use only these.
+     --------------------------------------------------------------- */
+  --surface-page: var(--color-parchment);
+  --surface-raised: var(--color-parchment);
+  --surface-accent: var(--color-periwinkle-mist);
+  --surface-inverted: var(--color-off-black);
+  --surface-bar: var(--color-ink);
+  --surface-disabled: var(--color-periwinkle-mist);
+
+  --text-primary: var(--color-off-black);
+  --text-secondary: var(--color-graphite);
+  --text-muted: var(--color-smoke-text);
+  --text-on-inverted: var(--color-parchment);
+  --text-on-accent-fill: #ffffff;
+  --text-link: var(--color-lake-blue);
+  /* Body text on the accent surface. Smoke (3.18:1) and Lake Blue (4.34:1) both fail there. */
+  --text-on-accent-surface: var(--color-graphite);
+  --text-error: var(--color-error);
+
+  --border-hairline: var(--color-ash);
+  --border-control: var(--color-control-border);
+  --border-strong: var(--color-off-black);
+
+  --accent-fill: var(--color-lake-blue);
+  --accent-fill-hover: #2449ad;
+  --focus-ring: var(--color-lake-blue);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --easing: cubic-bezier(0.2, 0, 0.2, 1);
+
+  color-scheme: light;
 }
 
-@media (max-width: 767px) {
-  :root {
-    --nav-height: 64px;
+/* ---------------------------------------------------------------
+   Layer 3: dark theme. Applied when the viewer prefers dark and has
+   not forced light, or when data-theme="dark" is set explicitly.
+   --------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --surface-page: var(--color-dark-base);
+    --surface-raised: var(--color-dark-raised);
+    --surface-accent: var(--color-dark-raised);
+    --surface-inverted: var(--color-dark-sunken);
+    --surface-bar: var(--color-dark-sunken);
+    --surface-disabled: #2e2b2a;
+
+    --text-primary: var(--color-dark-text);
+    --text-secondary: var(--color-dark-text-secondary);
+    --text-muted: var(--color-dark-text-muted);
+    --text-on-inverted: var(--color-dark-text);
+    --text-on-accent-fill: #ffffff;
+    --text-link: var(--color-lake-blue-text);
+    --text-on-accent-surface: var(--color-dark-text-secondary);
+    --text-error: var(--color-error-dark);
+
+    --border-hairline: var(--color-dark-hairline);
+    --border-control: var(--color-dark-control-border);
+    --border-strong: var(--color-dark-text);
+
+    --accent-fill: var(--color-lake-blue-bright);
+    --accent-fill-hover: #5680ea;
+    --focus-ring: var(--color-lake-blue-text);
+
+    color-scheme: dark;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --duration-fast: 0ms;
-    --duration-base: 0ms;
-  }
+:root[data-theme='dark'] {
+  --surface-page: var(--color-dark-base);
+  --surface-raised: var(--color-dark-raised);
+  --surface-accent: var(--color-dark-raised);
+  --surface-inverted: var(--color-dark-sunken);
+  --surface-bar: var(--color-dark-sunken);
+  --surface-disabled: #2e2b2a;
+
+  --text-primary: var(--color-dark-text);
+  --text-secondary: var(--color-dark-text-secondary);
+  --text-muted: var(--color-dark-text-muted);
+  --text-on-inverted: var(--color-dark-text);
+  --text-on-accent-fill: #ffffff;
+  --text-link: var(--color-lake-blue-text);
+    --text-on-accent-surface: var(--color-dark-text-secondary);
+    --text-error: var(--color-error-dark);
+
+  --border-hairline: var(--color-dark-hairline);
+  --border-control: var(--color-dark-control-border);
+  --border-strong: var(--color-dark-text);
+
+  --accent-fill: var(--color-lake-blue-bright);
+  --accent-fill-hover: #5680ea;
+  --focus-ring: var(--color-lake-blue-text);
+
+  color-scheme: dark;
 }

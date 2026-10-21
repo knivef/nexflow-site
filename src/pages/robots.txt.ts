@@ -1,20 +1,26 @@
 /**
- * /robots.txt: allow all crawlers (search and AI) on v1, keep the review versions (/v2/, /v3/)
- * and the form endpoints out, point to the sitemap.
+ * robots.txt, generated so the sitemap URL always matches SITE_URL rather than a hardcoded
+ * host. The home page versions under test are disallowed as well as noindexed: noindex stops
+ * them being listed, Disallow stops them being crawled in the first place.
  */
 import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = ({ site }) => {
-  const sitemap = new URL('/sitemap-index.xml', site ?? 'http://localhost:4321').href;
+  const origin = site?.origin ?? '';
   const body = [
     'User-agent: *',
     'Allow: /',
-    'Disallow: /api/',
-    'Disallow: /v2/',
-    'Disallow: /v3/',
     '',
-    `Sitemap: ${sitemap}`,
+    '# Home page versions under test. Noindex with a canonical to "/" as well.',
+    'Disallow: /b',
+    'Disallow: /c',
+    '',
+    '# Form endpoints are not content.',
+    'Disallow: /api/',
+    '',
+    `Sitemap: ${origin}/sitemap-index.xml`,
     '',
   ].join('\n');
+
   return new Response(body, { headers: { 'content-type': 'text/plain; charset=utf-8' } });
 };

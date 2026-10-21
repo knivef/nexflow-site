@@ -1,27 +1,29 @@
 // @ts-check
 import { defineConfig, envField } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
-import mdx from '@astrojs/mdx';
 import vercel from '@astrojs/vercel';
 import { loadEnv } from 'vite';
 
-import { PRODUCTION_URL } from './src/shared/versions';
-
 const { SITE_URL } = loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), '');
 
-// Public URL: SITE_URL if set, otherwise the production URL when building on Vercel.
-// All three versions are served from this one deployment: v1 at /, v2 at /v2/, v3 at /v3/.
-const siteUrl = SITE_URL || (process.env.VERCEL ? PRODUCTION_URL : undefined) || 'http://localhost:4321';
+// Interim production host until a real domain is confirmed. See PLACEHOLDERS.md.
+const INTERIM_PRODUCTION_URL = 'https://nexflow-site-one.vercel.app';
+
+const siteUrl =
+  SITE_URL || (process.env.VERCEL ? INTERIM_PRODUCTION_URL : undefined) || 'http://localhost:4321';
 
 export default defineConfig({
   site: siteUrl,
-  // Pages are prerendered to static HTML. Only /api/apply runs on demand, as a Vercel function.
+  // Every page is prerendered. The account, partner and sales form endpoints will run on
+  // demand as Vercel functions when they are built.
   output: 'static',
   adapter: vercel(),
   trailingSlash: 'ignore',
-  // Review versions (/v2/, /v3/) and the form endpoints stay out of the sitemap.
-  integrations: [mdx(), sitemap({ filter: (page) => !/\/(api|v2|v3)\//.test(new URL(page).pathname) })],
-  // The sitemap integration writes /sitemap-index.xml; /sitemap.xml redirects there for crawlers that guess.
+  integrations: [
+    // Home versions B and C are noindex while the pitch line is under test, so they stay
+    // out of the sitemap along with any form endpoints.
+    sitemap({ filter: (page) => !/\/(api|b|c)\/?$/.test(new URL(page).pathname) }),
+  ],
   redirects: { '/sitemap.xml': '/sitemap-index.xml' },
   env: {
     schema: {
@@ -33,11 +35,10 @@ export default defineConfig({
         default: 'none',
       }),
       FORM_ENDPOINT: envField.string({ context: 'server', access: 'secret', optional: true }),
-      FORM_WEBHOOK_SECRET: envField.string({ context: 'server', access: 'secret', optional: true }),
       NOTION_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
-      NOTION_DATABASE_ID: envField.string({ context: 'server', access: 'secret', optional: true }),
-      FORM_EMAIL_TO: envField.string({ context: 'server', access: 'secret', optional: true }),
-      BOOKING_URL: envField.string({ context: 'server', access: 'public', optional: true }),
+      NOTION_DB_ACCOUNTS: envField.string({ context: 'server', access: 'secret', optional: true }),
+      NOTION_DB_PARTNERS: envField.string({ context: 'server', access: 'secret', optional: true }),
+      NOTION_DB_SALES: envField.string({ context: 'server', access: 'secret', optional: true }),
       ANALYTICS_DOMAIN: envField.string({ context: 'server', access: 'public', optional: true }),
     },
   },

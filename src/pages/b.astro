@@ -1,0 +1,9 @@
+---
+// Home version B at "/b". Noindex with a canonical to "/" until a winner is chosen.
+import HomeShell from './_HomeShell.astro';
+import { home } from '@/content/home';
+
+const version = home.versions.find((entry) => entry.id === 'b')!;
+---
+
+<HomeShell version={version} />

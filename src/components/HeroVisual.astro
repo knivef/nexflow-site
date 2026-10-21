@@ -1,0 +1,133 @@
+---
+/**
+ * Hero visual. Product only: a flow diagram or a dashboard mock-up, never a photograph.
+ *
+ * The dashboard variant shows example figures. They carry a visible Example badge and a
+ * caption saying so, because no real balance, rate or volume may appear on the site.
+ */
+import { home } from '@/content/home';
+import FlowDiagram from './FlowDiagram.astro';
+import Badge from './Badge.astro';
+
+interface Props {
+  type: 'crypto-to-fiat-flow' | 'balances-dashboard' | 'four-step-flow';
+}
+
+const { type } = Astro.props;
+const visuals = home.sections.heroVisuals;
+---
+
+{
+  (type === 'crypto-to-fiat-flow' || type === 'four-step-flow') && (
+    <div class="hero-visual hero-visual--flow">
+      <FlowDiagram label={visuals[type].label} steps={visuals[type].steps} />
+    </div>
+  )
+}
+
+{
+  type === 'balances-dashboard' && (
+    <figure class="hero-visual hero-visual--dashboard">
+      <div class="dashboard">
+        <div class="dashboard__head">
+          <span class="dashboard__title">{visuals['balances-dashboard'].accountLabel}</span>
+          <Badge tone="muted">{visuals['balances-dashboard'].exampleBadge}</Badge>
+        </div>
+
+        <table class="dashboard__table">
+          <caption class="visually-hidden">{visuals['balances-dashboard'].label}</caption>
+          <tbody>
+            {visuals['balances-dashboard'].rows.map((row) => (
+              <tr class="dashboard__row">
+                <th class="dashboard__currency" scope="row">{row.currency}</th>
+                <td class="dashboard__amount">{row.amount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <figcaption class="hero-visual__caption">{visuals['balances-dashboard'].caption}</figcaption>
+    </figure>
+  )
+}
+
+<style>
+  .hero-visual {
+    margin: 0;
+  }
+
+  .hero-visual--flow {
+    padding: var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-cards);
+    background-color: var(--surface-raised);
+  }
+
+  @media (min-width: 768px) {
+    .hero-visual--flow {
+      padding: var(--spacing-32);
+    }
+  }
+
+  .dashboard {
+    padding: var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-cards);
+    background-color: var(--surface-raised);
+  }
+
+  .dashboard__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-16);
+    padding-bottom: var(--spacing-16);
+    border-bottom: 1px solid var(--border-hairline);
+  }
+
+  .dashboard__title {
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+
+  .dashboard__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .dashboard__row {
+    border-bottom: 1px solid var(--border-hairline);
+  }
+
+  .dashboard__row:last-child {
+    border-bottom: 0;
+  }
+
+  .dashboard__currency,
+  .dashboard__amount {
+    padding-block: var(--spacing-16);
+    font-size: var(--text-body);
+    font-weight: var(--font-weight-regular);
+    text-align: left;
+  }
+
+  .dashboard__currency {
+    letter-spacing: var(--tracking-body-sm);
+    color: var(--text-secondary);
+  }
+
+  .dashboard__amount {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+  }
+
+  .hero-visual__caption {
+    margin-top: var(--spacing-16);
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+</style>

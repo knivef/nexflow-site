@@ -1,0 +1,120 @@
+---
+/**
+ * Flow diagram: pill nodes joined by hairline connectors, in the manner of the reference's
+ * pipeline diagram. Used for the crypto in, conversion, fiat account flow.
+ *
+ * Built as an ordered list so it reads correctly as a sequence to a screen reader and
+ * degrades to a plain numbered list with no CSS. Connectors are decorative and hidden from
+ * assistive technology. Nothing animates, so there is no motion to reduce.
+ */
+interface Props {
+  /** Accessible name for the sequence. */
+  label: string;
+  steps: { label: string; note?: string }[];
+  class?: string;
+}
+
+const { label, steps, class: className } = Astro.props;
+---
+
+<figure class={['flow', className].filter(Boolean).join(' ')}>
+  <figcaption class="visually-hidden">{label}</figcaption>
+  <ol class="flow__list">
+    {
+      steps.map((step, index) => (
+        <li class="flow__item">
+          <div class="flow__node">
+            <span class="flow__index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+            <span class="flow__label">{step.label}</span>
+          </div>
+          {step.note && <p class="flow__note">{step.note}</p>}
+          {index < steps.length - 1 && <span class="flow__connector" aria-hidden="true" />}
+        </li>
+      ))
+    }
+  </ol>
+</figure>
+
+<style>
+  .flow {
+    margin: 0;
+    /* Container query, not a viewport query: the diagram goes horizontal when ITS OWN box is
+       wide enough. In a narrow hero column it stays stacked instead of squeezing the pills. */
+    container-type: inline-size;
+  }
+
+  .flow__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-24);
+    list-style: none;
+  }
+
+  .flow__item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-8);
+    position: relative;
+  }
+
+  .flow__node {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-16);
+    padding: var(--spacing-16) var(--spacing-24);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-pills);
+    background-color: var(--surface-raised);
+  }
+
+  .flow__index {
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-caption);
+    color: var(--text-muted);
+  }
+
+  .flow__label {
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+
+  .flow__note {
+    max-width: 40ch;
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  /* Vertical connector when stacked, horizontal once the diagram has room. */
+  .flow__connector {
+    display: block;
+    width: 1px;
+    height: var(--spacing-24);
+    margin-left: var(--spacing-40);
+    background-color: var(--border-hairline);
+  }
+
+  @container (min-width: 680px) {
+    .flow__list {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: var(--spacing-16);
+    }
+
+    .flow__item {
+      flex: 1 1 0;
+    }
+
+    .flow__connector {
+      position: absolute;
+      top: 24px;
+      right: calc(var(--spacing-16) * -1);
+      width: var(--spacing-16);
+      height: 1px;
+      margin-left: 0;
+    }
+  }
+</style>

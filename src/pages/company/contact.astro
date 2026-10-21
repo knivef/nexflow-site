@@ -1,0 +1,102 @@
+---
+/**
+ * Contact and sales. Carries the sales form, the support address, the complaints route
+ * and the registered address.
+ *
+ * Server-rendered for the same reason as the other form pages: it reads ?submitted= to
+ * show the state after a no-script submission.
+ */
+export const prerender = false;
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/Section.astro';
+import Form from '@/components/Form.astro';
+import { company } from '@/content/company';
+import { forms } from '@/content/forms';
+import { site } from '@/content/site';
+
+const supportMailbox = `${company.contact.support.mailbox}@${site.contact.emailDomain}`;
+---
+
+<BaseLayout
+  title={company.contact.seoTitle}
+  description={company.contact.description}
+  breadcrumbs={[{ name: 'Company', href: '/company/about' }, { name: 'Contact and sales', href: '/company/contact' }]}
+>
+  <section class="intro" aria-labelledby="contact-heading">
+    <div class="container">
+      <h1 id="contact-heading">{company.contact.title}</h1>
+      <p class="intro__line">{company.contact.intro}</p>
+    </div>
+  </section>
+
+  <Section id="sales-form" heading={forms.sales.title} lead={forms.sales.description}>
+    <Form form={forms.sales} />
+  </Section>
+
+  <Section id="support" heading={company.contact.support.heading}>
+    <p class="body">{company.contact.support.body}</p>
+    <p class="mailbox"><span class="mailbox__address">{supportMailbox}</span></p>
+  </Section>
+
+  <Section id="complaints" heading={company.contact.complaints.heading}>
+    <p class="body">{company.contact.complaints.body}</p>
+    <p class="link">
+      <a href={company.contact.complaints.link.href}>{company.contact.complaints.link.label}</a>
+    </p>
+  </Section>
+
+  <Section id="address" heading={company.contact.address.heading}>
+    <address class="address">{site.contact.registeredAddress}</address>
+  </Section>
+</BaseLayout>
+
+<style>
+  .intro {
+    padding-block: var(--spacing-48) var(--spacing-24);
+  }
+
+  @media (min-width: 768px) {
+    .intro {
+      padding-block: var(--section-gap) var(--spacing-32);
+    }
+  }
+
+  .intro__line {
+    margin-top: var(--spacing-24);
+    max-width: 60ch;
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body-lg);
+    color: var(--text-secondary);
+  }
+
+  .body {
+    max-width: 68ch;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .mailbox {
+    margin-top: var(--spacing-16);
+  }
+
+  .mailbox__address {
+    user-select: all;
+    font-size: var(--text-body-lg);
+    color: var(--text-primary);
+  }
+
+  .link {
+    margin-top: var(--spacing-24);
+    font-size: var(--text-body-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-body-sm);
+  }
+
+  .address {
+    max-width: 40ch;
+    font-style: normal;
+    line-height: 1.6;
+    color: var(--text-primary);
+  }
+</style>

@@ -1,60 +1,85 @@
 /**
- * /llms.txt: a plain-language summary for AI assistants (https://llmstxt.org).
- * Built from the content file, so it stays in sync with the page. Placeholder text is never included:
- * any line still containing a [PLACEHOLDER: ...] is left out until it is real.
+ * /llms.txt: a plain-text summary for AI crawlers and assistants.
+ *
+ * Generated from the same content the site renders, so it cannot drift from the pages.
+ * It states what NexFlow does and, just as importantly, what it does not do, because the
+ * failure mode for an assistant summarising a payments company is inventing a capability.
+ *
+ * The same rule as the structured data applies: nothing here is invented. Where a fact is
+ * still a placeholder, the placeholder text is shown so a reader can see it is pending
+ * rather than read a guess as fact.
  */
 import type { APIRoute } from 'astro';
-import { BOOKING_URL } from 'astro:env/server';
+import { getCollection } from 'astro:content';
 import { site } from '@/content/site';
-import { hasPlaceholder, isReal } from '@/lib/placeholder';
+import { industries } from '@/content/industries';
+import { compliance } from '@/content/compliance';
+import { siteConfig } from '@/config/site.config';
 
-export const GET: APIRoute = ({ site: siteUrl }) => {
-  const base = siteUrl ?? new URL('http://localhost:4321');
-  const url = (path: string) => new URL(path, base).href;
-  const { seo, verticals, trust, footer, faq } = site;
-  const { llms } = seo;
-  const keep = (line: string) => !hasPlaceholder(line);
+export const GET: APIRoute = async ({ site: siteUrl }) => {
+  const origin = siteUrl?.origin ?? '';
+  const abs = (path: string) => `${origin}${path}`;
 
-  const email = [footer.contact.email, trust.contact.email, site.apply.failure.email].find(isReal);
-  const booking = isReal(BOOKING_URL) ? BOOKING_URL : undefined;
-  const notAcquirer = trust.corporate.licences.length === 0;
+  const solutions = (await getCollection('solutions')).sort((a, b) => a.data.order - b.data.order);
 
-  const lines = [
-    `# ${site.nav.brand}`,
-    '',
-    `> ${seo.categoryLabel}`,
-    '',
-    llms.summary,
-    ...(notAcquirer ? ['', llms.notAcquirerLine] : []),
-    '',
-    `## ${llms.servesHeading}`,
-    '',
-    ...llms.serves.filter(keep).map((line) => `- ${line}`),
-    '',
-    `## ${llms.verticalsHeading}`,
-    '',
-    ...verticals.items
-      .map((v) => `- [${v.name}](${url(`/#verticals-${v.id}`)}): ${v.subheading}`)
-      .filter(keep),
-    `- ${verticals.other.title}`,
-    '',
-    `## ${llms.doesNotHeading}`,
-    '',
-    ...llms.doesNot.filter(keep).map((line) => `- ${line}`),
-    '',
-    `## ${llms.contactHeading}`,
-    '',
-    `- ${llms.applyLine}: ${url('/#apply')}`,
-    ...(email ? [`- Email: ${email}`] : []),
-    ...(booking ? [`- Book a call: ${booking}`] : []),
-    '',
-    `## ${llms.pagesHeading}`,
-    '',
-    `- [${site.nav.brand}](${url('/')}): ${seo.description}`,
-    `- [${site.how.heading}](${url('/#how')})`,
-    `- [${faq.heading}](${url('/#faq')})`,
-    '',
-  ];
+  const lines: string[] = [];
 
-  return new Response(lines.join('\n'), { headers: { 'content-type': 'text/plain; charset=utf-8' } });
+  lines.push(`# ${site.brand.name}`);
+  lines.push('');
+  lines.push(site.footer.aboutLine);
+  lines.push('');
+
+  lines.push('## Registrations');
+  lines.push('');
+  for (const registration of compliance.regulatory.registrations) {
+    lines.push(`- ${registration.regulator}: ${registration.statement} ${registration.reference}`);
+  }
+  lines.push(`- ${compliance.regulatory.partnersNote}`);
+  lines.push('');
+
+  lines.push('## Solutions');
+  lines.push('');
+  for (const solution of solutions) {
+    lines.push(`- [${solution.data.navLabel}](${abs(`/solutions/${solution.id}`)}): ${solution.data.navSummary}`);
+  }
+  lines.push('');
+
+  lines.push('## Industries served');
+  lines.push('');
+  for (const section of industries.sections) {
+    lines.push(`- [${section.title}](${abs(`/industries#${section.id}`)}): ${section.problem}`);
+  }
+  lines.push('');
+
+  lines.push('## What NexFlow does not do');
+  lines.push('');
+  lines.push('- NexFlow is not a bank and does not accept deposits.');
+  lines.push('- NexFlow does not offer trading or investment services, and does not operate an exchange.');
+  lines.push('- NexFlow does not offer consumer accounts. Services are for businesses only.');
+  lines.push('- NexFlow does not hold client crypto itself: crypto balances are held with a regulated partner.');
+  lines.push('- NexFlow does not serve these businesses:');
+  for (const prohibited of siteConfig.prohibitedBusinesses) {
+    lines.push(`  - ${prohibited}`);
+  }
+  lines.push('- Services are available in supported countries only, subject to verification and approval.');
+  lines.push('');
+
+  lines.push('## Contact');
+  lines.push('');
+  for (const mailbox of site.contact.mailboxes) {
+    lines.push(`- ${mailbox.label}: ${mailbox.user}@${site.contact.emailDomain}`);
+  }
+  lines.push('');
+
+  lines.push('## Key pages');
+  lines.push('');
+  lines.push(`- [Compliance and trust](${abs('/compliance')})`);
+  lines.push(`- [Partners](${abs('/partners')})`);
+  lines.push(`- [Open an account](${abs('/open-an-account')})`);
+  lines.push(`- [Prohibited businesses and restricted countries](${abs('/legal/prohibited-businesses')})`);
+  lines.push('');
+
+  return new Response(lines.join('\n'), {
+    headers: { 'content-type': 'text/plain; charset=utf-8' },
+  });
 };

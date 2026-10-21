@@ -1,0 +1,243 @@
+---
+/**
+ * Cookie consent. Nothing beyond essential cookies may load until a choice is made, so the
+ * analytics hook stays unset until the viewer accepts.
+ *
+ * Accept, Reject and Manage choices are all offered at the same level: rejecting is exactly
+ * as easy as accepting. The choice is remembered in localStorage, wrapped in try/catch, and
+ * the banner is hidden by default so it never flashes for someone who has already chosen.
+ */
+import { site } from '@/content/site';
+---
+
+<section class="cookies" id="cookie-banner" aria-labelledby="cookie-title" hidden>
+  <div class="container cookies__inner">
+    <div class="cookies__copy">
+      <h2 class="cookies__title" id="cookie-title">{site.cookies.title}</h2>
+      <p class="cookies__body">
+        {site.cookies.body} <a href={site.cookies.policyHref}>{site.cookies.policyLinkLabel}</a>
+      </p>
+    </div>
+
+    <div class="cookies__actions">
+      <button class="cookies__btn cookies__btn--primary" type="button" data-cookie-accept>
+        {site.cookies.accept}
+      </button>
+      <button class="cookies__btn" type="button" data-cookie-reject>{site.cookies.reject}</button>
+      <button
+        class="cookies__btn cookies__btn--quiet"
+        type="button"
+        data-cookie-manage
+        aria-expanded="false"
+        aria-controls="cookie-choices"
+      >
+        {site.cookies.manage}
+      </button>
+    </div>
+
+    <div class="cookies__choices" id="cookie-choices" hidden>
+      <fieldset class="cookies__fieldset">
+        <legend class="visually-hidden">Cookie categories</legend>
+
+        <div class="cookies__choice">
+          <input type="checkbox" id="cookie-essential" checked disabled />
+          <label for="cookie-essential">
+            <span class="cookies__choice-label">{site.cookies.essentialLabel}</span>
+            <span class="cookies__choice-note">{site.cookies.essentialNote}</span>
+          </label>
+        </div>
+
+        <div class="cookies__choice">
+          <input type="checkbox" id="cookie-analytics" data-cookie-analytics />
+          <label for="cookie-analytics">
+            <span class="cookies__choice-label">{site.cookies.analyticsLabel}</span>
+            <span class="cookies__choice-note">{site.cookies.analyticsNote}</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <button class="cookies__btn cookies__btn--primary" type="button" data-cookie-save>
+        {site.cookies.save}
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  type Consent = { analytics: boolean; decidedAt: string };
+
+  const KEY = 'nexflow.cookie-consent';
+
+  function readConsent(): Consent | null {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as Consent;
+      return typeof parsed?.analytics === 'boolean' ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function writeConsent(analytics: boolean): void {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ analytics, decidedAt: new Date().toISOString() }));
+    } catch {
+      // Storage can be unavailable. The banner simply asks again next time.
+    }
+  }
+
+  function applyConsent(analytics: boolean): void {
+    // Step 13 attaches the analytics loader here. Nothing loads without an explicit yes.
+    window.dispatchEvent(new CustomEvent('nexflow:consent', { detail: { analytics } }));
+  }
+
+  const banner = document.getElementById('cookie-banner');
+  if (banner) {
+    const choices = document.getElementById('cookie-choices');
+    const manage = banner.querySelector<HTMLButtonElement>('[data-cookie-manage]');
+    const analyticsInput = banner.querySelector<HTMLInputElement>('[data-cookie-analytics]');
+
+    const decide = (analytics: boolean): void => {
+      writeConsent(analytics);
+      applyConsent(analytics);
+      banner.hidden = true;
+    };
+
+    const existing = readConsent();
+    if (existing) {
+      applyConsent(existing.analytics);
+    } else {
+      banner.hidden = false;
+    }
+
+    banner.querySelector('[data-cookie-accept]')?.addEventListener('click', () => decide(true));
+    banner.querySelector('[data-cookie-reject]')?.addEventListener('click', () => decide(false));
+    banner.querySelector('[data-cookie-save]')?.addEventListener('click', () => {
+      decide(Boolean(analyticsInput?.checked));
+    });
+
+    manage?.addEventListener('click', () => {
+      if (!choices) return;
+      const open = !choices.hidden;
+      choices.hidden = open;
+      manage.setAttribute('aria-expanded', String(!open));
+    });
+  }
+</script>
+
+<style>
+  .cookies {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 60;
+    border-top: 1px solid var(--border-hairline);
+    background-color: var(--surface-page);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* The review switcher also sits at the bottom. The banner stacks above it. */
+  :global(body.has-switcher) .cookies {
+    bottom: 48px;
+  }
+
+  .cookies__inner {
+    display: grid;
+    gap: var(--spacing-16);
+    padding-block: var(--spacing-24);
+  }
+
+  @media (min-width: 900px) {
+    .cookies__inner {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+
+    .cookies__choices {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .cookies__title {
+    font-size: var(--text-subheading);
+    line-height: var(--leading-subheading);
+  }
+
+  .cookies__body {
+    margin-top: var(--spacing-8);
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+
+  .cookies__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+  }
+
+  .cookies__btn {
+    min-height: 44px;
+    padding: var(--spacing-8) var(--spacing-24);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-buttons);
+    background-color: transparent;
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .cookies__btn--primary {
+    background-color: var(--accent-fill);
+    border-color: var(--accent-fill);
+    color: var(--text-on-accent-fill);
+  }
+
+  .cookies__btn--quiet {
+    border-color: transparent;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .cookies__fieldset {
+    margin: 0 0 var(--spacing-16);
+    padding: 0;
+    border: 0;
+    display: grid;
+    gap: var(--spacing-16);
+  }
+
+  .cookies__choice {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--spacing-16);
+    align-items: start;
+  }
+
+  .cookies__choice input {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    accent-color: var(--accent-fill);
+  }
+
+  .cookies__choice-label {
+    display: block;
+    font-size: var(--text-body-sm);
+    letter-spacing: var(--tracking-body-sm);
+    text-transform: uppercase;
+  }
+
+  .cookies__choice-note {
+    display: block;
+    margin-top: 4px;
+    font-size: var(--text-caption);
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+</style>
